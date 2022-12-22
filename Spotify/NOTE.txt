@@ -1,0 +1,6 @@
+- khách hàng điền info : phía site mình ghi nhận vào db
+
+- next : server của mình always connect surshank rồi => lúc này script automation (gọi chung là plugin đi) mới thực hiện là ở server side
+
+
+Plugin sẽ connect db lấy u/p account ròi mới thực hiện change country to  Turkey
