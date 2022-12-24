@@ -88,8 +88,6 @@ select.select_by_value('TR')
 driver.find_element(By.XPATH, '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''').click()
 
 
-# //body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]
-# //span[contains(text(),'Profili kaydet')]
 input('Press any key to break')
 
 
