@@ -24,77 +24,105 @@ import requests
 from termcolor import colored 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import json
 
 #Excel Processing:
 from openpyxl import Workbook 
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
-from openpyxl.styles import Alignment, Font,PatternFill,Border,Side
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 
 #pypyodbc:
 import pypyodbc as odbc
 import pyodbc
 
-DRIVER_NAME = 'ODBC Driver 17 for SQL Server'
-SERVER_NAME = 'DESKTOP-RCFES7K\SQLEXPRESS'
-DATABASE_NAME = 'SpotifyUpgrade_DB'
+class delay():
+    MINI_DELAY    = 0.5 #second
+    SOFT_DELAY    = 1   #second
+    DELAY         = 3   #second
+    HARD_DELAY    = 5   #second
+    MASSIVE_DELAY = 10  #second
+    SUPER_DELAY   = 30  #second
+    WORLD_DELAY   = 60  #second
 
-connection = f'''
-        DRIVER={DRIVER_NAME};
-        SERVER={SERVER_NAME};
-        DATABASE={DATABASE_NAME};
-        UID=Thanhnhan19;
-        PWD=Nhan0334842024;
-'''
-#connect to database:
-conn = pyodbc.connect(connection)
+class Process(delay):
+    #Attributes:
+    whoer_url    = f'https://whoer.net/fr'
+    Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
+    Profile_url  = f'https://www.spotify.com/tr/account/profile/'
 
-#use cursor:
-cursor = conn.cursor()
+    Element_dict = {
+        'Nation_Sel' : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]'''
+    }
 
-#Extract data from
-#Local var
-Email = []
-PassW = []
+    Json_ls = ['Status_TEST','Username_TEST', 'Token_TEST', 'ID_Premium_TEST']
 
-for row in cursor.execute('select * from Customer_Infor'):
-        Email.append(row.EmailAddress)
-        PassW.append(row.EmailPW)
+    #Constructor:
+    def __init__(self, user_, password_, familyURL_):
+        self.user     = user_
+        self.password = password_
+        self.familyUR = familyURL_
 
-print('Email: ',Email[0])
-print('PassW: ',PassW[0])
+    def accessSpotify(self, driver):
+        driver.get(self.Spotify_url)
+        driver.maximize_window()
+        sleep(self.DELAY)
+        driver.find_element(By.ID ,'login-username').send_keys(self.user)
+        driver.find_element(By.ID ,'login-password').send_keys(self.password)
+        driver.find_element(By.ID ,'login-button').click()
+        #Return:
+        return True
+    
+    def switchNation(self, driver):
+        driver.get(self.Profile_url)
+        sleep(self.DELAY)
+        select = Select(driver.find_element(By.ID, 'country'))
+        select.select_by_value('TR')
+        driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
+        #Return:
+        return True
 
-driver = webdriver.Chrome('chromedriver.exe')
-url = 'https://whoer.net/fr'
-#Get link:
-driver.get(url)
-
-url = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
-#Get link:
-driver.get(url)
-
-driver.maximize_window()
-sleep(3)
-driver.find_element(By.ID ,'login-username').send_keys(Email[0])
-driver.find_element(By.ID ,'login-password').send_keys(PassW[0])
-driver.find_element(By.ID ,'login-button').click()
-sleep(3)
-driver.get('https://www.spotify.com/tr/account/profile/')
-sleep(3)
-select = Select(driver.find_element(By.ID, 'country'))
-select.select_by_value('TR')
-
-driver.find_element(By.XPATH, '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''').click()
-
-
-input('Press any key to break')
-
-
-print("Press any key to break")
+    def joinPremium(self, driver):
+        #Return:
+        return self.Json_ls
 
 
 
+    @classmethod
+    def checkCurrentIP(cls, driver):
+        driver.get(cls.whoer_url)
+
+
+if __name__ == "__main__": 
+    #Local var
+    Email       = ['z.ntnhan19@gmail.com']
+    PassW       = ['Nhan0334842024']
+    familyURL   = 'ABC'
+    ret_dict    = {}
+
+    ########## ANCHOR: DO NOT CHANGE ##########
+    #Instance:
+    DRIVER = webdriver.Chrome('chromedriver.exe')
+    USER   = Process(Email[0], PassW[0], familyURL)
+
+    #Method:
+    # USER.accessSpotify(DRIVER)
+    # USER.HARD_DELAY
+    # USER.switchNation(DRIVER)
+    # USER.HARD_DELAY
+
+    #Send request to Database:
+    Status, Username, Token, ID_Premium = USER.joinPremium(DRIVER)
+    ret_dict['JSON'] = dict(ret_dict)
+    ret_dict['JSON'] = {
+        'Status'     : Status,
+        'Username'   : Username,
+        'Token'      : Token,
+        'ID_Premium' : ID_Premium
+    }
+
+    print(ret_dict)
 
 
 
@@ -111,11 +139,15 @@ print("Press any key to break")
 
 
 
-# PROXY = "188.132.222.22:8080"
-# chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument('--proxy-server=%s' % PROXY)
-# chrome = webdriver.Chrome(chrome_options=chrome_options)
-# chrome.get("https://whoer.net/fr")
-# sleep(30)
+
+
+
+
+
+
+
+
+
+
 
 
