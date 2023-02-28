@@ -61,46 +61,55 @@ import pyodbc
 
 #Extract data from
 #Local var
-Email = ['z.ntnhan19@gmail.com']
-PassW = ['Nhan0334842024']
+# Email = ['z.ntnhan19@gmail.com']
+# PassW = ['Nhan0334842024']
 
-# for row in cursor.execute('select * from Customer_Infor'):
-#         Email.append(row.EmailAddress)
-#         PassW.append(row.EmailPW)
+# # for row in cursor.execute('select * from Customer_Infor'):
+# #         Email.append(row.EmailAddress)
+# #         PassW.append(row.EmailPW)
 
-print('Email: ',Email[0])
-print('PassW: ',PassW[0])
+# print('Email: ',Email[0])
+# print('PassW: ',PassW[0])
 
-driver = webdriver.Chrome('chromedriver.exe')
-url = 'https://whoer.net/fr'
-#Get link:
-driver.get(url)
+# driver = webdriver.Chrome('chromedriver.exe')
+# url = 'https://whoer.net/fr'
+# #Get link:
+# driver.get(url)
 
-url = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
-#Get link:
-driver.get(url)
+# url = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
+# #Get link:
+# driver.get(url)
 
-driver.maximize_window()
-sleep(3)
-driver.find_element(By.ID ,'login-username').send_keys(Email[0])
-driver.find_element(By.ID ,'login-password').send_keys(PassW[0])
-driver.find_element(By.ID ,'login-button').click()
-sleep(3)
-driver.get('https://www.spotify.com/tr/account/profile/')
-sleep(3)
-select = Select(driver.find_element(By.ID, 'country'))
-select.select_by_value('TR')
+# driver.maximize_window()
+# sleep(3)
+# driver.find_element(By.ID ,'login-username').send_keys(Email[0])
+# driver.find_element(By.ID ,'login-password').send_keys(PassW[0])
+# driver.find_element(By.ID ,'login-button').click()
+# sleep(3)
+# driver.get('https://www.spotify.com/tr/account/profile/')
+# sleep(3)
+# select = Select(driver.find_element(By.ID, 'country'))
+# select.select_by_value('TR')
 
-driver.find_element(By.XPATH, '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''').click()
-
-
-input('Press any key to break')
-print("Press any key to break")
+# driver.find_element(By.XPATH, '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''').click()
 
 
+# input('Press any key to break')
+# print("Press any key to break")
 
 
 
+
+url = 'https://www.w3schools.com/python/demopage.php'
+myobj = {'somekey': 'somevalue'}
+
+x = requests.post(url, json = myobj)
+
+print('1',x)
+
+r = requests.get(url)
+
+print(f"Response: {r.json()}")
 
 
 

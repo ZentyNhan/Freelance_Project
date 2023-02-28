@@ -3,6 +3,7 @@ from ast import Try, keyword
 from contextlib import nullcontext
 from lib2to3.pgen2.literals import test
 import os
+import time
 from pickle import FALSE, TRUE
 from subprocess import check_output
 from inspect import currentframe
@@ -36,6 +37,12 @@ from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 #pypyodbc:
 import pypyodbc as odbc
 import pyodbc
+#Web server:
+from http.server import HTTPServer
+from server import Server
+
+HOST_NAME = 'localhost'
+PORT = 8000
 
 class delay():
     MINI_DELAY    = 0.5 #second
@@ -56,7 +63,7 @@ class Process(delay):
         'Nation_Sel' : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]'''
     }
 
-    Json_ls = ['Status_TEST','Username_TEST', 'Token_TEST', 'ID_Premium_TEST']
+    Json_ls = ['Status_TEST','Username_TEST', 'ID_Premium_TEST']
 
     #Constructor:
     def __init__(self, user_, password_, familyURL_):
@@ -87,8 +94,6 @@ class Process(delay):
         #Return:
         return self.Json_ls
 
-
-
     @classmethod
     def checkCurrentIP(cls, driver):
         driver.get(cls.whoer_url)
@@ -100,6 +105,16 @@ if __name__ == "__main__":
     PassW       = ['Nhan0334842024']
     familyURL   = 'ABC'
     ret_dict    = {}
+
+    #SERVER:
+    httpd = HTTPServer((HOST_NAME,PORT),Server)
+    print(time.asctime(), "Start Server - %s:%s"%(HOST_NAME,PORT))
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print('interrupted!')
+    httpd.server_close()
+    print(time.asctime(),'Stop Server - %s:%s' %(HOST_NAME,PORT))
 
     ########## ANCHOR: DO NOT CHANGE ##########
     #Instance:
@@ -118,9 +133,10 @@ if __name__ == "__main__":
     ret_dict['JSON'] = {
         'Status'     : Status,
         'Username'   : Username,
-        'Token'      : Token,
         'ID_Premium' : ID_Premium
     }
+
+    requests.post(url = '', json = ret_dict['JSON'])
 
     print(ret_dict)
 
