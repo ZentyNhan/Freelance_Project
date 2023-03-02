@@ -1,7 +1,15 @@
 from http.server import BaseHTTPRequestHandler
 import os
+import spotify
+
+
+
 class Server(BaseHTTPRequestHandler):
     def do_GET(self):
+        #Process:
+        
+
+        #put on index:
         if self.path == '/':
             self.path = '/index.html'
         try:

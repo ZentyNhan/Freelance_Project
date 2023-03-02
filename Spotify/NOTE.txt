@@ -9,3 +9,13 @@ Plugin sẽ connect db lấy u/p account ròi mới thực hiện change country
 Wordpress:
 User : wayne.j.N19@gmail.com
 pw: Nhan0334842024
+
+
+### ANCHOR: requirement ###
+
+middleware.py -> chứa phần run forever (gọi server.py)
+
+server.py -> chứa do_GET và xử lý spotify (gọi spotify.py) 
+	sau khi xử lý xong sẽ gửi ra html
+
+spotify.py -> xử lý các hàm (chuyển Turkey, và family joining)
