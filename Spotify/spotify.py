@@ -37,12 +37,6 @@ from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 #pypyodbc:
 import pypyodbc as odbc
 import pyodbc
-#Web server:
-from http.server import HTTPServer
-from server import Server
-
-HOST_NAME = 'localhost'
-PORT = 8000
 
 class delay():
     MINI_DELAY    = 0.5 #second
