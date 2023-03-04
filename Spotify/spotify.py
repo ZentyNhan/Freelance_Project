@@ -9,6 +9,7 @@ from subprocess import check_output
 from inspect import currentframe
 from typing import List
 from xml.etree.ElementTree import QName
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -99,8 +100,8 @@ class Process(delay):
         driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
         sleep(self.DELAY)
         driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
-        sleep(self.DELAY)
-        driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
+        # sleep(self.DELAY)
+        # driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
         #Return:
         return self.Json_ls
 
@@ -112,8 +113,8 @@ class Process(delay):
 
 if __name__ == "__main__": 
     #Local var
-    Email       = ['z.ntnhan19@gmail.com']
-    PassW       = ['Nhan0334842024']
+    Email       = 'z.ntnhan19@gmail.com'
+    PassW       = 'Nhan0334842024'
     familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
     Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
     ret_dict    = {}
@@ -121,11 +122,11 @@ if __name__ == "__main__":
     ########## ANCHOR: DO NOT CHANGE ##########
     #Instance:
     DRIVER = webdriver.Chrome('chromedriver.exe')
-    USER   = Process(Email[0], PassW[0], familyURL, Address)
+    USER   = Process(Email, PassW, familyURL, Address)
 
     #Method:
     USER.accessSpotify(DRIVER)
-    USER.SUPER_DELAY
+    USER.MASSIVE_DELAY
     USER.switchNation(DRIVER)
     USER.HARD_DELAY
 

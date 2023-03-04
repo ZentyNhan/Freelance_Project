@@ -9,6 +9,7 @@ from subprocess import check_output
 from inspect import currentframe
 from typing import List
 from xml.etree.ElementTree import QName
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -33,41 +34,43 @@ import spotify
 
 class Server(BaseHTTPRequestHandler):
     def do_GET(self):
-        # #Process:
-        # #Local var
-        # Email       = ['z.ntnhan19@gmail.com']
-        # PassW       = ['Nhan0334842024']
-        # familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
-        # Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
-        # ret_dict    = {}
+        #Process:
+        a  = requests.get('')
 
-        # ########## ANCHOR: DO NOT CHANGE ##########
-        # #Instance:
-        # DRIVER = webdriver.Chrome('chromedriver.exe')
-        # USER   = spotify.Process(Email[0], PassW[0], familyURL, Address)
+        #Local var
+        Email       = 'free280223@kikyushop.com'
+        PassW       = 'Hoang123'
+        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
+        Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
+        ret_dict    = {}
 
-        # #Method:
-        # USER.accessSpotify(DRIVER)
-        # USER.SUPER_DELAY
-        # USER.switchNation(DRIVER)
-        # USER.HARD_DELAY
+        ########## ANCHOR: DO NOT CHANGE ##########
+        #Instance:
+        DRIVER = webdriver.Chrome('Driver/chromedriver.exe')
+        USER   = spotify.Process(Email, PassW, familyURL, Address)
 
-        # # Send request to Database:
-        # Status, Username, ID_Premium = USER.joinPremium(DRIVER)
-        # ret_dict['JSON'] = dict(ret_dict)
-        # ret_dict['JSON'] = {
-        #     'Status'     : Status,
-        #     'Username'   : Username,
-        #     'ID_Premium' : ID_Premium
-        # }
+        #Method:
+        USER.accessSpotify(DRIVER)
+        USER.HARD_DELAY
+        USER.switchNation(DRIVER)
+        USER.HARD_DELAY
+
+        # Send request to Database:
+        Status, Username, ID_Premium = USER.joinPremium(DRIVER)
+        ret_dict['JSON'] = dict(ret_dict)
+        ret_dict['JSON'] = {
+            'Status'     : Status,
+            'Username'   : Username,
+            'ID_Premium' : ID_Premium
+        }
 
         #put on index:
         var_a = {'user' : 'NguyenThanhNhan', 'passw' : '123456', 'Premium_ID' : 'HCM'}
         self.path = 'index.html'
         try:
-            f = open(self.path).readlines()
-            f[3] = '{0}\n'.format(var_a)
-            open(self.path, 'w').writelines(f)
+            f    = open(self.path).readlines()
+            f[3] = '{0}\n'.format(str(ret_dict['JSON']))
+            open(self.path, 'w').writelines('<pre>{0}</pre>'.format(f))
             split_path = os.path.splitext(self.path)
             request_extension = split_path[1]
             if request_extension != ".py":
