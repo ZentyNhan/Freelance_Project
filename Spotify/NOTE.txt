@@ -19,3 +19,7 @@ server.py -> chứa do_GET và xử lý spotify (gọi spotify.py)
 	sau khi xử lý xong sẽ gửi ra html
 
 spotify.py -> xử lý các hàm (chuyển Turkey, và family joining)
+
+#Performance:
+kiểm tra validation của data
+Kiểm tra log in success hay k để return về

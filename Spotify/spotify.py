@@ -1,14 +1,6 @@
 ########## SECTION: Library ##########
-from ast import Try, keyword
-from contextlib import nullcontext
-from lib2to3.pgen2.literals import test
-import os
-import time
 from pickle import FALSE, TRUE
 from subprocess import check_output
-from inspect import currentframe
-from typing import List
-from xml.etree.ElementTree import QName
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -23,21 +15,9 @@ from time import sleep
 from datetime import datetime
 from datetime import date
 import requests
-from termcolor import colored 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import json
-
-#Excel Processing:
-from openpyxl import Workbook 
-from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl import load_workbook
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
-
-#pypyodbc:
-import pypyodbc as odbc
-import pyodbc
 
 class delay():
     MINI_DELAY    = 0.5 #second
@@ -100,8 +80,8 @@ class Process(delay):
         driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
         sleep(self.DELAY)
         driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
-        # sleep(self.DELAY)
-        # driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
+        sleep(self.DELAY)
+        driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
         #Return:
         return self.Json_ls
 
@@ -121,12 +101,12 @@ if __name__ == "__main__":
 
     ########## ANCHOR: DO NOT CHANGE ##########
     #Instance:
-    DRIVER = webdriver.Chrome('chromedriver.exe')
+    DRIVER = webdriver.Chrome(ChromeDriverManager().install())
     USER   = Process(Email, PassW, familyURL, Address)
 
     #Method:
     USER.accessSpotify(DRIVER)
-    USER.MASSIVE_DELAY
+    USER.HARD_DELAY
     USER.switchNation(DRIVER)
     USER.HARD_DELAY
 

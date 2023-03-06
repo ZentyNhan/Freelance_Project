@@ -1,14 +1,6 @@
 ########## SECTION: Library ##########
-from ast import Try, keyword
-from contextlib import nullcontext
-from lib2to3.pgen2.literals import test
-import os
-import time
 from pickle import FALSE, TRUE
 from subprocess import check_output
-from inspect import currentframe
-from typing import List
-from xml.etree.ElementTree import QName
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -23,10 +15,10 @@ from time import sleep
 from datetime import datetime
 from datetime import date
 import requests
-from termcolor import colored 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import json
+
 
 from http.server import BaseHTTPRequestHandler
 import os
@@ -35,7 +27,6 @@ import spotify
 class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         #Process:
-        a  = requests.get('')
 
         #Local var
         Email       = 'free280223@kikyushop.com'
