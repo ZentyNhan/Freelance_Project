@@ -4,8 +4,8 @@ from server import Server
 import time
 
 #HOST and PORT:
-HOST_NAME = 'localhost'
-PORT = 8000
+HOST_NAME = 'python.bizonc.com'
+PORT = 80
 
 #SERVER:
 httpd = HTTPServer((HOST_NAME,PORT), Server)

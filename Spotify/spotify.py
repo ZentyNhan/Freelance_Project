@@ -1,4 +1,5 @@
 ########## SECTION: Library ##########
+import sys
 from pickle import FALSE, TRUE
 from subprocess import check_output
 from webdriver_manager.chrome import ChromeDriverManager
@@ -98,6 +99,12 @@ if __name__ == "__main__":
     familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
     Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
     ret_dict    = {}
+
+    #Get info from PHP:
+    Email       = sys.argv[1]
+    PassW       = sys.argv[2]
+    familyURL   = sys.argv[3]
+    Address     = sys.argv[4]
 
     ########## ANCHOR: DO NOT CHANGE ##########
     #Instance:
