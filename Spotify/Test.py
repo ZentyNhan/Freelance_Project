@@ -100,38 +100,11 @@ import pyodbc
 
 
 
-url = 'https://www.w3schools.com/python/demopage.php'
-myobj = {'somekey': 'somevalue'}
+familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
 
-x = requests.post(url, json = myobj)
+list = familyURL.split('/')
+Index  = list.index('invite') + 1
 
-print('1',x)
-
-r = requests.get(url)
-
-print(f"Response: {r.json()}")
-
- f = open(self.path).readlines()
-for i in f:
-    if i.__contains__('<body>'):
-        i = f'<body>{var_a}</body>\n'
-open(self.path, 'w').writelines(f)
-out = open(self.path).read()
-self.wfile.write(bytes(out, 'utf-8'))
-self.send_response(200)
-self.end_headers()
-self.wfile.write(bytes(f, 'utf-8'))
-
-
-
-with open(self.path, 'w') as aaa:
-            aaa.writelines('<!DOCTYPE html>')
-            aaa.writelines('<html>')
-            aaa.writelines('<head></head>')
-            aaa.writelines(f'<body>{var_a}</body>')
-            aaa.writelines('</html>')
-
-
-
+print(list[Index])
 
 
