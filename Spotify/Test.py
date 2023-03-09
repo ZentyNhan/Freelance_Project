@@ -100,11 +100,37 @@ import pyodbc
 
 
 
-familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
+# familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
 
-list = familyURL.split('/')
-Index  = list.index('invite') + 1
+# list = familyURL.split('/')
+# Index  = list.index('invite') + 1
 
-print(list[Index])
+# print(list[Index])
+# a = [1,2,3]
+# b = [*a,4,5,6]
+# c = [4,5,6]
+
+# c.extend(a) 
+# print(c) # [1,2,3,4,5,6]
+
+
+# *  giống extend
+# ** giống update
+
+# a = {'1':1,'2':2,'3':3,'4':4}
+# b = {**a,'5':5,'6':6}
+# print(b)
+
+def HAHAHA(a: int,b : int) -> str:
+        return a + b
+
+
+print(type(HAHAHA(5,4)))
+print(HAHAHA(5,10))
+
+
+
+
+
 
 

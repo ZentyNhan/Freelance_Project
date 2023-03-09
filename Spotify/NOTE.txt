@@ -23,3 +23,24 @@ spotify.py -> xử lý các hàm (chuyển Turkey, và family joining)
 #Performance:
 kiểm tra validation của data
 Kiểm tra log in success hay k để return về
+
+from flask import Flask
+from flask import request
+import time
+import json
+
+app = Flask(__name__)
+@app.route('/', methods = ['GET', 'POST'])
+def handle_request():
+     user      = str(request.args.get('user'))
+     passW     = str(request.args.get('PW'))
+     familyURL = str(request.args.get('familyURL'))
+     address   = str(request.args.get('address'))
+
+     #test reassign:
+     URL = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
+     familyURL1 = URL[49:64]
+
+     data_set = {'user' : user, 'passW' : passW, 'familyURL' : familyURL1, 'address' : address, 'timestamp' : time.time()}
+     json_dump = json.dumps(data_set)
+     return json_dump
