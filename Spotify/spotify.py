@@ -2,7 +2,8 @@
 import sys
 from pickle import FALSE, TRUE
 from subprocess import check_output
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
+# from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -10,12 +11,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import NoSuchElementException,ElementNotInteractableException
+from selenium.common.exceptions import NoSuchElementException,ElementNotInteractableException,ElementClickInterceptedException
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime
 from datetime import date
-import requests
 import time
 import datetime
 from selenium import webdriver
@@ -55,24 +55,40 @@ class Process(delay):
         self.address   = address_
 
     def accessSpotify(self, driver):
-        driver.get(self.Spotify_url)
-        driver.maximize_window()
-        sleep(self.DELAY)
-        driver.find_element(By.ID ,'login-username').send_keys(self.user)
-        driver.find_element(By.ID ,'login-password').send_keys(self.password)
-        driver.find_element(By.ID ,'login-button').click()
-        sleep(self.SOFT_DELAY)
-        #Return:
-        return True
+        try:
+            driver.get(self.Spotify_url)
+            driver.maximize_window()
+            sleep(self.DELAY)
+            driver.find_element(By.ID ,'login-username').send_keys(self.user)
+            driver.find_element(By.ID ,'login-password').send_keys(self.password)
+            driver.find_element(By.ID ,'login-button').click()
+            sleep(self.SOFT_DELAY)
+            #Return:
+            return 'passed'
+        except ElementClickInterceptedException or \
+               NoSuchElementException           or \
+               ElementNotInteractableException  or \
+               TimeoutException as e:
+            return f'Failure: {e}'
+        except:
+            return 'others fault'
     
     def switchNation(self, driver):
-        driver.get(self.Profile_url)
-        sleep(self.DELAY)
-        select = Select(driver.find_element(By.ID, 'country'))
-        select.select_by_value('TR')
-        driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
-        #Return:
-        return True
+        try:
+            driver.get(self.Profile_url)
+            sleep(self.DELAY)
+            select = Select(driver.find_element(By.ID, 'country'))
+            select.select_by_value('TR')
+            driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
+            #Return:
+            return 'passed'
+        except ElementClickInterceptedException or \
+               NoSuchElementException           or \
+               ElementNotInteractableException  or \
+               TimeoutException as e:
+            return f'Failure: {e}'
+        except:
+            return 'others fault'
 
     def joinPremium(self, driver):
         try:
@@ -89,11 +105,14 @@ class Process(delay):
             driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
             sleep(self.SOFT_DELAY)
             #Return:
-            if driver.find_element(By.XPATH, self.Element_dict['join_sucess_status'] ).text == 'Chào mừng bạn đến với Premium Family': return 'Success'
-            else: return 'Failure'
+            return 'Success'
+        except ElementClickInterceptedException or \
+               NoSuchElementException           or \
+               ElementNotInteractableException  or \
+               TimeoutException as e:
+            return f'Failure: {e}'
         except:
-            #Return:
-            return 'Failure'
+            return 'others fault'
 
     @classmethod
     def checkCurrentIP(cls, driver):
@@ -111,10 +130,6 @@ if __name__ == "__main__":
         Address     = str(sys.argv[4])
     except IndexError as error:
         print('Argument shortage')
-        Email       = 'free280223@kikyushop.com'
-        PassW       = 'Hoang123'
-        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
-        Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
     #String Handling:
     dt_format  = "%d-%m-%Y_%H:%M:%S"
@@ -123,22 +138,40 @@ if __name__ == "__main__":
     Premium_ID = ls[Ind]
 
     #Instances:
-    DRIVER = webdriver.Chrome(ChromeDriverManager().install())
+    driver_location = '/usr/bin/chromedriver'
+    binary_location = '/usr/bin/google-chrome'
+    options = webdriver.ChromeOptions()
+    options.binary_location = binary_location
+    options.add_argument('--no-sandbox')
+    options.add_argument('--window-size=1420,1080')
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    DRIVER = webdriver.Chrome(executable_path=driver_location,options=options)
     USER   = Process(Email, PassW, familyURL, Address)
 
     #Method:
-    USER.accessSpotify(DRIVER)
+    Debug_1 = USER.accessSpotify(DRIVER)
     USER.HARD_DELAY
-    USER.switchNation(DRIVER)
+    Debug_2 = USER.switchNation(DRIVER)
     USER.HARD_DELAY
-    Status = USER.joinPremium(DRIVER)
-    DRIVER.close()
-    ret_dict = {
-        'Status'     : Status,
-        'Username'   : Email,
-        'Premium_ID' : Premium_ID,
-        'Time'       : datetime.datetime.now().strftime(dt_format)
-    }
+    if (Debug_1 in 'passed') and (Debug_2 in 'passed'):
+        Status  = USER.joinPremium(DRIVER)
+        DRIVER.close()
+        ret_dict = {
+            'Status'     : Status,
+            'Username'   : Email,
+            'Premium_ID' : Premium_ID,
+            'Time'       : datetime.datetime.now().strftime(dt_format)
+        }
+    else:
+        Status = 'failed'
+        DRIVER.close()
+        ret_dict = {
+            'Status'     : Status,
+            'Debug_1'    : Debug_1,
+            'Debug_2'    : Debug_2,
+            'Time'       : datetime.datetime.now().strftime(dt_format)
+        }
 
     #Return:
     print(str(ret_dict))

@@ -44,3 +44,5 @@ def handle_request():
      data_set = {'user' : user, 'passW' : passW, 'familyURL' : familyURL1, 'address' : address, 'timestamp' : time.time()}
      json_dump = json.dumps(data_set)
      return json_dump
+
+Không click đc Turkey: Failure: Message: element click intercepted: Element <button type="submit" data-encore-id="buttonPrimary" class="Button-sc-qlcn5g-0 otMlU">...</button> is not clickable at point (1407, 884). Other element would receive the click: <div class="ot-sdk-row">...</div>

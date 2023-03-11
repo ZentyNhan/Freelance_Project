@@ -15,7 +15,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime
 from datetime import date
-import requests
 import time
 import datetime
 from selenium import webdriver
@@ -30,8 +29,6 @@ class delay():
     MASSIVE_DELAY = 10  #second
     SUPER_DELAY   = 30  #second
     WORLD_DELAY   = 60  #second
-
-
 
 class Process(delay):
     #Attributes:
@@ -57,24 +54,40 @@ class Process(delay):
         self.address   = address_
 
     def accessSpotify(self, driver):
-        driver.get(self.Spotify_url)
-        driver.maximize_window()
-        sleep(self.DELAY)
-        driver.find_element(By.ID ,'login-username').send_keys(self.user)
-        driver.find_element(By.ID ,'login-password').send_keys(self.password)
-        driver.find_element(By.ID ,'login-button').click()
-        sleep(self.SOFT_DELAY)
-        #Return:
-        return True
+        try:
+            driver.get(self.Spotify_url)
+            driver.maximize_window()
+            sleep(self.DELAY)
+            driver.find_element(By.ID ,'login-username').send_keys(self.user)
+            driver.find_element(By.ID ,'login-password').send_keys(self.password)
+            driver.find_element(By.ID ,'login-button').click()
+            sleep(self.SOFT_DELAY)
+            #Return:
+            return 'passed'
+        except ElementClickInterceptedException or \
+               NoSuchElementException           or \
+               ElementNotInteractableException  or \
+               TimeoutException as e:
+            return f'Failure: {e}'
+        except:
+            return 'others fault'
     
     def switchNation(self, driver):
-        driver.get(self.Profile_url)
-        sleep(self.DELAY)
-        select = Select(driver.find_element(By.ID, 'country'))
-        select.select_by_value('TR')
-        driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
-        #Return:
-        return True
+        try:
+            driver.get(self.Profile_url)
+            sleep(self.DELAY)
+            select = Select(driver.find_element(By.ID, 'country'))
+            select.select_by_value('TR')
+            driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
+            #Return:
+            return 'passed'
+        except ElementClickInterceptedException or \
+               NoSuchElementException           or \
+               ElementNotInteractableException  or \
+               TimeoutException as e:
+            return f'Failure: {e}'
+        except:
+            return 'others fault'
 
     def joinPremium(self, driver):
         try:
@@ -91,11 +104,14 @@ class Process(delay):
             driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
             sleep(self.SOFT_DELAY)
             #Return:
-            if driver.find_element(By.XPATH, self.Element_dict['join_sucess_status'] ).text == 'Chào mừng bạn đến với Premium Family': return 'Success'
-            else: return 'Failure'
+            return 'Success'
+        except ElementClickInterceptedException or \
+               NoSuchElementException           or \
+               ElementNotInteractableException  or \
+               TimeoutException as e:
+            return f'Failure: {e}'
         except:
-            #Return:
-            return 'Failure'
+            return 'others fault'
 
     @classmethod
     def checkCurrentIP(cls, driver):
@@ -106,10 +122,9 @@ if __name__ == "__main__":
     
     ########## ANCHOR: DO NOT CHANGE ##########
     #Get information from PHP:
-    print('Start Selenium')
-    Email       = 'free280223@kikyushop.com'
+    Email       = 'free090323@kikyushop.com'
     PassW       = 'Hoang123'
-    familyURL   = 'https://www.spotify.com/tr-tr/family/join/invite/CzX87ZyAX178xbc/'
+    familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/2X06z34zc93zB11/'
     Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
     #String Handling:
@@ -119,24 +134,60 @@ if __name__ == "__main__":
     Premium_ID = ls[Ind]
 
     #Instances:
-    driver_location = '/usr/bin/chromedriver'
-    binary_location = '/usr/bin/google-chrome'
-    options = webdriver.ChromeOptions()
-    options.binary_location = binary_location
-    DRIVER = webdriver.Chrome(executable_path=driver_location,options=options)
-    
-    DRIVER.get('https://www.google.com.vn/')
-    DRIVER.maximize_window()
-    sleep(delay.DELAY)
-    DRIVER.find_element(By.XPATH, '//body/div[1]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/input[1]').send_keys('Python addict')
-    sleep(delay.HARD_DELAY)
-    DRIVER.close()
-    print('Close Selenium')
-    ret_dict = {
-        'Status'     : 'Status',
-        'Username'   : Email,
-        'Premium_ID' : Premium_ID,
-        'Time'       : datetime.datetime.now().strftime(dt_format)
-    }
+    DRIVER = webdriver.Chrome(ChromeDriverManager().install())
+    USER   = Process(Email, PassW, familyURL, Address)
+
+    #Method:
+    Debug_1 = USER.accessSpotify(DRIVER)
+    USER.HARD_DELAY
+    Debug_2 = USER.switchNation(DRIVER)
+    USER.HARD_DELAY
+    if (Debug_1 in 'passed') and (Debug_2 in 'passed'):
+        Status  = USER.joinPremium(DRIVER)
+        DRIVER.close()
+        ret_dict = {
+            'Status'     : Status,
+            'Username'   : Email,
+            'Premium_ID' : Premium_ID,
+            'Time'       : datetime.datetime.now().strftime(dt_format)
+        }
+    else:
+        Status = 'failed'
+        DRIVER.close()
+        ret_dict = {
+            'Status'     : Status,
+            'Debug_1'    : Debug_1,
+            'Debug_2'    : Debug_2,
+            'Time'       : datetime.datetime.now().strftime(dt_format)
+        }
+
     #Return:
     print(str(ret_dict))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
