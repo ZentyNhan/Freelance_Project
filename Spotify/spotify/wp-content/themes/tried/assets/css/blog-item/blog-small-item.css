@@ -1,0 +1,57 @@
+.smallblog-item {
+    margin-bottom: 20px;
+}
+.smallblog-item .wrap {
+    display: grid;
+    grid-template-columns: 120px auto;
+}
+.smallblog-item .featured-image {
+    height: 72px;
+    width: 72px;
+    overflow: hidden;
+}
+.smallblog-item .featured-image img {
+    object-fit: contain;
+    object-position: center;
+    height: 100%;
+}
+.smallblog-item .box-contain {
+    padding-left: 10px;
+}
+.smallblog-item .box-contain .title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+    height: 36px;
+}
+.smallblog-item .box-contain .title a {
+    color: #222;
+}
+.smallblog-item .box-contain .title:hover a {
+    color: var(--primary-color-theme);
+}
+.smallblog-item .box-contain ul.meta {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.smallblog-item .box-contain ul.meta li {
+    margin-right: 7.5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #aaa;
+    text-transform: capitalize;
+}
+.smallblog-item .box-contain ul.meta li:not(:last-child, .term)::after {
+    content: '-';
+    color: #aaa;
+    margin-left: 7.5px;
+}

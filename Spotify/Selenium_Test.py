@@ -106,7 +106,6 @@ if __name__ == "__main__":
     
     ########## ANCHOR: DO NOT CHANGE ##########
     #Get information from PHP:
-    print('Start Selenium')
     Email       = 'free280223@kikyushop.com'
     PassW       = 'Hoang123'
     familyURL   = 'https://www.spotify.com/tr-tr/family/join/invite/CzX87ZyAX178xbc/'
@@ -135,7 +134,6 @@ if __name__ == "__main__":
     DRIVER.find_element(By.XPATH, '//body/div[1]/div[3]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/input[1]').send_keys('Python addict')
     sleep(delay.HARD_DELAY)
     DRIVER.close()
-    print('Close Selenium')
     ret_dict = {
         'Status'     : 'Status',
         'Username'   : Email,

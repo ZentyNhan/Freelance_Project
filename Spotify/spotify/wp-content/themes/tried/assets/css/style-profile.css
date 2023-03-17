@@ -1,0 +1,265 @@
+.main-contain.profile .profile-contain {
+  display: grid;
+  grid-template-columns: 300px auto;
+  row-gap: 20px;
+  align-items: self-start;
+}
+.main-contain.profile .profile-contain .form-table {
+  width: 100%;
+}
+.main-contain.profile .profile-contain .form-table th {
+  vertical-align: top;
+}
+.main-contain.profile .profile-contain .form-table tr:not(:first-child) {
+  margin-top: 20px;
+}
+
+.main-contain.profile .profile-tab {
+  padding-right: 20px;
+}
+.main-contain.profile .profile-tab .avatar-user {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+@media only screen and (max-width: 767px) {
+  .main-contain.profile .profile-tab {
+    padding-right: 0;
+  }
+}
+
+.col-field,
+.col-field .wrap-fields {
+  margin-top: 10px;
+}
+.purple-text {
+  color: #673AB7;
+  font-weight: normal
+}
+.fieldlabels {
+  color: gray;
+  text-align: left
+}
+
+.form-table th {
+  text-align: left;
+  padding: 10px 10px 10px 0;
+}
+.form-table td .title {
+  margin-bottom: 10px;
+}
+
+
+.avatar-user.avatar-upload {
+  display: inline-block;
+  margin-bottom: 30px;
+}
+.avatar-user.avatar-upload .avatar-edit {
+  position: absolute;
+  right: 12px;
+  z-index: 1;
+  top: 10px;
+}
+.avatar-user.avatar-upload .avatar-edit .avatar-browse {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0;
+  border-radius: 100%;
+  background-color: #fff;
+  border: 1px solid transparent;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  font-weight: normal;
+  transition: all 0.2s ease-in-out;
+}
+.avatar-user.avatar-upload .avatar-edit .avatar-browse:hover {
+  background: #f1f1f1;
+  border-color: #d6d6d6;
+}
+.avatar-user.avatar-upload .avatar-edit .avatar-browse::before {
+  content: "\f030";
+  font-family: "Font Awesome 5 Pro";
+  color: #000;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  margin: auto;
+}
+.avatar-user.avatar-upload .avatar-preview {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  background-color: #fff;
+  border: 6px solid #F8F8F8;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* step-form */
+.step-form {
+  text-align: center;
+  position: relative;
+  margin-top: 20px
+}
+.step-form fieldset {
+  background: white;
+  border: 0 none;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding-bottom: 20px;
+  position: relative
+}
+.step-form .wrappper-step {
+  text-align: left
+}
+.step-form fieldset:not(.active) {
+  display: none;
+}
+.step-form input,
+.step-form textarea {
+  padding: 8px 15px 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  margin-bottom: 25px;
+  margin-top: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  color: #000;
+  background-color: #fff;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+.step-form textarea {
+  resize: none;
+}
+.step-form input[type="checkbox"],
+.step-form input[type="radio"],
+.step-form div.wp-editor-wrap input {
+  width: auto;
+}
+.step-form input[type="checkbox"],
+.step-form input[type="radio"] {
+  margin-right: 5px;
+}
+.step-form input:focus,
+.step-form textarea:focus {
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #673AB7;
+  outline-width: 0
+}
+.step-form .action-button {
+  width: 100px;
+  background: #673AB7;
+  font-weight: bold;
+  color: white;
+  border: 0 none;
+  border-radius: 0px;
+  cursor: pointer;
+  padding: 10px 5px;
+  margin: 10px 0px 10px 5px;
+  float: right;
+}
+.step-form .action-button:hover,
+.step-form .action-button:focus {
+  background-color: #311B92
+}
+.step-form .action-button.action-button-highlight {
+  background: #616161;
+  margin: 10px 5px 10px 0px;
+}
+.step-form .action-button.action-button-highlight:hover,
+.step-form .action-button.action-button-highlight:focus {
+  background-color: #000000
+}
+.step-form .step-title {
+  font-size: 25px;
+  color: #673AB7;
+  margin-bottom: 15px;
+  font-weight: normal;
+  text-align: left
+}
+.step-form .progressbar-bar {
+  margin-bottom: 30px;
+  overflow: hidden;
+  color: lightgrey
+}
+.step-form .progressbar-bar .active {
+  color: #673AB7
+}
+.step-form .progressbar-bar li {
+  list-style-type: none;
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 500;
+  width: 20%;
+  float: left;
+  position: relative;
+}
+.step-form .progressbar-bar li:before {
+  width: 50px;
+  height: 50px;
+  line-height: 45px;
+  display: block;
+  font-size: 20px;
+  color: #ffffff;
+  background: lightgray;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  padding: 2px
+}
+.step-form .progressbar-bar li:after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  background: lightgray;
+  position: absolute;
+  left: 0;
+  top: 25px;
+  z-index: -1
+}
+.step-form .progressbar-bar li.active:before,
+.step-form .progressbar-bar li.active:after {
+  background: #673AB7
+}
+.step-form .step-progress {
+  height: 20px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.step-form .step-progress .progress-bar {
+  background-color: #673AB7;
+  height: 100%;
+}
+.step-form .fit-image {
+  width: 100%;
+  object-fit: cover
+}
+.step-form .ask-popup {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, .7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.step-form .ask-popup .title-ask {
+  margin: 0;
+}
+.step-form .ask-popup .chooses-ask {
+  margin-top: 10px;
+}
