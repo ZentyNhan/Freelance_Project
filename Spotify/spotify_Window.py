@@ -40,11 +40,14 @@ class Process(delay):
         'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
+        'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
         'join_submit'             : '''//body/div[@id='__next']/form[1]/main[1]/div[1]/div[1]/fieldset[1]/div[1]/button[1]''',
         'continue_active_account' : '''/html[1]/body[1]/div[1]/main[1]/div[1]/div[1]/a[1]/span[1]''',
         'join_address_confirm'    : '''/html[1]/body[1]/div[1]/div[1]/div[1]/footer[1]/button[2]/span[1]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
     }
+
+    Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
 
     #Constructor:
     def __init__(self, user_, password_, familyURL_, address_):
@@ -64,16 +67,12 @@ class Process(delay):
             sleep(self.SOFT_DELAY)
             #Return:
             return 'passed'
-        except ElementClickInterceptedException or \
-               NoSuchElementException           or \
-               ElementNotInteractableException  or \
-               TimeoutException as e:
+        except Exception as e:
             return f'Failure: {e}'
-        except:
-            return 'others fault'
     
     def switchNation(self, driver):
         try:
+            sleep(self.DELAY)
             driver.get(self.Profile_url)
             sleep(self.DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
@@ -81,37 +80,32 @@ class Process(delay):
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
             #Return:
             return 'passed'
-        except ElementClickInterceptedException or \
-               NoSuchElementException           or \
-               ElementNotInteractableException  or \
-               TimeoutException as e:
+        except Exception as e:
             return f'Failure: {e}'
-        except:
-            return 'others fault'
 
     def joinPremium(self, driver):
         try:
             driver.get(self.familyURL) 
             sleep(self.DELAY)
-            driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
-            sleep(self.DELAY)
-            driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
-            sleep(self.DELAY)
-            driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
-            sleep(self.DELAY)
-            driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
-            sleep(self.DELAY)
-            driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
-            sleep(self.SOFT_DELAY)
-            #Return:
-            return 'Success'
-        except ElementClickInterceptedException or \
-               NoSuchElementException           or \
-               ElementNotInteractableException  or \
-               TimeoutException as e:
+            if driver.find_element(By.XPATH , self.Element_dict['join_expired']).text not in self.Expired_list:
+                sleep(self.DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
+                sleep(self.DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
+                sleep(self.DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
+                sleep(self.DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
+                sleep(self.DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
+                sleep(self.SOFT_DELAY)
+                #Return:
+                return 'Success'
+            else:
+                #Return:
+                return 'Join Link expired'
+        except Exception as e:
             return f'Failure: {e}'
-        except:
-            return 'others fault'
 
     @classmethod
     def checkCurrentIP(cls, driver):
@@ -122,9 +116,9 @@ if __name__ == "__main__":
     
     ########## ANCHOR: DO NOT CHANGE ##########
     #Get information from PHP:
-    Email       = 'free090323@kikyushop.com'
+    Email       = 'freetest173@kikyushop.com'
     PassW       = 'Hoang123'
-    familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/2X06z34zc93zB11/'
+    familyURL   = 'https://www.spotify.com/tr-tr/family/join/invite/CzX87ZyAX178xbc/'
     Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
     #String Handling:
