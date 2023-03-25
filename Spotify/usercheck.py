@@ -21,3 +21,9 @@ import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import json
+#Self lib
+import lib
+
+#Main:
+if __name__ == "__main__": 
+    pass
