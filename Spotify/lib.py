@@ -1,8 +1,8 @@
 import sys
 from pickle import FALSE, TRUE
 from subprocess import check_output
-# from webdriver_manager.chrome import ChromeDriverManager
-# from pyvirtualdisplay import Display
+# from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
+# from pyvirtualdisplay import Display #Window flatform only
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -22,6 +22,7 @@ from selenium.webdriver.chrome.options import Options
 import json
 
 class delay():
+    #Attributes:
     MINI_DELAY    = 0.5 #second
     SOFT_DELAY    = 1   #second
     DELAY         = 3   #second
@@ -40,18 +41,21 @@ class Process(delay):
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
+        'invalid_user'            : '''/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]''',
         'join_submit'             : '''//body/div[@id='__next']/form[1]/main[1]/div[1]/div[1]/fieldset[1]/div[1]/button[1]''',
         'continue_active_account' : '''/html[1]/body[1]/div[1]/main[1]/div[1]/div[1]/a[1]/span[1]''',
         'join_address_confirm'    : '''/html[1]/body[1]/div[1]/div[1]/div[1]/footer[1]/button[2]/span[1]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
     }
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
-    #Constructor:
+    Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
+
     def __init__(self, user_, password_, familyURL_, address_):
         self.user      = user_
         self.password  = password_
         self.familyURL = familyURL_
         self.address   = address_
+
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
@@ -66,6 +70,15 @@ class Process(delay):
         except Exception as e:
             return f'Failure: {e}'
     
+    def userCheck(self, driver):
+        try:
+            if self.checkText(driver, self.Invalid_list[0]):
+                return 'Invalid user or password'
+            else: 
+                return 'Valid'
+        except Exception as e:
+            return f'Failure: {e}'
+
     def switchNation(self, driver):
         try:
             sleep(self.DELAY)
@@ -78,11 +91,18 @@ class Process(delay):
             return 'passed'
         except Exception as e:
             return f'Failure: {e}'
+        
     def joinPremium(self, driver):
         try:
+            out = False
             driver.get(self.familyURL) 
             sleep(self.DELAY)
-            if driver.find_element(By.XPATH , self.Element_dict['join_expired']).text not in self.Expired_list:
+            for text in self.Expired_list:
+                if self.checkText(driver, text): 
+                    out = True 
+                    break 
+            if out: return 'Join Link expired'
+            else:
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
                 sleep(self.DELAY)
@@ -94,14 +114,19 @@ class Process(delay):
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
                 sleep(self.SOFT_DELAY)
-                #Return:
                 return 'Success'
-            else:
-                #Return:
-                return 'Join Link expired'
         except Exception as e:
             return f'Failure: {e}'
+        
     @classmethod
     def checkCurrentIP(cls, driver):
         driver.get(cls.whoer_url)
+
+    @classmethod
+    def checkText(self, driver, text):
+        if text in driver.page_source: return True
+        else:                          return False
+
+#Instance:
+Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4')
 

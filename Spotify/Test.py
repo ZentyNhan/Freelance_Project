@@ -42,6 +42,9 @@ from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 import pypyodbc as odbc
 import pyodbc
 
+#self lib
+import lib
+
 # DRIVER_NAME = 'ODBC Driver 17 for SQL Server'
 # SERVER_NAME = 'DESKTOP-RCFES7K\SQLEXPRESS'
 # DATABASE_NAME = 'SpotifyUpgrade_DB'
@@ -121,12 +124,20 @@ import pyodbc
 # b = {**a,'5':5,'6':6}
 # print(b)
 
-def HAHAHA(a: int,b : int) -> str:
-        return a + b
+# def HAHAHA(a: int,b : int) -> str:
+#         return a + b
 
 
-print(type(HAHAHA(5,4)))
-print(HAHAHA(5,10))
+# print(type(HAHAHA(5,4)))
+# print(HAHAHA(5,10))
+
+a = lib.Process('a','a','a','a')
+
+b = a.Invalid_list[0]
+
+print(f'''//*[contains(text(),'{a.Invalid_list[0]}')]''')
+
+
 
 
 

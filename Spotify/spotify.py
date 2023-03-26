@@ -2,8 +2,8 @@
 import sys
 from pickle import FALSE, TRUE
 from subprocess import check_output
-# from webdriver_manager.chrome import ChromeDriverManager
-# from pyvirtualdisplay import Display
+# from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
+# from pyvirtualdisplay import Display  #Window flatform only
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -26,7 +26,7 @@ import lib
 
 #Main:
 if __name__ == "__main__": 
-    
+
     ########## ANCHOR: DO NOT CHANGE ##########
     try:
         #Get information from PHP:
@@ -34,11 +34,13 @@ if __name__ == "__main__":
         PassW       = str(sys.argv[2])
         familyURL   = str(sys.argv[3])
         Address     = str(sys.argv[4])
+
         #String Handling:
         dt_format  = "%d-%m-%Y_%H:%M:%S"
         ls         = familyURL.split('/')
         Ind        = ls.index('invite') + 1
         Premium_ID = ls[Ind]
+
         #Instances:
         driver_location = '/usr/bin/chromedriver'
         binary_location = '/usr/bin/google-chrome'
@@ -50,6 +52,7 @@ if __name__ == "__main__":
         options.add_argument('--disable-gpu')
         DRIVER = webdriver.Chrome(executable_path=driver_location,options=options)
         USER   = lib.Process(Email, PassW, familyURL, Address)
+        
         #Method:
         Debug_1 = USER.accessSpotify(DRIVER)
         USER.HARD_DELAY

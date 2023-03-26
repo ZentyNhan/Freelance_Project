@@ -2,7 +2,7 @@
 import sys
 from pickle import FALSE, TRUE
 from subprocess import check_output
-# from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
