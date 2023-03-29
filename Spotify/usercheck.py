@@ -35,9 +35,9 @@ if __name__ == "__main__":
 
         #Instances:
         driver_location = '/usr/bin/chromedriver'
-        binary_location = '/usr/bin/google-chrome'
+        # binary_location = '/usr/bin/google-chrome'
         options = webdriver.ChromeOptions()
-        options.binary_location = binary_location
+        # options.binary_location = binary_location
         options.add_argument('--no-sandbox')
         options.add_argument('--window-size=1420,1080')
         options.add_argument('--headless')
@@ -45,6 +45,8 @@ if __name__ == "__main__":
         DRIVER = webdriver.Chrome(executable_path=driver_location,options=options)
         USER   = lib.Process(Email, PassW, 'dummy_1', 'dummy_2')
         dt_format  = "%d-%m-%Y_%H:%M:%S"
+        Code     = 'null'
+        Username = 'null'
         
         #Method:
         Debug_1 = USER.accessSpotify(DRIVER)
@@ -52,23 +54,21 @@ if __name__ == "__main__":
             sleep(USER.DELAY)
             Debug_2 = USER.userCheck(DRIVER)
             if Debug_2 == 'Valid':
-                Code   = '200' # OK
-                Status = 'Success'
+                Code     = '200' # OK
+                Username = Email
                 DRIVER.close()
             else:
-                Code   = '410' # Gone
-                Status = 'Failed'
+                Code   = '400' # Gone
                 DRIVER.close()
         else:
-            Code   = '408' # Timeout
-            Status = 'Failed'
+            Code   = '401' # Timeout
             DRIVER.close()
         
         #Return:
         ret_dict = {
-                'Code'     : Code,
-                'Status'   : Status,
-                'Time'     : datetime.datetime.now().strftime(dt_format)
+                'response'  : Code,
+                'username'  : Username,
+                'time'      : datetime.datetime.now().strftime(dt_format)
         }
         print(str(ret_dict))
 

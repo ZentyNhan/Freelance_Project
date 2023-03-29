@@ -48,23 +48,21 @@ if __name__ == "__main__":
         sleep(USER.DELAY)
         Debug_2 = USER.userCheck(DRIVER)
         if Debug_2 == 'Valid':
-            Code   = '200' # OK
-            Status = 'Success'
+            Code     = '200' # OK
+            Username = Email
             DRIVER.close()
         else:
-            Code   = '410' # Gone
-            Status = 'Failed'
+            Code   = '400' # Gone
             DRIVER.close()
     else:
-        Code   = '408' # Timeout
-        Status = 'Failed'
+        Code   = '401' # Timeout
         DRIVER.close()
-       
+    
     #Return:
     ret_dict = {
-            'Code'     : Code,
-            'Status'   : Status,
-            'Time'     : datetime.datetime.now().strftime(dt_format)
+            'response'  : Code,
+            'username'  : Username,
+            'time'      : datetime.datetime.now().strftime(dt_format)
     }
     print(str(ret_dict))
         

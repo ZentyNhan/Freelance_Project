@@ -43,9 +43,9 @@ if __name__ == "__main__":
 
         #Instances:
         driver_location = '/usr/bin/chromedriver'
-        binary_location = '/usr/bin/google-chrome'
+        # binary_location = '/usr/bin/google-chrome'
         options = webdriver.ChromeOptions()
-        options.binary_location = binary_location
+        # options.binary_location = binary_location
         options.add_argument('--no-sandbox')
         options.add_argument('--window-size=1420,1080')
         options.add_argument('--headless')
