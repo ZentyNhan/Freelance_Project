@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 'Time'       : datetime.datetime.now().strftime(dt_format)
             }
         #Return:
-        print(str(ret_dict))
+        print(json.dumps(ret_dict))
     
     # Argument shortage: 
     except IndexError as error:

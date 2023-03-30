@@ -28,9 +28,9 @@ if __name__ == "__main__":
     
     ########## ANCHOR: DO NOT CHANGE ##########
     #Get information from PHP:
-    Email       = 'freetest17323@kikyushop.com'
+    Email       = 'testfree3003@kikyushop.com'
     PassW       = 'Hoang123'
-    familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/C3Cx803CX968Ya1/'
+    familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/2X06z34zc93zB11/'
     Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
     #String Handling:
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         }
 
     #Return:
-    print(str(ret_dict))
+    print(json.dumps(ret_dict))
 
 
 

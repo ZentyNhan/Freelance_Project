@@ -16,6 +16,7 @@ from time import sleep
 from datetime import datetime
 from datetime import date
 import time
+import string
 import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -44,7 +45,7 @@ class Process(delay):
         'invalid_user'            : '''/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]''',
         'join_submit'             : '''//body/div[@id='__next']/form[1]/main[1]/div[1]/div[1]/fieldset[1]/div[1]/button[1]''',
         'continue_active_account' : '''/html[1]/body[1]/div[1]/main[1]/div[1]/div[1]/a[1]/span[1]''',
-        'join_address_confirm'    : '''/html[1]/body[1]/div[1]/div[1]/div[1]/footer[1]/button[2]/span[1]/span[1]''',
+        'join_address_confirm'    : '''//body/div[@id='__next']/div[1]/div[1]/footer[1]/button[2]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
     }
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
@@ -101,7 +102,7 @@ class Process(delay):
                 if self.checkText(driver, text): 
                     out = True 
                     break 
-            if out: return 'Join Link expired'
+            if out == True: return 'Join Link expired'
             else:
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
@@ -113,7 +114,7 @@ class Process(delay):
                 driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
-                sleep(self.SOFT_DELAY)
+                sleep(self.MASSIVE_DELAY)
                 return 'Success'
         except Exception as e:
             return f'Failure: {e}'
@@ -124,8 +125,14 @@ class Process(delay):
 
     @classmethod
     def checkText(self, driver, text):
-        if text in driver.page_source: return True
-        else:                          return False
+        ps = driver.page_source
+        if (text in driver.page_source) and (self.Occurrences(text, ps) > 1): return True
+        else:                                                                 return False
+
+    @classmethod
+    def Occurrences(self, str_, ps_):
+        counts = str(ps_).count(str_)
+        return counts
 
 #Instance:
 Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4')

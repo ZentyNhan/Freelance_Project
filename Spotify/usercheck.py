@@ -45,32 +45,32 @@ if __name__ == "__main__":
         DRIVER = webdriver.Chrome(executable_path=driver_location,options=options)
         USER   = lib.Process(Email, PassW, 'dummy_1', 'dummy_2')
         dt_format  = "%d-%m-%Y_%H:%M:%S"
-        Code     = 'null'
-        Username = 'null'
+        Code     = "null"
+        Username = "null"
         
         #Method:
         Debug_1 = USER.accessSpotify(DRIVER)
-        if Debug_1 == 'passed':
+        if Debug_1 == "passed":
             sleep(USER.DELAY)
             Debug_2 = USER.userCheck(DRIVER)
-            if Debug_2 == 'Valid':
-                Code     = '200' # OK
+            if Debug_2 == "Valid":
+                Code     = "200" # OK
                 Username = Email
                 DRIVER.close()
             else:
-                Code   = '400' # Gone
+                Code   = "400" # Gone
                 DRIVER.close()
         else:
-            Code   = '401' # Timeout
+            Code   = "401" # Timeout
             DRIVER.close()
         
         #Return:
         ret_dict = {
-                'response'  : Code,
-                'username'  : Username,
-                'time'      : datetime.datetime.now().strftime(dt_format)
+                "response"  : Code,
+                "username"  : Username,
+                "time"      : f"{datetime.datetime.now().strftime(dt_format)}"
         }
-        print(str(ret_dict))
+        print(json.dumps(ret_dict))
 
     # Argument shortage: 
     except IndexError as error:

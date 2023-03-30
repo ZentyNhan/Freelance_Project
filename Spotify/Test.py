@@ -30,6 +30,7 @@ from termcolor import colored
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import json
+import string
 
 #Excel Processing:
 from openpyxl import Workbook 
@@ -130,12 +131,9 @@ import lib
 
 # print(type(HAHAHA(5,4)))
 # print(HAHAHA(5,10))
-
-a = lib.Process('a','a','a','a')
-
-b = a.Invalid_list[0]
-
-print(f'''//*[contains(text(),'{a.Invalid_list[0]}')]''')
+n = 'aaaaaaa'
+o = n.count('a')
+print(o)
 
 
 
