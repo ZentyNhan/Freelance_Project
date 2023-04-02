@@ -1,3 +1,0 @@
-USE SpotifyUpgrade_DB
-GO 
-SELECT @@SERVERNAME

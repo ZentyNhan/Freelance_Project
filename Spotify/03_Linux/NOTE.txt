@@ -1,0 +1,23 @@
+### 01_usercheck: ###
+1.Argument :2
+     + Email 
+     + password
+2.Return : {"response" : code, "username" : Email, "time" : Current time}   
+
+### 02_switchNation: 2 Argument ###
+1.Argument :2
+     + Email 
+     + password
+2.Return :
+     + Positive:  {"Status" : "Success", "username" : Email, "time" : Current time} 
+     + Negative:  {"Status" : "failed", "Debug_1" : Debug_1, "Debug_2" : Debug_2, "time" : Current time} 
+
+### 03_joinPremium: ###
+1.Argument :4
+     + Email 
+     + password
+     + Premium LINK 
+     + Address
+2.Return :
+     + Positive:  {"Status" : "Success", "username" : Email, "Premium_ID" : Premium ID, "time" : Current time} 
+     + Negative:  {"Status" : "failed", "Debug_1" : Debug_1, "Debug_2" : Debug_2, "time" : Current time} 

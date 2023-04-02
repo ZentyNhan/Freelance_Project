@@ -16,6 +16,7 @@ from time import sleep
 from datetime import datetime
 from datetime import date
 import time
+import pickle
 import string
 import datetime
 from selenium import webdriver
@@ -34,6 +35,7 @@ class delay():
 
 class Process(delay):
     #Attributes:
+    dt_format    = "%d-%m-%Y_%H:%M:%S"
     whoer_url    = f'https://whoer.net/fr'
     Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
     Profile_url  = f'https://www.spotify.com/tr/account/profile/'
@@ -126,7 +128,7 @@ class Process(delay):
     @classmethod
     def checkText(self, driver, text):
         ps = driver.page_source
-        if (text in driver.page_source) and (self.Occurrences(text, ps) > 1): return True
+        if (text in driver.page_source) and (self.Occurrences(text, ps) > 0): return True
         else:                                                                 return False
 
     @classmethod
@@ -134,6 +136,26 @@ class Process(delay):
         counts = str(ps_).count(str_)
         return counts
 
+    #ANCHOR - Test:
+    def accessSpotify_Test(self, driver):
+        try:
+            driver.get(self.Spotify_url)
+            driver.maximize_window()
+            sleep(self.DELAY)
+            driver.find_element(By.ID ,'login-username').send_keys(self.user)
+            driver.find_element(By.ID ,'login-password').send_keys(self.password)
+            # sleep(self.DELAY)
+            driver.find_element(By.ID ,'login-button').click()
+            sleep(self.DELAY)
+            driver.get(self.Profile_url)
+            sleep(self.HARD_DELAY)
+            print(driver.page_source) 
+            # sleep(self.DELAY)
+            #Return:
+            return 'passed'
+        except Exception as e:
+            return f'Failure: {e}'
+        
 #Instance:
 Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4')
 
