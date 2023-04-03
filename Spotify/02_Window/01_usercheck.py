@@ -2,8 +2,8 @@
 import sys
 from pickle import FALSE, TRUE
 from subprocess import check_output
-# from webdriver_manager.chrome import ChromeDriverManager
-# from pyvirtualdisplay import Display
+from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
+from pyvirtualdisplay import Display  #Window flatform only
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -35,27 +35,18 @@ if __name__ == "__main__":
         PassW =  str(sys.argv[2])
 
         #Instances:
-        driver_location = '/usr/bin/chromedriver'
-        # binary_location = '/usr/bin/google-chrome'
-        options = webdriver.ChromeOptions()
-        # options.binary_location = binary_location
-        options.add_argument('--no-sandbox')
-        options.add_argument('--window-size=1420,1080')
-        options.add_argument('--headless')
-        options.add_argument('--disable-gpu')
-        DRIVER = webdriver.Chrome(executable_path=driver_location,options=options)
+        DRIVER = webdriver.Chrome(ChromeDriverManager().install())
         USER   = lib.Process(Email, PassW, 'dummy_1', 'dummy_2')
         Code     = "null"
         Username = "null"
         
-        #Method:
+        # Method:
         Debug_1 = USER.accessSpotify(DRIVER)
         if Debug_1 == "passed":
             sleep(USER.DELAY)
             Debug_2 = USER.userCheck(DRIVER)
             if Debug_2 == "Valid":
                 Code     = "200" # OK
-                Username = Email
                 DRIVER.close()
             else:
                 Code   = "400" # Gone
@@ -67,14 +58,16 @@ if __name__ == "__main__":
         #Return:
         ret_dict = {
                 "response"  : Code,
-                "username"  : Username,
-                "time"      : f"{datetime.datetime.now().strftime(USER.dt_format)}"
+                "username"  : Email,
+                "time"      : datetime.datetime.now().strftime(USER.dt_format)
         }
         print(json.dumps(ret_dict))
 
     # Argument shortage: 
     except IndexError as error:
         print('Argument shortage')
+
+        
 
     
 

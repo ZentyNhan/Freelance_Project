@@ -74,14 +74,13 @@ class Process(delay):
             return f'Failure: {e}'
     
     def userCheck(self, driver):
-        # try:
-            print('Occurrences_1: {0}'.format(str(self.Occurrences(self.Invalid_list[0], driver.page_source))))
+        try:
             if self.checkText(driver, self.Invalid_list[0]):
                 return 'Invalid user or password'
             else: 
                 return 'Valid'
-        # except Exception as e:
-        #     return f'Failure: {e}'
+        except Exception as e:
+            return f'Failure: {e}'
 
     def switchNation(self, driver):
         try:
@@ -129,7 +128,6 @@ class Process(delay):
     @classmethod
     def checkText(self, driver, text):
         ps = driver.page_source
-        print('Occurrences_2: {0}'.format(str(self.Occurrences(text, ps))))
         if (text in driver.page_source) and (self.Occurrences(text, ps) > 0): return True
         else:                                                                 return False
 
