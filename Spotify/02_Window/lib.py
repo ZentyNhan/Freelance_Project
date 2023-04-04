@@ -38,7 +38,7 @@ class Process(delay):
     dt_format    = "%d-%m-%Y_%H:%M:%S"
     whoer_url    = f'https://whoer.net/fr'
     Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
-    Profile_url  = f'https://www.spotify.com/tr/account/profile/'
+    Profile_url  = f'https://www.spotify.com/us/account/profile/'
     Element_dict = {
         'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
@@ -49,6 +49,12 @@ class Process(delay):
         'continue_active_account' : '''/html[1]/body[1]/div[1]/main[1]/div[1]/div[1]/a[1]/span[1]''',
         'join_address_confirm'    : '''//body/div[@id='__next']/div[1]/div[1]/footer[1]/button[2]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
+    }
+    Nation_dict  = {
+        'Japan'                   : 'JP',
+        'Turkey'                  : 'TR',
+        'Vietnam'                 : 'VN',
+        'USA'                     : 'US'
     }
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
     Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
@@ -88,8 +94,9 @@ class Process(delay):
             driver.get(self.Profile_url)
             sleep(self.DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
-            select.select_by_value('TR')
+            select.select_by_value(self.Nation_dict['Japan'])
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
+            sleep(self.SOFT_DELAY)
             #Return:
             return 'passed'
         except Exception as e:

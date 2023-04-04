@@ -50,6 +50,12 @@ class Process(delay):
         'join_address_confirm'    : '''//body/div[@id='__next']/div[1]/div[1]/footer[1]/button[2]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
     }
+    Nation_dict  = {
+        'Japan'                   : 'JP',
+        'Turkey'                  : 'TR',
+        'Vietnam'                 : 'VN',
+        'USA'                     : 'US'
+    }
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
     Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
 
@@ -88,7 +94,7 @@ class Process(delay):
             driver.get(self.Profile_url)
             sleep(self.DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
-            select.select_by_value('TR')
+            select.select_by_value(self.Nation_dict['Japan'])
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
             #Return:
             return 'passed'

@@ -31,8 +31,10 @@ if __name__ == "__main__":
     ########## ANCHOR: DO NOT CHANGE ##########
     try:
         # Get information from PHP: 
-        Email =  str(sys.argv[1])
-        PassW =  str(sys.argv[2])
+        # Email =  str(sys.argv[1])
+        # PassW =  str(sys.argv[2])
+        Email       = 'free090323@kikyushop.com'
+        PassW       = 'Hoang123'
 
         #Instances:
         DRIVER = webdriver.Chrome(ChromeDriverManager().install())

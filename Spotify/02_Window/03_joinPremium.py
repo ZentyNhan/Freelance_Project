@@ -29,10 +29,14 @@ if __name__ == "__main__":
     ########## ANCHOR: DO NOT CHANGE ##########
     try:
         #Get information from PHP:
-        Email       = str(sys.argv[1])
-        PassW       = str(sys.argv[2])
-        familyURL   = str(sys.argv[3])
-        Address     = str(sys.argv[4])
+        # Email       = str(sys.argv[1])
+        # PassW       = str(sys.argv[2])
+        # familyURL   = str(sys.argv[3])
+        # Address     = str(sys.argv[4])
+        Email       = 'free090323@kikyushop.com'
+        PassW       = 'Hoang123'
+        familyURL   = 'https://www.spotify.com/tr-tr/family/join/invite/CzX87ZyAX178xbc/'
+        Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
         #String Handling:
         ls         = familyURL.split('/')
