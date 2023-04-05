@@ -46,3 +46,12 @@ def handle_request():
      return json_dump
 
 Không click đc Turkey: Failure: Message: element click intercepted: Element <button type="submit" data-encore-id="buttonPrimary" class="Button-sc-qlcn5g-0 otMlU">...</button> is not clickable at point (1407, 884). Other element would receive the click: <div class="ot-sdk-row">...</div>
+
+
+hosting spotify: 192.168.1.12| remotedesktop 3389
+hosting01/SKJD*(@Jh124
+Administrator/wIn@mkt23
+
+tk surfshark vpn
+email: evtf41@gmail.com
+pas : Hoang@@11

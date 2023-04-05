@@ -38,7 +38,7 @@ class Process(delay):
     dt_format    = "%d-%m-%Y_%H:%M:%S"
     whoer_url    = f'https://whoer.net/fr'
     Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
-    Profile_url  = f'https://www.spotify.com/tr/account/profile/'
+    Profile_url  = f'https://www.spotify.com/us/account/profile/'
     Element_dict = {
         'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
@@ -81,7 +81,7 @@ class Process(delay):
     
     def userCheck(self, driver):
         try:
-            if self.checkText(driver, self.Invalid_list[0]):
+            if self.checkText(driver, self.Invalid_list[0],'Usercheck'):
                 return 'Invalid user or password'
             else: 
                 return 'Valid'
@@ -94,8 +94,9 @@ class Process(delay):
             driver.get(self.Profile_url)
             sleep(self.DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
-            select.select_by_value(self.Nation_dict['Japan'])
+            select.select_by_value(self.Nation_dict['Turkey'])
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
+            sleep(self.SOFT_DELAY)
             #Return:
             return 'passed'
         except Exception as e:
@@ -107,12 +108,12 @@ class Process(delay):
             driver.get(self.familyURL) 
             sleep(self.DELAY)
             for text in self.Expired_list:
-                if self.checkText(driver, text): 
+                if self.checkText(driver, text,'Joinfamily'): 
                     out = True 
                     break 
             if out == True: return 'Join Link expired'
             else:
-                sleep(self.DELAY)
+                sleep(self.HARD_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
@@ -132,9 +133,12 @@ class Process(delay):
         driver.get(cls.whoer_url)
 
     @classmethod
-    def checkText(self, driver, text):
+    def checkText(self, driver, text, option=None):
+        if option == 'Joinfamily':  OCCUR = 1
+        elif option == 'Usercheck': OCCUR = 0
+        else:                       OCCUR = 0  
         ps = driver.page_source
-        if (text in driver.page_source) and (self.Occurrences(text, ps) > 0): return True
+        if (text in driver.page_source) and (self.Occurrences(text, ps) > OCCUR): return True
         else:                                                                 return False
 
     @classmethod
