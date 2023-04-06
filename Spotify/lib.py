@@ -73,16 +73,17 @@ class Process(delay):
             driver.find_element(By.ID ,'login-username').send_keys(self.user)
             driver.find_element(By.ID ,'login-password').send_keys(self.password)
             driver.find_element(By.ID ,'login-button').click()
-            sleep(self.SOFT_DELAY)
+            sleep(self.DELAY)
+            ret = self.userCheck(driver)
             #Return:
-            return 'passed'
+            return ret
         except Exception as e:
             return f'Failure: {e}'
     
     def userCheck(self, driver):
         try:
             if self.checkText(driver, self.Invalid_list[0],'Usercheck'):
-                return 'Invalid user or password'
+                return 'Invalid'
             else: 
                 return 'Valid'
         except Exception as e:
@@ -98,7 +99,7 @@ class Process(delay):
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
             sleep(self.SOFT_DELAY)
             #Return:
-            return 'passed'
+            return 'Success'
         except Exception as e:
             return f'Failure: {e}'
         

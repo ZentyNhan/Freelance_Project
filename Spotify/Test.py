@@ -131,10 +131,13 @@ import lib
 
 # print(type(HAHAHA(5,4)))
 # print(HAHAHA(5,10))
-n = 'aaaaaaa'
-o = n.count('a')
-print(o)
+# n = 'aaaaaaa'
+# o = n.count('a')
+# print(o)
 
+a = "Failure: "
+
+print(a[:7])
 
 
 

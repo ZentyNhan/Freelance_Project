@@ -59,7 +59,7 @@ if __name__ == "__main__":
         
         #Return:
         ret_dict = {
-                "response"  : Code,
+                "status"    : Code,
                 "username"  : Email,
                 "time"      : datetime.datetime.now().strftime(USER.dt_format)
         }
