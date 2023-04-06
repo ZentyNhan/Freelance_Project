@@ -46,8 +46,10 @@ if __name__ == "__main__":
         Premium_ID = ls[Ind]
 
         #Instances:
-        DRIVER = webdriver.Chrome(ChromeDriverManager().install())
-        USER   = lib.Process(Email, PassW, familyURL, Address)
+        DRIVER  = webdriver.Chrome(ChromeDriverManager().install())
+        USER    = lib.Process(Email, PassW, familyURL, Address)
+        code    = '400'
+        failure = 'none'
 
         #Method:
         Debug_1 = USER.accessSpotify(DRIVER)
@@ -59,24 +61,18 @@ if __name__ == "__main__":
                     code     = '200'
                     message  = 'Join Spotify Family successfully'
                 elif Status in 'Join Link expired':
-                    code    = '400'
                     message = 'Join Link expired'
                 else: 
-                    code    = '400'
                     message = 'Joining Spotify Family failed'
                     failure  = Status
             elif Debug_2 in 'Join Link expired':
-                code    = '400'
                 message = 'Join Link expired'
             else:
-                code    = '400'
                 message = 'Country transfer failed'
                 failure  = Debug_2
         elif Debug_1 in 'Invalid':
-            code    = '400'
             message = 'login unsuccessful'
         else:
-            code     = '400'
             message  = 'login unsuccessful'
             failure  = Debug_1
         DRIVER.close()

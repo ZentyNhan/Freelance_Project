@@ -135,10 +135,6 @@ import lib
 # o = n.count('a')
 # print(o)
 
-a = "Failure: "
-
-print(a[:7])
-
 
 
 
