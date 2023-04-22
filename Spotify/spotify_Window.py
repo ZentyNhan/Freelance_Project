@@ -29,14 +29,13 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        Email       = 'testfree33@kikyushop.com'
-        PassW       = 'Hoang123'
-        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/BZA98b8b3XaA4Ax/'
-        Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
+        # Email       = 'testfree3003@kikyushop.com'
+        # PassW       = 'Hoang123'
+        # Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
-        # Email       = str(sys.argv[1])
-        # PassW       = str(sys.argv[2])
-        # familyURL   = str(sys.argv[3])
+        Email       = str(sys.argv[1])
+        PassW       = str(sys.argv[2])
+        familyURL   = str(sys.argv[3])
         Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
 
         #String Handling:
@@ -59,21 +58,21 @@ if __name__ == "__main__":
                 Status  = USER.joinPremium(DRIVER)
                 if Status in 'Success':
                     code     = '200'
-                    message  = 'Join Spotify Family successfully'
+                    message  = 'Tham gia Spotify Family thành công'
                 elif Status in 'Join Link expired':
-                    message = 'Join Link expired'
+                    message = 'Liên kết tham gia đã hết hạn'
                 else: 
-                    message = 'Joining Spotify Family failed'
+                    message = 'Tham gia Spotify Family thất bại'
                     failure  = Status
             elif Debug_2 in 'Join Link expired':
-                message = 'Join Link expired'
+                message = 'Liên kết tham gia đã hết hạn'
             else:
-                message = 'Country transfer failed'
+                message = 'Chuyển quốc gia không thành công'
                 failure  = Debug_2
         elif Debug_1 in 'Invalid':
-            message = 'login unsuccessful'
+            message = 'Đăng nhập không thành công'
         else:
-            message  = 'login unsuccessful'
+            message  = 'Đăng nhập không thành công'
             failure  = Debug_1
         DRIVER.close()
     
@@ -98,6 +97,8 @@ if __name__ == "__main__":
     # Argument shortage: 
     except IndexError as error:
         print('Argument shortage')
+    except:
+        print('Thất bại, không thể thực hiện được')
 
 
 

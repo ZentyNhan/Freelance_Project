@@ -68,7 +68,6 @@ class Process(delay):
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
-            driver.maximize_window()
             sleep(self.DELAY)
             driver.find_element(By.ID ,'login-username').send_keys(self.user)
             driver.find_element(By.ID ,'login-password').send_keys(self.password)
