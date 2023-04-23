@@ -29,14 +29,16 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        # Email       = 'testfree3003@kikyushop.com'
-        # PassW       = 'Hoang123'
-        # Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
+        Email       = 'freetest1@kikyushop.com'
+        PassW       = 'Hoang123'
+        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/96yZ8b43Xb366CY/'
+        Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
 
-        Email       = str(sys.argv[1])
-        PassW       = str(sys.argv[2])
-        familyURL   = str(sys.argv[3])
-        Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
+        # Email       = str(sys.argv[1])
+        # PassW       = str(sys.argv[2])
+        # familyURL   = str(sys.argv[3])
+        Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
+
 
         #String Handling:
         dt_format  = "%d-%m-%Y_%H:%M:%S"

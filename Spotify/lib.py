@@ -46,6 +46,7 @@ class Process(delay):
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
         'invalid_user'            : '''/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]''',
         'join_submit'             : '''//body/div[@id='__next']/form[1]/main[1]/div[1]/div[1]/fieldset[1]/div[1]/button[1]''',
+        'ignore_addr_suggesttion' : '''/html[1]/body[1]/div[1]/form[1]/main[1]/div[1]/section[1]/fieldset[1]/div[1]/div[1]/label[1]/span[1]''',
         'continue_active_account' : '''/html[1]/body[1]/div[1]/main[1]/div[1]/div[1]/a[1]/span[1]''',
         'join_address_confirm'    : '''//body/div[@id='__next']/div[1]/div[1]/footer[1]/button[2]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
@@ -63,7 +64,7 @@ class Process(delay):
         self.user      = user_
         self.password  = password_
         self.familyURL = familyURL_
-        self.address   = address_
+        self.address   = str(address_).replace('__',' ')
 
     def accessSpotify(self, driver):
         try:
@@ -119,6 +120,8 @@ class Process(delay):
                 driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
+                sleep(self.SOFT_DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['ignore_addr_suggesttion'] ).click()
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
                 sleep(self.DELAY)

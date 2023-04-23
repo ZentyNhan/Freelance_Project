@@ -135,7 +135,15 @@ import lib
 # o = n.count('a')
 # print(o)
 
+Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122__Fatih/İstanbul,__Türkiye'
 
+# Email       = str(sys.argv[1])
+# PassW       = str(sys.argv[2])
+# familyURL   = str(sys.argv[3])
+
+#String Handling:
+Address    = Address.replace('__',' ')
+print(Address)
 
 
 
