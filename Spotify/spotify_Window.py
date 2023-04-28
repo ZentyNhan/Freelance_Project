@@ -29,17 +29,18 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        Email       = 'freetest1@kikyushop.com'
+        Email       = 'freetest0423@kikyushop.com'
         PassW       = 'Hoang123'
         familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/96yZ8b43Xb366CY/'
         Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
+        Nation      = 'IN' #India test
 
         # Email       = str(sys.argv[1])
         # PassW       = str(sys.argv[2])
         # familyURL   = str(sys.argv[3])
-        Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
-
-
+        # Address     = str(sys.argv[4])
+        # Nation      = str(sys.argv[5]) 
+        
         #String Handling:
         dt_format  = "%d-%m-%Y_%H:%M:%S"
         ls         = familyURL.split('/')
@@ -48,7 +49,7 @@ if __name__ == "__main__":
 
         #Instances:
         DRIVER  = webdriver.Chrome(ChromeDriverManager().install())
-        USER    = lib.Process(Email, PassW, familyURL, Address)
+        USER    = lib.Process(Email, PassW, familyURL, Address, Nation)
         code    = '400'
         failure = 'none'
 

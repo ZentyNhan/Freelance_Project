@@ -60,11 +60,12 @@ class Process(delay):
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
     Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
 
-    def __init__(self, user_, password_, familyURL_, address_):
+    def __init__(self, user_, password_, familyURL_, address_, nation_):
         self.user      = user_
         self.password  = password_
         self.familyURL = familyURL_
         self.address   = str(address_).replace('__',' ')
+        self.nation    = str(nation_).upper()
 
     def accessSpotify(self, driver):
         try:
@@ -95,7 +96,7 @@ class Process(delay):
             driver.get(self.Profile_url)
             sleep(self.DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
-            select.select_by_value(self.Nation_dict['Turkey'])
+            select.select_by_value(self.nation)
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
             sleep(self.SOFT_DELAY)
             #Return:
@@ -170,5 +171,5 @@ class Process(delay):
             return f'Failure: {e}'
         
 #Instance:
-Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4')
+Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5')
 
