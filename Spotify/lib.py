@@ -143,7 +143,7 @@ class Process(delay):
         else:                       OCCUR = 0  
         ps = driver.page_source
         if (text in driver.page_source) and (self.Occurrences(text, ps) > OCCUR): return True
-        else:                                                                 return False
+        else:                                                                     return False
 
     @classmethod
     def Occurrences(self, str_, ps_):

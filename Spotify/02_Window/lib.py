@@ -46,6 +46,7 @@ class Process(delay):
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
         'invalid_user'            : '''/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]''',
         'join_submit'             : '''//body/div[@id='__next']/form[1]/main[1]/div[1]/div[1]/fieldset[1]/div[1]/button[1]''',
+        'ignore_addr_suggesttion' : '''/html[1]/body[1]/div[1]/form[1]/main[1]/div[1]/section[1]/fieldset[1]/div[1]/div[1]/label[1]/span[1]''',
         'continue_active_account' : '''/html[1]/body[1]/div[1]/main[1]/div[1]/div[1]/a[1]/span[1]''',
         'join_address_confirm'    : '''//body/div[@id='__next']/div[1]/div[1]/footer[1]/button[2]/span[1]''',
         'join_sucess_status'      : '''/html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/div[1]/h1[1]'''
@@ -59,30 +60,31 @@ class Process(delay):
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
     Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
 
-    def __init__(self, user_, password_, familyURL_, address_):
+    def __init__(self, user_, password_, familyURL_, address_, nation_):
         self.user      = user_
         self.password  = password_
         self.familyURL = familyURL_
-        self.address   = address_
+        self.address   = str(address_).replace('__',' ')
+        self.nation    = str(nation_).upper()
 
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
-            driver.maximize_window()
             sleep(self.DELAY)
             driver.find_element(By.ID ,'login-username').send_keys(self.user)
             driver.find_element(By.ID ,'login-password').send_keys(self.password)
             driver.find_element(By.ID ,'login-button').click()
-            sleep(self.SOFT_DELAY)
+            sleep(self.DELAY)
+            ret = self.userCheck(driver)
             #Return:
-            return 'passed'
+            return ret
         except Exception as e:
             return f'Failure: {e}'
     
     def userCheck(self, driver):
         try:
             if self.checkText(driver, self.Invalid_list[0],'Usercheck'):
-                return 'Invalid user or password'
+                return 'Invalid'
             else: 
                 return 'Valid'
         except Exception as e:
@@ -94,11 +96,11 @@ class Process(delay):
             driver.get(self.Profile_url)
             sleep(self.DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
-            select.select_by_value(self.Nation_dict['Turkey'])
+            select.select_by_value(self.nation)
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
             sleep(self.SOFT_DELAY)
             #Return:
-            return 'passed'
+            return 'Success'
         except Exception as e:
             return f'Failure: {e}'
         
@@ -119,6 +121,8 @@ class Process(delay):
                 driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
+                sleep(self.SOFT_DELAY)
+                driver.find_element(By.XPATH, self.Element_dict['ignore_addr_suggesttion'] ).click()
                 sleep(self.DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
                 sleep(self.DELAY)
@@ -167,5 +171,5 @@ class Process(delay):
             return f'Failure: {e}'
         
 #Instance:
-Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4')
+Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5')
 
