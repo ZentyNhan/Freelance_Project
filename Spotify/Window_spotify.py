@@ -29,7 +29,7 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        Email       = 'freetest0423@kikyushop.com'
+        Email       = 'freetest423@kikyushop.com'
         PassW       = 'Hoang123'
         familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/96yZ8b43Xb366CY/'
         Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
@@ -48,7 +48,9 @@ if __name__ == "__main__":
         Premium_ID = ls[Ind]
 
         #Instances:
-        DRIVER  = webdriver.Chrome(ChromeDriverManager().install())
+        op = webdriver.ChromeOptions()
+        op.add_argument('headless')
+        DRIVER  = webdriver.Chrome(ChromeDriverManager().install(), options=op)
         USER    = lib.Process(Email, PassW, familyURL, Address, Nation)
         code    = '400'
         failure = 'none'

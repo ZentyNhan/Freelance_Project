@@ -29,14 +29,16 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        # Email       = 'freetest04@kikyushop.com'
-        # PassW       = 'Hoang123'
+        Email       = 'freetest423@kikyushop.com'
+        PassW       = 'Hoang123'
 
-        Email       = str(sys.argv[1])
-        PassW       = str(sys.argv[2])
+        # Email       = str(sys.argv[1])
+        # PassW       = str(sys.argv[2])
 
         #Instances:
-        DRIVER  = webdriver.Chrome(ChromeDriverManager().install())
+        op = webdriver.ChromeOptions()
+        op.add_argument('headless')
+        DRIVER  = webdriver.Chrome(ChromeDriverManager().install(), options=op)
         USER    = lib.Process(Email, PassW, 'dummy_1', 'dummy_2', 'dummy_3')
         code    = '400'
         failure = 'none'
