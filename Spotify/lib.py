@@ -27,6 +27,8 @@ class delay():
     #Attributes:
     MINI_DELAY    = 0.5 #second
     SOFT_DELAY    = 1   #second
+    FLEX_DELAY    = 1.5   #second
+    SPONGY_DELAY  = 2   #second
     DELAY         = 3   #second
     HARD_DELAY    = 5   #second
     MASSIVE_DELAY = 10  #second
@@ -70,11 +72,11 @@ class Process(delay):
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
-            sleep(self.DELAY)
+            sleep(self.FLEX_DELAY)
             driver.find_element(By.ID ,'login-username').send_keys(self.user)
             driver.find_element(By.ID ,'login-password').send_keys(self.password)
             driver.find_element(By.ID ,'login-button').click()
-            sleep(self.DELAY)
+            sleep(self.FLEX_DELAY)
             ret = self.userCheck(driver)
             #Return:
             return ret
@@ -92,13 +94,13 @@ class Process(delay):
 
     def switchNation(self, driver):
         try:
-            sleep(self.DELAY)
+            sleep(self.FLEX_DELAY)
             driver.get(self.Profile_url)
-            sleep(self.DELAY)
+            sleep(self.FLEX_DELAY)
             select = Select(driver.find_element(By.ID, 'country'))
             select.select_by_value(self.nation)
             driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
-            sleep(self.SOFT_DELAY)
+            sleep(self.FLEX_DELAY)
             #Return:
             return 'Success'
         except Exception as e:
@@ -108,7 +110,7 @@ class Process(delay):
         try:
             out = False
             driver.get(self.familyURL) 
-            sleep(self.DELAY)
+            sleep(self.FLEX_DELAY)
             for text in self.Expired_list:
                 if self.checkText(driver, text,'Joinfamily'): 
                     out = True 
@@ -117,17 +119,17 @@ class Process(delay):
             else:
                 sleep(self.HARD_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
-                sleep(self.DELAY)
+                sleep(self.SPONGY_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
-                sleep(self.DELAY)
+                sleep(self.SPONGY_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
                 sleep(self.SOFT_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['ignore_addr_suggesttion'] ).click()
-                sleep(self.DELAY)
+                sleep(self.SPONGY_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
-                sleep(self.DELAY)
+                sleep(self.SPONGY_DELAY)
                 driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
-                sleep(self.MASSIVE_DELAY)
+                sleep(self.HARD_DELAY)
                 return 'Success'
         except Exception as e:
             return f'Failure: {e}'
