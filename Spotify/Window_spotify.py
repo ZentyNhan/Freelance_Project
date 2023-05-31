@@ -29,11 +29,11 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        Email       = 'freetest423@kikyushop.com'
-        PassW       = 'Hoang123'
-        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/96yZ8b43Xb366CY/'
+        Email       = 'z.ntnhan19@gmail.com'
+        PassW       = 'Hihihi12@'
+        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
         Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
-        Nation      = 'IN' #India test
+        Nation      = 'TR' #India test
 
         # Email       = str(sys.argv[1])
         # PassW       = str(sys.argv[2])
@@ -50,10 +50,14 @@ if __name__ == "__main__":
         #Instances:
         op = webdriver.ChromeOptions()
         # op.add_argument('headless')
-        DRIVER  = webdriver.Chrome(ChromeDriverManager().install(), options=op)
-        USER    = lib.Process(Email, PassW, familyURL, Address, Nation)
-        code    = '400'
-        failure = 'none'
+        DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
+        USER           = lib.Process(Email, PassW, familyURL, Address, Nation)
+        code           = '400'
+        failure        = ['Failure', 'Timeout']
+        failureMessage = 'none'
+        Debug_1        = 'none'
+        Debug_2        = 'none'
+        Status         = 'none'
 
         #Method:
         Debug_1 = USER.accessSpotify(DRIVER)
@@ -63,37 +67,47 @@ if __name__ == "__main__":
                 Status  = USER.joinPremium(DRIVER)
                 if Status in 'Success':
                     code     = '200'
-                    message  = 'Tham gia Spotify Family thành công'
                 elif Status in 'Join Link expired':
-                    message = 'Liên kết tham gia đã hết hạn'
+                    code     = '403'
                 else: 
-                    message = 'Tham gia Spotify Family thất bại'
-                    failure  = Status
+                    code     = '400'
+                    failureMessage  = Status
             elif Debug_2 in 'Join Link expired':
-                message = 'Liên kết tham gia đã hết hạn'
+                code     = '403'
             else:
-                message = 'Chuyển quốc gia không thành công'
-                failure  = Debug_2
+                code     = '402'
+                failureMessage  = Debug_2
         elif Debug_1 in 'Invalid':
-            message = 'Đăng nhập không thành công'
+            code     = '401'
+            failureMessage = 'Invalid account'
         else:
-            message  = 'Đăng nhập không thành công'
-            failure  = Debug_1
+            code     = '401'
+            failureMessage  = Debug_1
         DRIVER.close()
-    
-        if Debug_1[:7] not in 'Failure' or \
-            Debug_2[:7] not in 'Failure' or \
-            Status[:7] not in 'Failure':
+        
+        if Debug_1 == 'Invalid':
             ret_dict = {
-                'Status'     : code,
-                'message'    : message,
+                'status'     : code,
+                'failure'    : failureMessage,
+            }
+        elif Debug_1[:7] not in failure and \
+            Debug_2[:7] not in failure and \
+            Status[:7] not in failure:
+            ret_dict = {
+                'status'     : code,
                 'username'   : Email,
             }
+        elif Debug_1[:7] in failure[1] or \
+            Debug_2[:7] in failure[1] or \
+            Status[:7] in failure[1]:
+            ret_dict = {
+                'status'     : '408',
+                'failure'    : failure[1],
+            } 
         else:
             ret_dict = {
-                'Status'     : code,
-                'message'    : message,
-                'failure'    : failure,
+                'status'     : code,
+                'failure'    : failureMessage,
             }
 
         #Return:
@@ -102,6 +116,10 @@ if __name__ == "__main__":
     # Argument shortage: 
     except IndexError as error:
         print('Argument shortage')
+    #Timeout:
+    except TimeoutException as error:
+        print('Timeout')
+    #Others:
     except:
         print('Thất bại, không thể thực hiện được')
 

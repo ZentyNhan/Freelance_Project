@@ -18,6 +18,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException,ElementNotInteractableException
@@ -135,18 +136,27 @@ import lib
 # o = n.count('a')
 # print(o)
 
-Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122__Fatih/İstanbul,__Türkiye'
+# Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122__Fatih/İstanbul,__Türkiye'
 
-# Email       = str(sys.argv[1])
-# PassW       = str(sys.argv[2])
-# familyURL   = str(sys.argv[3])
+# # Email       = str(sys.argv[1])
+# # PassW       = str(sys.argv[2])
+# # familyURL   = str(sys.argv[3])
 
-#String Handling:
-Address    = Address.replace('__',' ')
-print(Address)
-
-
+# #String Handling:
+# Address    = Address.replace('__',' ')
+# print(Address)
 
 
+Email       = 'z.ntnhan19@gmail.com'
+PassW       = 'Hihihi123@'
+Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
+op = webdriver.ChromeOptions()
+DRIVER  = webdriver.Chrome(ChromeDriverManager().install(), options=op)
+DRIVER.get(Spotify_url)
+WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-username'))).send_keys(Email)
+WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-password'))).send_keys(PassW)
+WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-button'))).click()
+
+sleep(3)
 
 

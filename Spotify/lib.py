@@ -41,8 +41,9 @@ class Process(delay):
     whoer_url    = f'https://whoer.net/fr'
     Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
     Profile_url  = f'https://www.spotify.com/us/account/profile/'
+    TO_wait      = 15
     Element_dict = {
-        'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]''',
+        'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
@@ -72,14 +73,16 @@ class Process(delay):
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
-            sleep(self.FLEX_DELAY)
-            driver.find_element(By.ID ,'login-username').send_keys(self.user)
-            driver.find_element(By.ID ,'login-password').send_keys(self.password)
-            driver.find_element(By.ID ,'login-button').click()
-            sleep(self.FLEX_DELAY)
+            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-username'))).send_keys(self.user)
+            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-password'))).send_keys(self.password)
+            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-button'))).click()
+            sleep(self.DELAY) #MUST!
             ret = self.userCheck(driver)
+            print(ret)
             #Return:
             return ret
+        except TimeoutException as e:
+            return f'Timeout: {e}'
         except Exception as e:
             return f'Failure: {e}'
     
@@ -94,15 +97,16 @@ class Process(delay):
 
     def switchNation(self, driver):
         try:
-            sleep(self.FLEX_DELAY)
+            print('hahaha')
             driver.get(self.Profile_url)
-            sleep(self.FLEX_DELAY)
-            select = Select(driver.find_element(By.ID, 'country'))
+            select = Select(WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID, 'country'))))
             select.select_by_value(self.nation)
-            driver.find_element(By.XPATH, self.Element_dict['Nation_Sel'] ).click()
-            sleep(self.FLEX_DELAY)
+            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['Nation_Sel']))).click()
+            sleep(self.DELAY) #MUST!
             #Return:
             return 'Success'
+        except TimeoutException as e:
+            return f'Timeout: {e}'
         except Exception as e:
             return f'Failure: {e}'
         
@@ -117,20 +121,17 @@ class Process(delay):
                     break 
             if out == True: return 'Join Link expired'
             else:
-                sleep(self.HARD_DELAY)
-                driver.find_element(By.XPATH, self.Element_dict['join_invite'] ).click()
-                sleep(self.SPONGY_DELAY)
-                driver.find_element(By.XPATH, self.Element_dict['continue_active_account'] ).click()
-                sleep(self.SPONGY_DELAY)
-                driver.find_element(By.XPATH, self.Element_dict['join_address'] ).send_keys(self.address)
-                sleep(self.SOFT_DELAY)
-                driver.find_element(By.XPATH, self.Element_dict['ignore_addr_suggesttion'] ).click()
-                sleep(self.SPONGY_DELAY)
-                driver.find_element(By.XPATH, self.Element_dict['join_submit'] ).click()
-                sleep(self.SPONGY_DELAY)
-                driver.find_element(By.XPATH, self.Element_dict['join_address_confirm'] ).click()
-                sleep(self.HARD_DELAY)
+                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_invite']))).click()
+                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['continue_active_account']))).click()
+                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_address']))).send_keys(self.address)
+                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['ignore_addr_suggesttion']))).click()
+                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_submit']))).click()
+                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_address_confirm']))).click()
+                sleep(self.DELAY) #MUST!
+                #Return:
                 return 'Success'
+        except TimeoutException as e:
+            return f'Timeout: {e}'
         except Exception as e:
             return f'Failure: {e}'
         

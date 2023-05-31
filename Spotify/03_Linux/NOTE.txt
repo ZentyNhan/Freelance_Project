@@ -21,3 +21,7 @@
 2.Return :
      + Positive:  {"Status" : "Success", "username" : Email, "Premium_ID" : Premium ID, "time" : Current time} 
      + Negative:  {"Status" : "failed", "Debug_1" : Debug_1, "Debug_2" : Debug_2, "time" : Current time} 
+
+
+code
+200

@@ -29,8 +29,8 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        Email       = 'freetest423@kikyushop.com'
-        PassW       = 'Hoang123'
+        Email       = 'z.ntnhan19@gmail.com'
+        PassW       = 'Hihihi12@'
 
         # Email       = str(sys.argv[1])
         # PassW       = str(sys.argv[2])
