@@ -1,5 +1,6 @@
 11########## SECTION: Library ##########
 import sys
+import os
 from pickle import FALSE, TRUE
 from subprocess import check_output
 from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
@@ -29,8 +30,8 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        # Email       = 'z.ntnhan19@gmail.com'
-        # PassW       = 'Hihihi12@'
+        # Email       = 'nhan@cloud-air.com'
+        # PassW       = 'Nhan123456'
 
         Email       = str(sys.argv[1])
         PassW       = str(sys.argv[2])
@@ -39,7 +40,8 @@ if __name__ == "__main__":
         op = webdriver.ChromeOptions()
         # op.add_argument('headless')
         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
-        USER           = lib.Process(Email, PassW, 'dummy_1', 'dummy_2', 'dummy_3')
+        LOGGING        = lib.logging(os.getcwd())
+        USER           = lib.Process(Email, PassW, 'dummy_1', 'dummy_2', 'dummy_3', LOGGING)
         code           = '400'
         failure        = ['Failure', 'Timeout']
         failureMessage = 'none'

@@ -1,5 +1,6 @@
 11########## SECTION: Library ##########
 import sys
+import os
 from pickle import FALSE, TRUE
 from subprocess import check_output
 from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
@@ -29,17 +30,17 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        # Email       = 'z.ntnhan19@gmail.com'
-        # PassW       = 'Hihihi12@'
-        # familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
-        # Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
-        # Nation      = 'TR' #India test
+        Email       = 'nhan@cloud-air.com'
+        PassW       = 'Nhan123456'
+        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
+        Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
+        Nation      = 'VN' #India test
 
-        Email       = str(sys.argv[1])
-        PassW       = str(sys.argv[2])
-        familyURL   = str(sys.argv[3])
-        Address     = str(sys.argv[4])
-        Nation      = str(sys.argv[5]) 
+        # Email       = str(sys.argv[1])
+        # PassW       = str(sys.argv[2])
+        # familyURL   = str(sys.argv[3])
+        # Address     = str(sys.argv[4])
+        # Nation      = str(sys.argv[5]) 
         
         #String Handling:
         dt_format  = "%d-%m-%Y_%H:%M:%S"
@@ -51,7 +52,8 @@ if __name__ == "__main__":
         op = webdriver.ChromeOptions()
         # op.add_argument('headless')
         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
-        USER           = lib.Process(Email, PassW, familyURL, Address, Nation)
+        LOGGING        = lib.logging(os.getcwd())
+        USER           = lib.Process(Email, PassW, familyURL, Address, Nation, LOGGING)
         code           = '400'
         failure        = ['Failure', 'Timeout']
         failureMessage = 'none'
@@ -119,9 +121,9 @@ if __name__ == "__main__":
     #Timeout:
     except TimeoutException as error:
         print('Timeout')
-    #Others:
-    except:
-        print('Thất bại, không thể thực hiện được')
+    # #Others:
+    # except:
+    #     print('Thất bại, không thể thực hiện được')
 
 
 

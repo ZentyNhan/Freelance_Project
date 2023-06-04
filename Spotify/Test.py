@@ -32,6 +32,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import json
 import string
+import time
 
 #Excel Processing:
 from openpyxl import Workbook 
@@ -147,16 +148,46 @@ import lib
 # print(Address)
 
 
-Email       = 'z.ntnhan19@gmail.com'
-PassW       = 'Hihihi123@'
-Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
-op = webdriver.ChromeOptions()
-DRIVER  = webdriver.Chrome(ChromeDriverManager().install(), options=op)
-DRIVER.get(Spotify_url)
-WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-username'))).send_keys(Email)
-WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-password'))).send_keys(PassW)
-WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-button'))).click()
+# Email       = 'z.ntnhan19@gmail.com'
+# PassW       = 'Hihihi123@'
+# Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
+# op = webdriver.ChromeOptions()
+# DRIVER  = webdriver.Chrome(ChromeDriverManager().install(), options=op)
+# DRIVER.get(Spotify_url)
+# WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-username'))).send_keys(Email)
+# WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-password'))).send_keys(PassW)
+# WebDriverWait(DRIVER, 20).until(EC.presence_of_element_located((By.ID ,'login-button'))).click()
 
-sleep(3)
+# sleep(3)
+
+class logging():
+    #Attributes:
+    dt_format = "%d-%m-%Y_%H.%M.%S"
+    dt = datetime.now().strftime(dt_format)
+
+    def __init__(self, curpath_):
+        self.curpath = curpath_
+        self.curlogpath = os.path.join(self.curpath, 'log')
+        self.create_log_folder()
+        self.create_log()
+
+    def create_log(self):
+        try:
+            f  = open(os.path.join(self.curlogpath, f'Selenium_log_{self.dt}.txt'), 'w')
+            f.writelines(f'[{self.dt}]: ########## START RECORDING LOG ##########')
+        except Exception as e:
+            print(f'Failed: {e}')
+
+    def create_log_folder(self):
+        try:
+            os.mkdir(self.curlogpath)
+        except FileExistsError:
+            pass
+        except Exception as e:
+            print(f'Failed: {e}')
+
+
+print(os.getcwd())
+log = logging(os.getcwd())
 
 

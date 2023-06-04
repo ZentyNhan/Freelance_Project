@@ -1,0 +1,39 @@
+[04-06-2023_19.10.45]: ########## START RECORDING LOG ##########
+[04-06-2023_19.10.48]: In accessSpotify - Start accessing Spotify ... Done
+[04-06-2023_19.10.49]: In accessSpotify - Tried to insert username/password ... Done
+[04-06-2023_19.10.52]: In accessSpotify - Waiting to check validation ... Done
+[04-06-2023_19.10.52]: In accessSpotify - Username is "Valid" ... Done
+[04-06-2023_19.10.53]: In switchNation - Start switching Nation ... Done
+[04-06-2023_19.10.54]: In switchNation - Selected Nation ... Done
+[04-06-2023_19.10.54]: In switchNation - Saved profile ... Done
+[04-06-2023_19.10.57]: In accessSpotify - Waiting to check Nation validation ... Done
+[04-06-2023_19.10.58]: In joinPremium - Start joining Premium family ... Done
+[04-06-2023_19.10.59]: In joinPremium - Checking for expired join link ... Done
+[04-06-2023_19.10.59]: In joinPremium - Accepted invite ... Done
+[04-06-2023_19.11.00]: In joinPremium - Failure: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=113.0.5672.93)
+Stacktrace:
+Backtrace:
+	GetHandleVerifier [0x007C8893+48451]
+	(No symbol) [0x0075B8A1]
+	(No symbol) [0x00665058]
+	(No symbol) [0x0064D073]
+	(No symbol) [0x006ADEBB]
+	(No symbol) [0x006BBFD3]
+	(No symbol) [0x006AA0B6]
+	(No symbol) [0x00687E08]
+	(No symbol) [0x00688F2D]
+	GetHandleVerifier [0x00A28E3A+2540266]
+	GetHandleVerifier [0x00A68959+2801161]
+	GetHandleVerifier [0x00A6295C+2776588]
+	GetHandleVerifier [0x00852280+612144]
+	(No symbol) [0x00764F6C]
+	(No symbol) [0x007611D8]
+	(No symbol) [0x007612BB]
+	(No symbol) [0x00754857]
+	BaseThreadInitThunk [0x769C7D59+25]
+	RtlInitializeExceptionChain [0x77A2B74B+107]
+	RtlClearBits [0x77A2B6CF+191]
+ ... Done
+[04-06-2023_19.11.00]: ########## END RECORDING LOG ##########
