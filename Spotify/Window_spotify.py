@@ -30,17 +30,17 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        Email       = 'nhan@cloud-air.com'
-        PassW       = 'Nhan123456'
-        familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
-        Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
-        Nation      = 'VN' #India test
+        # Email       = 'nhan@cloud-air.com'
+        # PassW       = 'Nhan123456'
+        # familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
+        # Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye' #Chuyển __ thành khoảng trắng
+        # Nation      = 'VN' #India test
 
-        # Email       = str(sys.argv[1])
-        # PassW       = str(sys.argv[2])
-        # familyURL   = str(sys.argv[3])
-        # Address     = str(sys.argv[4])
-        # Nation      = str(sys.argv[5]) 
+        Email       = str(sys.argv[1])
+        PassW       = str(sys.argv[2])
+        familyURL   = str(sys.argv[3])
+        Address     = str(sys.argv[4])
+        Nation      = str(sys.argv[5]) 
         
         #String Handling:
         dt_format  = "%d-%m-%Y_%H:%M:%S"
@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
         #Instances:
         op = webdriver.ChromeOptions()
-        # op.add_argument('headless')
+        op.add_argument('headless')
         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
         LOGGING        = lib.logging(os.getcwd())
         USER           = lib.Process(Email, PassW, familyURL, Address, Nation, LOGGING)

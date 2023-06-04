@@ -84,7 +84,7 @@ class Process(delay, logging):
     Profile_url  = f'https://www.spotify.com/us/account/profile/'
     TO_wait      = 30
     Element_dict = {
-        'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]''',
+        'Nation_Sel'              : '''/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]/span[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
@@ -129,9 +129,11 @@ class Process(delay, logging):
             return ret
         except TimeoutException as e:
             self.log.write_log(f'In {self.accessSpotify.__name__} - Timeout: {e}')
+            self.log.close_log()
             return f'Timeout: {e}'
         except Exception as e:
             self.log.write_log(f'In {self.accessSpotify.__name__} - Failure: {e}')
+            self.log.close_log()
             return f'Failure: {e}'
     
     def userCheck(self, driver):
@@ -150,7 +152,7 @@ class Process(delay, logging):
             select = Select(WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID, 'country'))))
             select.select_by_value(self.nation)
             self.log.write_log(f'In {self.switchNation.__name__} - Selected Nation')
-            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['Nation_Sel']))).click()
+            WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['Nation_Sel']))).click()
             self.log.write_log(f'In {self.switchNation.__name__} - Saved profile')
             sleep(self.DELAY) #MUST!
             self.log.write_log(f'In {self.accessSpotify.__name__} - Waiting to check Nation validation')
@@ -158,9 +160,11 @@ class Process(delay, logging):
             return 'Success'
         except TimeoutException as e:
             self.log.write_log(f'In {self.switchNation.__name__} - Timeout: {e}')
+            self.log.close_log()
             return f'Timeout: {e}'
         except Exception as e:
             self.log.write_log(f'In {self.switchNation.__name__} - Failure: {e}')
+            self.log.close_log()
             return f'Failure: {e}'
         
     def joinPremium(self, driver):
@@ -196,9 +200,11 @@ class Process(delay, logging):
                 return 'Success'
         except TimeoutException as e:
             self.log.write_log(f'In {self.joinPremium.__name__} - Timeout: {e}')
+            self.log.close_log()
             return f'Timeout: {e}'
         except Exception as e:
             self.log.write_log(f'In {self.joinPremium.__name__} - Failure: {e}')
+            self.log.close_log()
             return f'Failure: {e}'
         
     @classmethod

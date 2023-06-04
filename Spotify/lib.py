@@ -162,10 +162,10 @@ class Process(delay, logging):
             self.log.write_log(f'In {self.switchNation.__name__} - Timeout: {e}')
             self.log.close_log()
             return f'Timeout: {e}'
-        # except Exception as e:
-        #     self.log.write_log(f'In {self.switchNation.__name__} - Failure: {e}')
-        #     self.log.close_log()
-        #     return f'Failure: {e}'
+        except Exception as e:
+            self.log.write_log(f'In {self.switchNation.__name__} - Failure: {e}')
+            self.log.close_log()
+            return f'Failure: {e}'
         
     def joinPremium(self, driver):
         try:

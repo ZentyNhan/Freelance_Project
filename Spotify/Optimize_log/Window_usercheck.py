@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
         #Instances:
         op = webdriver.ChromeOptions()
-        # op.add_argument('headless')
+        op.add_argument('headless')
         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
         LOGGING        = lib.logging(os.getcwd())
         USER           = lib.Process(Email, PassW, 'dummy_1', 'dummy_2', 'dummy_3', LOGGING)
