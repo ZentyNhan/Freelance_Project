@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
         #Instances:
         op = webdriver.ChromeOptions()
-        op.add_argument('headless')
+        # op.add_argument('headless')
         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
         LOGGING        = lib.logging(os.getcwd())
         USER           = lib.Process(Email, PassW, familyURL, Address, Nation, LOGGING)
@@ -76,6 +76,8 @@ if __name__ == "__main__":
                     failureMessage  = Status
             elif Debug_2 in 'Join Link expired':
                 code     = '403'
+            elif Debug_2 in 'Wrong nation address':
+                code     = '405'
             else:
                 code     = '402'
                 failureMessage  = Debug_2
@@ -121,9 +123,9 @@ if __name__ == "__main__":
     #Timeout:
     except TimeoutException as error:
         print('Timeout')
-    # #Others:
-    # except:
-    #     print('Thất bại, không thể thực hiện được')
+    #Others:
+    except:
+        print('Thất bại, không thể thực hiện được')
 
 
 

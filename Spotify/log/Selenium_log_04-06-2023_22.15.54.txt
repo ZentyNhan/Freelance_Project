@@ -1,0 +1,18 @@
+[04-06-2023_22.15.54]: ########## START RECORDING LOG ##########
+[04-06-2023_22.15.56]: In accessSpotify - Start accessing Spotify ... Done
+[04-06-2023_22.15.56]: In accessSpotify - Tried to insert username/password ... Done
+[04-06-2023_22.15.59]: In accessSpotify - Waiting to check validation ... Done
+[04-06-2023_22.15.59]: In accessSpotify - Username is "Valid" ... Done
+[04-06-2023_22.16.00]: In switchNation - Start switching Nation ... Done
+[04-06-2023_22.16.00]: In switchNation - Selected Nation ... Done
+[04-06-2023_22.16.01]: In switchNation - Saved profile ... Done
+[04-06-2023_22.16.04]: In accessSpotify - Waiting to check Nation validation ... Done
+[04-06-2023_22.16.04]: In joinPremium - Start joining Premium family ... Done
+[04-06-2023_22.16.06]: In joinPremium - Checking for expired join link ... Done
+[04-06-2023_22.16.06]: In joinPremium - Accepted invite ... Done
+[04-06-2023_22.16.07]: In joinPremium - Continued with active account ... Done
+[04-06-2023_22.16.09]: In joinPremium - Inserted address string ... Done
+[04-06-2023_22.16.09]: In joinPremium - Ignored the address suggestion ... Done
+[04-06-2023_22.16.09]: In joinPremium - Tried to find address ... Done
+[04-06-2023_22.16.10]: In joinPremium - Confirm the inserted address ... Done
+[04-06-2023_22.16.10]: ########## END RECORDING LOG ##########

@@ -102,8 +102,12 @@ class Process(delay, logging):
         'USA'                     : 'US',
         'India'                   : 'IN'
     }
-    Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
-    Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
+    Expired_list         = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
+    Invalid_list         = ['Tên người dùng hoặc mật khẩu không chính xác.']
+    # Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác. 
+    # Premium Family chỉ dành cho các thành viên gia đình sống cùng nhau. 
+    # Hãy thử lại khi bạn cũng ở địa chỉ đó.
+    Invalid_address_list = ['Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác.'] 
 
     def __init__(self, user_, password_, familyURL_, address_, nation_, log_):
         self.user      = user_
@@ -139,6 +143,15 @@ class Process(delay, logging):
     def userCheck(self, driver):
         try:
             if self.checkText(driver, self.Invalid_list[0],'Usercheck'):
+                return 'Invalid'
+            else: 
+                return 'Valid'
+        except Exception as e:
+            return f'Failure: {e}'
+        
+    def addressCheck(self, driver):
+        try:
+            if self.checkText(driver, self.Invalid_address_list[0],'Addresscheck'):
                 return 'Invalid'
             else: 
                 return 'Valid'
@@ -193,11 +206,19 @@ class Process(delay, logging):
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_submit']))).click()
                 self.log.write_log(f'In {self.joinPremium.__name__} - Tried to find address')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_address_confirm']))).click()
-                self.log.write_log(f'In {self.joinPremium.__name__} - Confirm the inserted address')
-                self.log.close_log()
-                sleep(self.DELAY) #MUST!
-                #Return:
-                return 'Success'
+                if self.addressCheck(driver) == 'Valid':
+                    self.log.write_log(f'In {self.joinPremium.__name__} - Confirm the inserted address')
+                    self.log.close_log()
+                    sleep(self.DELAY) #MUST!
+                    #Return:
+                    return 'Success'
+                else:
+                    self.log.write_log(f'In {self.joinPremium.__name__} - Wrong nation address')
+                    self.log.close_log()
+                    sleep(self.DELAY) #MUST!
+                    #Return:
+                    return 'Wrong nation address'
+                
         except TimeoutException as e:
             self.log.write_log(f'In {self.joinPremium.__name__} - Timeout: {e}')
             self.log.close_log()
@@ -213,9 +234,10 @@ class Process(delay, logging):
 
     @classmethod
     def checkText(self, driver, text, option=None):
-        if option == 'Joinfamily':  OCCUR = 1
-        elif option == 'Usercheck': OCCUR = 0
-        else:                       OCCUR = 0  
+        if option == 'Joinfamily':     OCCUR = 1
+        elif option == 'Usercheck':    OCCUR = 0
+        elif option == 'Addresscheck': OCCUR = 0
+        else:                          OCCUR = 0  
         ps = driver.page_source
         if (text in driver.page_source) and (self.Occurrences(text, ps) > OCCUR): return True
         else:                                                                     return False
