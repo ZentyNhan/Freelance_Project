@@ -1,4 +1,5 @@
 import sys
+import os
 from pickle import FALSE, TRUE
 from subprocess import check_output
 # from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
@@ -35,15 +36,55 @@ class delay():
     SUPER_DELAY   = 30  #second
     WORLD_DELAY   = 60  #second
 
-class Process(delay):
+class logging():
     #Attributes:
-    dt_format    = "%d-%m-%Y_%H:%M:%S"
+    dt_format = "%d-%m-%Y_%H.%M.%S"
+    dt = datetime.datetime.now().strftime(dt_format)
+
+    def __init__(self, curdir_):
+        self.curdir = curdir_
+        self.curdirpath = os.path.join(self.curdir, 'log')
+        self.create_log_folder()
+        self.curlogpath = os.path.join(self.curdirpath, f'Selenium_log_{datetime.datetime.now().strftime(self.dt_format)}.txt')
+        self.create_log()
+
+    def create_log(self):
+        try:
+            f  = open(self.curlogpath, 'w')
+            f.writelines(f'[{datetime.datetime.now().strftime(self.dt_format)}]: ########## START RECORDING LOG ##########')
+        except Exception as e:
+            print(f'Failed: {e}')
+
+    def write_log(self, log):
+        try: 
+            f  = open(self.curlogpath, 'a')
+            f.writelines(f'\n[{datetime.datetime.now().strftime(self.dt_format)}]: {log} ... Done')
+        except Exception as e:
+            print(f'Failed: {e}')
+
+    def close_log(self):
+        try:
+            f  = open(self.curlogpath, 'a')
+            f.writelines(f'\n[{datetime.datetime.now().strftime(self.dt_format)}]: ########## END RECORDING LOG ##########')
+        except Exception as e:
+            print(f'Failed: {e}')
+
+    def create_log_folder(self):
+        try:
+            os.mkdir(self.curdirpath)
+        except FileExistsError:
+            pass
+        except Exception as e:
+            print(f'Failed: {e}')
+
+class Process(delay, logging):
+    #Attributes:
     whoer_url    = f'https://whoer.net/fr'
     Spotify_url  = f'https://accounts.spotify.com/vi-VN/login?continue=https%3A%2F%2Fopen.spotify.com%2F'
     Profile_url  = f'https://www.spotify.com/us/account/profile/'
-    TO_wait      = 15
+    TO_wait      = 30
     Element_dict = {
-        'Nation_Sel'              : '''//body/div[@id='__next']/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]''',
+        'Nation_Sel'              : '''/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]/span[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
@@ -58,32 +99,41 @@ class Process(delay):
         'Japan'                   : 'JP',
         'Turkey'                  : 'TR',
         'Vietnam'                 : 'VN',
-        'USA'                     : 'US'
+        'USA'                     : 'US',
+        'India'                   : 'IN'
     }
     Expired_list = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
     Invalid_list = ['Tên người dùng hoặc mật khẩu không chính xác.']
 
-    def __init__(self, user_, password_, familyURL_, address_, nation_):
+    def __init__(self, user_, password_, familyURL_, address_, nation_, log_):
         self.user      = user_
         self.password  = password_
         self.familyURL = familyURL_
         self.address   = str(address_).replace('__',' ')
         self.nation    = str(nation_).upper()
+        self.log       = log_
 
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
+            self.log.write_log(f'In {self.accessSpotify.__name__} - Start accessing Spotify')
             WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-username'))).send_keys(self.user)
             WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-password'))).send_keys(self.password)
             WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-button'))).click()
+            self.log.write_log(f'In {self.accessSpotify.__name__} - Tried to insert username/password')
             sleep(self.DELAY) #MUST!
+            self.log.write_log(f'In {self.accessSpotify.__name__} - Waiting to check validation')
             ret = self.userCheck(driver)
-            print(ret)
+            self.log.write_log(f'''In {self.accessSpotify.__name__} - Username is "{ret}"''')
             #Return:
             return ret
         except TimeoutException as e:
+            self.log.write_log(f'In {self.accessSpotify.__name__} - Timeout: {e}')
+            self.log.close_log()
             return f'Timeout: {e}'
         except Exception as e:
+            self.log.write_log(f'In {self.accessSpotify.__name__} - Failure: {e}')
+            self.log.close_log()
             return f'Failure: {e}'
     
     def userCheck(self, driver):
@@ -97,42 +147,64 @@ class Process(delay):
 
     def switchNation(self, driver):
         try:
-            print('hahaha')
             driver.get(self.Profile_url)
+            self.log.write_log(f'In {self.switchNation.__name__} - Start switching Nation')
             select = Select(WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID, 'country'))))
             select.select_by_value(self.nation)
-            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['Nation_Sel']))).click()
+            self.log.write_log(f'In {self.switchNation.__name__} - Selected Nation')
+            WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['Nation_Sel']))).click()
+            self.log.write_log(f'In {self.switchNation.__name__} - Saved profile')
             sleep(self.DELAY) #MUST!
+            self.log.write_log(f'In {self.accessSpotify.__name__} - Waiting to check Nation validation')
             #Return:
             return 'Success'
         except TimeoutException as e:
+            self.log.write_log(f'In {self.switchNation.__name__} - Timeout: {e}')
+            self.log.close_log()
             return f'Timeout: {e}'
-        except Exception as e:
-            return f'Failure: {e}'
+        # except Exception as e:
+        #     self.log.write_log(f'In {self.switchNation.__name__} - Failure: {e}')
+        #     self.log.close_log()
+        #     return f'Failure: {e}'
         
     def joinPremium(self, driver):
         try:
             out = False
             driver.get(self.familyURL) 
+            self.log.write_log(f'In {self.joinPremium.__name__} - Start joining Premium family')
             sleep(self.FLEX_DELAY)
+            self.log.write_log(f'In {self.joinPremium.__name__} - Checking for expired join link')
             for text in self.Expired_list:
                 if self.checkText(driver, text,'Joinfamily'): 
                     out = True 
                     break 
-            if out == True: return 'Join Link expired'
+            if out == True: 
+                self.log.write_log(f'In {self.joinPremium.__name__} - Join link expired')
+                return 'Join Link expired'
             else:
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_invite']))).click()
+                self.log.write_log(f'In {self.joinPremium.__name__} - Accepted invite')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['continue_active_account']))).click()
+                self.log.write_log(f'In {self.joinPremium.__name__} - Continued with active account')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_address']))).send_keys(self.address)
+                self.log.write_log(f'In {self.joinPremium.__name__} - Inserted address string')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['ignore_addr_suggesttion']))).click()
+                self.log.write_log(f'In {self.joinPremium.__name__} - Ignored the address suggestion')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_submit']))).click()
+                self.log.write_log(f'In {self.joinPremium.__name__} - Tried to find address')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_address_confirm']))).click()
+                self.log.write_log(f'In {self.joinPremium.__name__} - Confirm the inserted address')
+                self.log.close_log()
                 sleep(self.DELAY) #MUST!
                 #Return:
                 return 'Success'
         except TimeoutException as e:
+            self.log.write_log(f'In {self.joinPremium.__name__} - Timeout: {e}')
+            self.log.close_log()
             return f'Timeout: {e}'
         except Exception as e:
+            self.log.write_log(f'In {self.joinPremium.__name__} - Failure: {e}')
+            self.log.close_log()
             return f'Failure: {e}'
         
     @classmethod
@@ -174,5 +246,5 @@ class Process(delay):
             return f'Failure: {e}'
         
 #Instance:
-Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5')
+Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5', 'dummy_6')
 
