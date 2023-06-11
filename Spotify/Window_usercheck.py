@@ -31,7 +31,7 @@ if __name__ == "__main__":
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
         # Email       = 'nhan@cloud-air.com'
-        # PassW       = 'Nhan123456'
+        # PassW       = 'Nhan12345kk6'
 
         Email       = str(sys.argv[1])
         PassW       = str(sys.argv[2])
