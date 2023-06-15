@@ -121,9 +121,9 @@ class Process(delay, logging):
         try:
             driver.get(self.Spotify_url)
             self.log.write_log(f'In {self.accessSpotify.__name__} - Start accessing Spotify')
-            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-username'))).send_keys(self.user)
-            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-password'))).send_keys(self.password)
-            WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID ,'login-button'))).click()
+            WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_element_located((By.ID ,'login-username'))).send_keys(self.user)
+            WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_element_located((By.ID ,'login-password'))).send_keys(self.password)
+            WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_all_elements_located((By.ID ,'login-button'))).click()
             self.log.write_log(f'In {self.accessSpotify.__name__} - Tried to insert username/password')
             sleep(self.DELAY) #MUST!
             self.log.write_log(f'In {self.accessSpotify.__name__} - Waiting to check validation')
@@ -205,7 +205,7 @@ class Process(delay, logging):
                 self.log.write_log(f'In {self.joinPremium.__name__} - Ignored the address suggestion')
                 WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_submit']))).click()
                 self.log.write_log(f'In {self.joinPremium.__name__} - Tried to find address')
-                WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.XPATH, self.Element_dict['join_address_confirm']))).click()
+                WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_all_elements_located((By.XPATH, self.Element_dict['join_address_confirm']))).click()
                 if self.addressCheck(driver) == 'Valid':
                     self.log.write_log(f'In {self.joinPremium.__name__} - Confirm the inserted address')
                     self.log.close_log()
