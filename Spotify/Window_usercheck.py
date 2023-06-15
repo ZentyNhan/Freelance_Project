@@ -1,4 +1,4 @@
-11########## SECTION: Library ##########
+########## SECTION: Library ##########
 import sys
 import os
 from pickle import FALSE, TRUE
@@ -30,16 +30,18 @@ if __name__ == "__main__":
     try: 
         ########## ANCHOR: DO NOT CHANGE ##########
         # #Get information from PHP:
-        # Email       = 'nhan@cloud-air.com'
-        # PassW       = 'Nhan123456'
+        Email       = 'triet@cloud-air.com'
+        PassW       = 'Triet1223'
 
-        Email       = str(sys.argv[1])
-        PassW       = str(sys.argv[2])
+        # Email       = str(sys.argv[1])
+        # PassW       = str(sys.argv[2])
 
         #Instances:
-        op = webdriver.ChromeOptions()
-        op.add_argument('headless')
-        DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=op)
+        # op = webdriver.ChromeOptions()
+        chrome_options = Options()
+        chrome_options.add_argument("--headless=new")
+        # op.add_argument('headless')
+        DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
         LOGGING        = lib.logging(os.getcwd())
         USER           = lib.Process(Email, PassW, 'dummy_1', 'dummy_2', 'dummy_3', LOGGING)
         code           = '400'

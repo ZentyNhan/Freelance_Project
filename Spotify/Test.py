@@ -160,34 +160,36 @@ import lib
 
 # sleep(3)
 
-class logging():
-    #Attributes:
-    dt_format = "%d-%m-%Y_%H.%M.%S"
-    dt = datetime.now().strftime(dt_format)
+# class logging():
+#     #Attributes:
+#     dt_format = "%d-%m-%Y_%H.%M.%S"
+#     dt = datetime.now().strftime(dt_format)
 
-    def __init__(self, curpath_):
-        self.curpath = curpath_
-        self.curlogpath = os.path.join(self.curpath, 'log')
-        self.create_log_folder()
-        self.create_log()
+#     def __init__(self, curpath_):
+#         self.curpath = curpath_
+#         self.curlogpath = os.path.join(self.curpath, 'log')
+#         self.create_log_folder()
+#         self.create_log()
 
-    def create_log(self):
-        try:
-            f  = open(os.path.join(self.curlogpath, f'Selenium_log_{self.dt}.txt'), 'w')
-            f.writelines(f'[{self.dt}]: ########## START RECORDING LOG ##########')
-        except Exception as e:
-            print(f'Failed: {e}')
+#     def create_log(self):
+#         try:
+#             f  = open(os.path.join(self.curlogpath, f'Selenium_log_{self.dt}.txt'), 'w')
+#             f.writelines(f'[{self.dt}]: ########## START RECORDING LOG ##########')
+#         except Exception as e:
+#             print(f'Failed: {e}')
 
-    def create_log_folder(self):
-        try:
-            os.mkdir(self.curlogpath)
-        except FileExistsError:
-            pass
-        except Exception as e:
-            print(f'Failed: {e}')
+#     def create_log_folder(self):
+#         try:
+#             os.mkdir(self.curlogpath)
+#         except FileExistsError:
+#             pass
+#         except Exception as e:
+#             print(f'Failed: {e}')
 
 
-print(os.getcwd())
-log = logging(os.getcwd())
+# print(os.getcwd())
+# log = logging(os.getcwd())
 
+
+print(webdriver.version_info)
 

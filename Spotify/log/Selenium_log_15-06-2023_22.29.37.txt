@@ -1,0 +1,5 @@
+[15-06-2023_22.29.37]: ########## START RECORDING LOG ##########
+[15-06-2023_22.29.41]: In accessSpotify - Start accessing Spotify ... Done
+[15-06-2023_22.29.42]: In accessSpotify - Tried to insert username/password ... Done
+[15-06-2023_22.29.45]: In accessSpotify - Waiting to check validation ... Done
+[15-06-2023_22.29.45]: In accessSpotify - Username is "Valid" ... Done
