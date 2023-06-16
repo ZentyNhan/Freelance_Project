@@ -46,7 +46,12 @@ import pypyodbc as odbc
 import pyodbc
 
 #self lib
-import lib
+# import lib
+
+#DJANGO:
+import django
+
+print(django.get_version())
 
 # DRIVER_NAME = 'ODBC Driver 17 for SQL Server'
 # SERVER_NAME = 'DESKTOP-RCFES7K\SQLEXPRESS'
@@ -191,5 +196,4 @@ import lib
 # log = logging(os.getcwd())
 
 
-print(webdriver.version_info)
 

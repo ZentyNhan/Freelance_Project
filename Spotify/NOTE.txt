@@ -66,3 +66,11 @@ pas xzfjDe5UX5azDXPuFNJQ
 tk surfshark vpn
 email: evtf41@gmail.com
 pas : Hoang@@11
+
+
+==========================================================================================================
+########## DJANGO ##########
+1. python -m django startproject mysite
+2. python manage.py runserver
+3. python manage.py migrate
+==========================================================================================================
