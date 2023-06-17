@@ -37,13 +37,13 @@ def get_login(request):
 def joinSpotify(request):
     if request.method == 'POST':
         UserN = request.POST.get('username')
-        PassW = request.POST.get('password')
+        PassW = str(request.POST.get('password'))
         
         #Instances:
         # op = webdriver.ChromeOptions()
-        chrome_options = Options()
-        # chrome_options.add_argument("--headless=new")
         # op.add_argument('headless')
+        chrome_options = Options()
+        chrome_options.add_argument("--headless=new")
         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
         LOGGING        = lib.logging(os.getcwd())
         USER           = lib.Process(UserN, PassW, 'dummy_1', 'dummy_2', 'dummy_3', LOGGING)
@@ -84,8 +84,9 @@ def joinSpotify(request):
 
         #Return:
         print(json.dumps(ret_dict))
-        
-    return render(request, 'login.html')
+        return render(request, 'login.html')
+    else:
+        return render(request, 'login.html')
 
 def get_test(request):
     return render(request, 'test.html')
