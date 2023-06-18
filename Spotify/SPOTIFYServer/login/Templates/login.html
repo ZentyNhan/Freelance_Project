@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <!-- Design by foolishdeveloper.com -->
-    <title>Spotify Family Gate</title>
- 
+    <title>Spotify Family Gate</title> 
+    <link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
@@ -138,6 +138,15 @@
     margin-right: 4px;
     }
 
+    .box{
+        background-color: lightgrey;
+        width: 600px;
+        height: 300px;
+        border: 5px solid green;
+        padding: 50px;
+        margin: 20px;
+    }
+
 
     </style>
 </head>
@@ -148,21 +157,25 @@
     </div>
     <form method="post">
         <h3>Đăng Nhập</h3>
-        <h4 class='brief'>Nhập Email và password để tham gia Spotify Family</h4>
+        <h4 class='brief'>Nhập thông tin tài khoản để tham gia Spotify Family</h4>
         {% csrf_token %} 
-        <label for="username">Username</label>
-        <input type="text" placeholder="Enter Username" id="username" name="username">
+        <label for="Uname">Username</label>
+        <input type="text" placeholder="Enter Username" id="Uname" name="Uname">
 
-        <label for="password">Password</label>
-        <input type="password" placeholder="Password" id="password" name="pass">
+        <label for="Pwd">Password</label>
+        <input type="password" placeholder="Enter Password" id="Pwd" name="Pwd">
 
         <button type="submit">Tham Gia</button>
-        <!-- <input type="button" value=""> -->
-        <!-- <div class="social">
-          <div class="go"><i class="fab fa-google"></i>  Google</div>
-          <div class="fb"><i class="fab fa-facebook"></i>  Facebook</div>
-        </div> -->
-        {% comment %} <a href="{% url 'signup' %}" >Create a account</a> {% endcomment %}
     </form>
+
+    <div class="box">
+        <h4>Quá trình:</h4>
+        <p class="status">1.Trạng thái : {{ status }}</p>
+        <p class="status">2.Chi tiết : {{ detail }}</p>
+        <p class="status">3.Thời gian : {{ time }}</p>
+    </div>
+
+
+
 </body>
 </html>

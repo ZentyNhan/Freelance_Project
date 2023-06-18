@@ -1,4 +1,0 @@
-[17-06-2023_00.57.14]: ########## START RECORDING LOG ##########
-[17-06-2023_00.57.16]: In accessSpotify - Start accessing Spotify ... Done
-[17-06-2023_00.57.16]: In accessSpotify - Failure: object of type 'NoneType' has no len() ... Done
-[17-06-2023_00.57.16]: ########## END RECORDING LOG ##########

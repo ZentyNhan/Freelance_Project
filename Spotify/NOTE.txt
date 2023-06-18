@@ -67,10 +67,24 @@ tk surfshark vpn
 email: evtf41@gmail.com
 pas : Hoang@@11
 
+4. Spotify account:
+nhan@cloud-air.com/4cf584Bb9 (deactived)
+triet/83530fAc0 (deactived)
+kim/92807bEo3
+lee/4e92d3Px1
+pak/99957eJc7
+
 
 ==========================================================================================================
 ########## DJANGO ##########
-1. python -m django startproject mysite
+I.Syntax:
+1. python -m django startproject <mysite>
 2. python manage.py runserver
 3. python manage.py migrate
+
+II.Workloads
+1. Working with database (mySQL)
+2. Working with models
+3. Read Excel Requirements
+4. Xuất Excel từ database
 ==========================================================================================================

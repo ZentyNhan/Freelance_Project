@@ -196,4 +196,12 @@ print(django.get_version())
 # log = logging(os.getcwd())
 
 
+def ret_dict_met(stt_, detl_):
+    yield {"status": stt_, "detail": detl_}
+    yield 'hihihi'
+    yield 'hahaha'
+    return 'hehehe'
 
+
+
+print(ret_dict_met('Đang xử lý', 'Đang đăng nhập Spotify'))
