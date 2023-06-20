@@ -67,7 +67,6 @@ def joinSpotify(request):
         #Get info from customer:
         UserN = request.POST.get('Uname')
         PassW = request.POST.get('Pwd')
-
         
         if UserN in ""  or PassW in "" :
             ret_dict = ret_dict_met("Lỗi" , "Tài khoản và mật khẩu không được để trống")
@@ -95,7 +94,6 @@ def joinSpotify(request):
                 UserInfo.save()
                 mydata = MainDB.objects.all().values()
                 print(mydata)
-                
                 
                 #Instances:
                 ops = webdriver.ChromeOptions()
@@ -150,8 +148,8 @@ def joinSpotify(request):
             except TimeoutException as error:
                 ret_dict = ret_dict_met(ResponseCode['408']['status'], ResponseCode['408']['detail'])
             #Others:
-            # except:
-            #     ret_dict = ret_dict_met(ResponseCode['409']['status'], ResponseCode['409']['detail'])
+            except:
+                ret_dict = ret_dict_met(ResponseCode['409']['status'], ResponseCode['409']['detail'])
             
             #Return: 
             return render(request, 'login.html',ret_dict)

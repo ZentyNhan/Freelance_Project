@@ -84,8 +84,10 @@ I.Syntax:
 4. python manage.py makemigrations (Make models)
 
 II.Workloads
-1. Working with database (mySQL)
-2. Working with models
+1. Working with database (SQLite3) (Done) 
+2. Working with models (Done)
 3. Read Excel Requirements
 4. Xuất Excel từ database
+5. Save trên database mà KH có thể thấy
+6. Phân luồng (Multi Threads) nhiều account access 1 lúc (Done)
 ==========================================================================================================
