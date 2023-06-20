@@ -102,12 +102,16 @@ class Process(delay, logging):
         'USA'                     : 'US',
         'India'                   : 'IN'
     }
-    Expired_list         = ['Liên kết đó đã hết hạn', 'Bu bağlantının süresi doldu.']
-    Invalid_list         = ['Tên người dùng hoặc mật khẩu không chính xác.']
+    Expired_list         = ['Liên kết đó đã hết hạn', 'That link has expired' ,'Bu bağlantının süresi doldu.']
+    Invalid_list         = ['Tên người dùng hoặc mật khẩu không chính xác.','Incorrect username or password.','Kullanıcı adı veya parola yanlış.']
     # Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác. 
     # Premium Family chỉ dành cho các thành viên gia đình sống cùng nhau. 
     # Hãy thử lại khi bạn cũng ở địa chỉ đó.
-    Invalid_address_list = ['Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác.'] 
+    Invalid_address_list = [
+                            'Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác.',
+                            '''It looks like you're trying to join Premium Family from another country.''',
+                            '''Looks like you are trying to join Premium Family from another country.''',
+                            ] 
 
     def __init__(self, user_, password_, familyURL_, address_, nation_, log_):
         self.user      = user_
@@ -142,19 +146,19 @@ class Process(delay, logging):
     
     def userCheck(self, driver):
         try:
-            if self.checkText(driver, self.Invalid_list[0],'Usercheck'):
-                return 'Invalid'
-            else: 
-                return 'Valid'
+            for text in self.Invalid_list:
+                if self.checkText(driver, text,'Usercheck'):
+                    return 'Invalid'
+            return 'Valid'
         except Exception as e:
             return f'Failure: {e}'
         
     def addressCheck(self, driver):
         try:
-            if self.checkText(driver, self.Invalid_address_list[0],'Addresscheck'):
-                return 'Invalid'
-            else: 
-                return 'Valid'
+            for text in self.Invalid_address_list:
+                if self.checkText(driver, text,'Addresscheck'):
+                    return 'Invalid'
+            return 'Valid'
         except Exception as e:
             return f'Failure: {e}'
 

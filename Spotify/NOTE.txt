@@ -81,6 +81,7 @@ I.Syntax:
 1. python -m django startproject <mysite>
 2. python manage.py runserver
 3. python manage.py migrate
+4. python manage.py makemigrations (Make models)
 
 II.Workloads
 1. Working with database (mySQL)

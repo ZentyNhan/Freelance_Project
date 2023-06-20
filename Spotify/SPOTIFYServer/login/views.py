@@ -30,6 +30,7 @@ import login.static.lib as lib
 #DJANGO:
 from django.shortcuts import render
 from django.http import HttpResponse
+from login.models import MainDB
 
 
 ########## ANCHOR: DATA ##########
@@ -57,9 +58,13 @@ def ret_dict_met(stt_, detl_):
 def get_login(request):
     return render(request, 'login.html')
 
+# def DB_Input_TEST(User_,PassW_,FamLink_,Addr_,isJoin_,Detail_):
+    # UserInfo = SpotifyDB(1,User_, PassW_, FamLink_, Addr_, isJoin_, Detail_)
+    # UserInfo.save()
+
 def joinSpotify(request):
     if request.method == 'POST':
-        #Get 
+        #Get info from customer:
         UserN = request.POST.get('Uname')
         PassW = request.POST.get('Pwd')
 
@@ -74,7 +79,7 @@ def joinSpotify(request):
                 Username    = UserN
                 Password    = PassW
                 familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
-                Address     = 'Binbirdirek,__Peykhane__Cd.__10/A,__34122 Fatih/İstanbul,__Türkiye'
+                Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
                 Nation      = 'VN'
                 
                 #String Handling:
@@ -82,7 +87,16 @@ def joinSpotify(request):
                 ls         = familyURL.split('/')
                 Ind        = ls.index('invite') + 1
                 Premium_ID = ls[Ind]
-
+                length     = len(MainDB.objects.all().values()) 
+                id         = length + 1 #Calculate ID from current length Users in DB:
+                
+                #TEST DB:
+                UserInfo = MainDB(id, Username, Password, familyURL, Address, True, ResponseCode['200']['detail'])
+                UserInfo.save()
+                mydata = MainDB.objects.all().values()
+                print(mydata)
+                
+                
                 #Instances:
                 ops = webdriver.ChromeOptions()
                 # ops.add_argument('headless')
@@ -103,6 +117,9 @@ def joinSpotify(request):
                         Status  = USER.joinPremium(DRIVER)
                         if Status in 'Success':
                             code     = '200'
+                            #Update on DB:
+                            UserInfo = MainDB(Username, Password, familyURL, Address, True, ResponseCode[code]['detail'])
+                            UserInfo.save()
                         elif Status in 'Join Link expired':
                             code     = '403'
                         else: 
@@ -127,13 +144,14 @@ def joinSpotify(request):
                     ret_dict = ret_dict_met(ResponseCode['408']['status'], ResponseCode['408']['detail'])
                 else:
                     ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
+                    
 
             #Timeout:
             except TimeoutException as error:
                 ret_dict = ret_dict_met(ResponseCode['408']['status'], ResponseCode['408']['detail'])
             #Others:
-            except:
-                ret_dict = ret_dict_met(ResponseCode['409']['status'], ResponseCode['409']['detail'])
+            # except:
+            #     ret_dict = ret_dict_met(ResponseCode['409']['status'], ResponseCode['409']['detail'])
             
             #Return: 
             return render(request, 'login.html',ret_dict)
