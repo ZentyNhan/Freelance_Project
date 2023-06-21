@@ -88,6 +88,7 @@ class Process(delay, logging):
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
+        'onetrust_off'            : '''//body/div[@id='onetrust-consent-sdk']/div[@id='onetrust-banner-sdk']/div[1]/div[2]/button[1]''',
         'invalid_user'            : '''/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]''',
         'join_submit'             : '''//body/div[@id='__next']/form[1]/main[1]/div[1]/div[1]/fieldset[1]/div[1]/button[1]''',
         'ignore_addr_suggesttion' : '''/html[1]/body[1]/div[1]/form[1]/main[1]/div[1]/section[1]/fieldset[1]/div[1]/div[1]/label[1]/span[1]''',
@@ -169,6 +170,8 @@ class Process(delay, logging):
             select = Select(WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID, 'country'))))
             select.select_by_value(self.nation)
             self.log.write_log(f'In {self.switchNation.__name__} - Selected Nation')
+            WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['onetrust_off']))).click()
+            self.log.write_log(f'In {self.switchNation.__name__} - Closed Onetrust')
             WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['Nation_Sel']))).click()
             self.log.write_log(f'In {self.switchNation.__name__} - Saved profile')
             sleep(self.DELAY) #MUST!

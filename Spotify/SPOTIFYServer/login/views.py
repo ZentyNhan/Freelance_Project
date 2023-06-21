@@ -28,7 +28,9 @@ import json
 import login.static.lib as lib
 
 #DJANGO:
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from login.models import MainDB
 
@@ -49,18 +51,38 @@ ResponseCode = {
 ResponseProg = {
     
 }
-########## ANCHOR: METHOD ##########
+########## ANCHOR: METHODS ##########
 def ret_dict_met(stt_, detl_):
     return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
 
+def DB_Input(id_,User_,PassW_,FamLink_,Addr_,isJoin_,Detail_):
+    UserInfo = MainDB(id_, User_, PassW_, FamLink_, Addr_, isJoin_, Detail_)
+    UserInfo.save()
+    
 ########## ANCHOR: VIEWS ##########
 # Create your views here.
 def get_login(request):
-    return render(request, 'login.html')
+    return render(request, 'Spotify_login.html')
 
-# def DB_Input_TEST(User_,PassW_,FamLink_,Addr_,isJoin_,Detail_):
-    # UserInfo = SpotifyDB(1,User_, PassW_, FamLink_, Addr_, isJoin_, Detail_)
-    # UserInfo.save()
+def SysCtrlSpotify(request):
+    return render(request, 'Spotify_control.html')
+
+def AdminSpotify(request):
+    if request.method == 'POST':
+        AD_UserN = request.POST.get('uname')
+        AD_PassW = request.POST.get('psw')
+        AD_User = authenticate(username=AD_UserN, password=AD_PassW)
+        if AD_UserN in ""  or AD_PassW in "" :
+            ret_dict = ret_dict_met('Error: ', 'username or password can not be blank')
+            return render(request, 'Spotify_admin.html', ret_dict)
+        elif AD_User is not None:
+            login(request, AD_User)
+            return render(request, 'Spotify_control.html')
+        else:
+            ret_dict = ret_dict_met('Error: ', 'incorrect username or password. Please try again!')
+            return render(request, 'Spotify_admin.html', ret_dict)
+    else:
+        return render(request, 'Spotify_admin.html')
 
 def joinSpotify(request):
     if request.method == 'POST':
@@ -68,9 +90,10 @@ def joinSpotify(request):
         UserN = request.POST.get('Uname')
         PassW = request.POST.get('Pwd')
         
+        #Process:
         if UserN in ""  or PassW in "" :
             ret_dict = ret_dict_met("Lỗi" , "Tài khoản và mật khẩu không được để trống")
-            return render(request, 'login.html',ret_dict)
+            return render(request, 'Spotify_login.html',ret_dict)
         else:
             try: 
                 ########## ANCHOR: DO NOT CHANGE ##########
@@ -87,17 +110,11 @@ def joinSpotify(request):
                 Ind        = ls.index('invite') + 1
                 Premium_ID = ls[Ind]
                 length     = len(MainDB.objects.all().values()) 
-                id         = length + 1 #Calculate ID from current length Users in DB:
-                
-                #TEST DB:
-                UserInfo = MainDB(id, Username, Password, familyURL, Address, True, ResponseCode['200']['detail'])
-                UserInfo.save()
-                mydata = MainDB.objects.all().values()
-                print(mydata)
+                id         = length + 1 #Calculate ID from current length Users in DB
                 
                 #Instances:
                 ops = webdriver.ChromeOptions()
-                # ops.add_argument('headless')
+                ops.add_argument('headless')
                 DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=ops)
                 LOGGING        = lib.logging(os.getcwd())
                 USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
@@ -115,9 +132,6 @@ def joinSpotify(request):
                         Status  = USER.joinPremium(DRIVER)
                         if Status in 'Success':
                             code     = '200'
-                            #Update on DB:
-                            UserInfo = MainDB(Username, Password, familyURL, Address, True, ResponseCode[code]['detail'])
-                            UserInfo.save()
                         elif Status in 'Join Link expired':
                             code     = '403'
                         else: 
@@ -139,23 +153,32 @@ def joinSpotify(request):
                 if Debug_1[:7] in failure[1] or \
                     Debug_2[:7] in failure[1] or \
                     Status[:7] in failure[1]:
-                    ret_dict = ret_dict_met(ResponseCode['408']['status'], ResponseCode['408']['detail'])
+                    code = '408'
+                    ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
                 else:
                     ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
-                    
-
+                
+                #Update on DB:
+                if code == '200': DB_Input(id, Username, Password, familyURL, Address, True, ResponseCode[code]['detail'])
+                else:             DB_Input(id, Username, Password, familyURL, Address, False, ResponseCode[code]['detail'])
+                
+            ### Exception ###
             #Timeout:
             except TimeoutException as error:
-                ret_dict = ret_dict_met(ResponseCode['408']['status'], ResponseCode['408']['detail'])
+                code = '408'
+                ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
+                DB_Input(id, Username, Password, familyURL, Address, False, ResponseCode[code]['detail'])
             #Others:
             except:
-                ret_dict = ret_dict_met(ResponseCode['409']['status'], ResponseCode['409']['detail'])
-            
+                code = '409'
+                ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
+                DB_Input(id, Username, Password, familyURL, Address, False, ResponseCode[code]['detail'])
+                
             #Return: 
-            return render(request, 'login.html',ret_dict)
+            return render(request, 'Spotify_login.html',ret_dict)
     else:
         #Return: 
-        return render(request, 'login.html')
+        return render(request, 'Spotify_login.html')
 
 def get_test(request):
     return render(request, 'test.html')

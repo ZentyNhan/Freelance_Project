@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.urls import path
-from . import views as login
+from . import views as API
 
 urlpatterns = [
-    path('Spotify-join/', login.joinSpotify),
-    path('resp', login.get_test_rep),
-    path('', login.get_login), #default
+    path('', API.get_login), #default
+    path('Spot-join/', API.joinSpotify, name='joinSpotify'),
+    path('Spot-admin/', API.AdminSpotify, name='Administrator'),
+    # path('Spot-SysCtrl/', API.SysCtrlSpotify, name='ControlPanel'),
+    path('resp', API.get_test_rep),
     #TEST:
-    path('test/', login.get_test),
+    path('test/', API.get_test),
     
 ]
