@@ -60,7 +60,7 @@ def ret_dict_met(stt_, detl_):
     return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
 
 def DB_Input(id_,User_,PassW_,FamLink_,Addr_,isJoin_,Detail_):
-    UserInfo = MainDB(id_, User_, PassW_, FamLink_, Addr_, isJoin_, Detail_)
+    UserInfo = MainDB(id_, User_, PassW_, FamLink_, Addr_, isJoin_, Detail_,datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     UserInfo.save()
     
 ########## ANCHOR: VIEWS ##########
@@ -191,8 +191,8 @@ def ExportReport(request):
     workbook = xlsxwriter.Workbook(output)
     worksheet = workbook.add_worksheet('Report')
     #Header:
-    header_data = ['ID', 'Email/PhoneNumber', 'Famimy link', 'Address', 'Joined Family', 'Detail']
-    header_format = workbook.add_format({'bold': True,'bottom': 2,'bg_color': '#F9DA04'})
+    header_data = ['ID', 'Email/PhoneNumber', 'Famimy link', 'Address', 'Joined Family', 'Detail', 'Date']
+    header_format = workbook.add_format({'bold': True,'bottom': 2,'bg_color': '#5BC85B'})
     for col_num, data in enumerate(header_data):
         worksheet.write(0, col_num, data, header_format)
     #Data in excel:
@@ -204,6 +204,7 @@ def ExportReport(request):
             elif column == 3: worksheet.write(row, column, DB_data[row-1]['Address'])
             elif column == 4: worksheet.write(row, column, DB_data[row-1]['isJoined'])
             elif column == 5: worksheet.write(row, column, DB_data[row-1]['Detail'])
+            elif column == 6: worksheet.write(row, column, DB_data[row-1]['Date'])
             else:
                 #For next release
                 pass

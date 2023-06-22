@@ -16,6 +16,7 @@ class MainDB(models.Model):
     Address  = models.CharField(max_length=200)
     isJoined = models.BooleanField()
     Detail   = models.CharField(max_length=200)
+    Date     = models.CharField(max_length=200)
     
     #Method
     def __str__(self):
