@@ -1,106 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Administrator System</title> 
-    <link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
+  margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Style the header */
-header {
-  background-color: #666;
-  padding: 30px;
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  color: #f2f2f2;
   text-align: center;
-  font-size: 35px;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  background-color: #04AA6D;
   color: white;
 }
 
-/* Container for flexboxes */
-section {
-  display: -webkit-flex;
+.topnav a.split {
+  float: right;
+  background-color: #04AA6D;
+  color: white;
+}
+/* Create a column layout with Flexbox */
+.row {
   display: flex;
 }
 
-/* Style the navigation menu */
-nav {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  background: #ccc;
-  padding: 20px;
+/* Left column (menu) */
+.left {
+  flex: 35%;
+  padding: 15px 0;
 }
 
-/* Style the list inside the menu */
-nav ul {
+.left h2 {
+  padding-left: 8px;
+}
+
+/* Right column (page content) */
+.right {
+  flex: 144%;
+  padding: 15px;
+  border: 5px solid green;
+  margin: 20px;
+}
+
+/* Style the search box */
+#mySearch {
+  width: 100%;
+  font-size: 18px;
+  padding: 11px;
+  border: 1px solid #ddd;
+}
+
+/* Style the navigation menu inside the left column */
+#myMenu {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
-/* Style the content */
-article {
-  -webkit-flex: 3;
-  -ms-flex: 3;
-  flex: 3;
-  background-color: #f1f1f1;
-  padding: 10px;
+#myMenu li a {
+  padding: 12px;
+  text-decoration: none;
+  color: black;
+  display: block
 }
 
-/* Style the footer */
-footer {
-  background-color: #777;
-  padding: 10px;
-  text-align: center;
-  color: white;
+#myMenu li a:hover {
+  background-color: #eee;
 }
 
-/* Responsive layout - makes the menu and the content (inside the section) sit on top of each other instead of next to each other */
-@media (max-width: 600px) {
-  section {
-    -webkit-flex-direction: column;
-    flex-direction: column;
-  }
-}
 </style>
 </head>
 <body>
 
-<h2>CSS Layout Flexbox</h2>
-<p>In this example, we have created a header, two columns/boxes and a footer. On smaller screens, the columns will stack on top of each other.</p>
-<p>Resize the browser window to see the responsive effect.</p>
-<p><strong>Note:</strong> Flexbox is not supported in Internet Explorer 10 and earlier versions.</p>
+<div class="topnav">
+  <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a>
+  <a href="#"><i class="fa fa-fw fa-search"></i> Search</a>
+  <a href="#"><i class="fa fa-fw fa-search"></i> Functions</a>
+  <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
+  <a href="#about"><i class="fa fa-fw fa-info-circle"></i>About</a>
+  <a href="{% url 'LogoutAdmin' %}" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
+</div>
 
-<header>
-  <h2>Cities</h2>
-</header>
+{% comment %} <div class="row">
+    <div class="left" style="background-color:#bbb;">
+      <h2>Menu</h2>
+      <input type="text" id="mySearch" onkeyup="myFunction()" placeholder="Search.." title="Type in a category">
+      <ul id="myMenu">
+        <li><a href="#">Import data</a></li>
+        <li><a href="#">Export report</a></li>
+      </ul>
+    </div>
+    
+    <div class="right" style="background-color:#ddd;">
+      <h2>Page Content</h2>
+      <p>Start to type for a specific category inside the search bar to "filter" the search options.</p>
+      <p>Some text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
+      <p>Some other text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
+      <p>Some text..</p>
+    </div>
+</div> {% endcomment %}
 
-<section>
-  <nav>
-    <ul>
-      <li><a href="#">London</a></li>
-      <li><a href="#">Paris</a></li>
-      <li><a href="#">Tokyo</a></li>
-    </ul>
-  </nav>
+<div class="right" style="background-color:#ddd;">
+    <h2>Import Data</h2>
+    <p>Start to type for a specific category inside the search bar to "filter" the search options.</p>
+    <p>Some text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
+    <p>Some other text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
+    <p>Some text..</p>
+  </div>
   
-  <article>
-    <h1>London</h1>
-    <p>London is the capital city of England. It is the most populous city in the  United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
-    <p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
-  </article>
-</section>
+  <div class="right" style="background-color:#ddd;">
+    <h2>Export Report</h2>
+    {%if user.is_superuser %}
+    <p>Export all accounts which has access <a href='http://127.0.0.1:8000/Spot-join/'>Join Family Gate</a></p>
+    <form action="exportReport">
+        <button href="{% url 'LogoutAdmin' %}" id="exportReport-btn" class='er-btn'>Export</button>
+    </form>
+    {% else %}
+    <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
+    {% endif %}
+  </div>
 
-<footer>
-  <p>Footer</p>
-</footer>
+  <script>
+    function myFunction() {
+      var input, filter, ul, li, a, i;
+      input = document.getElementById("mySearch");
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("myMenu");
+      li = ul.getElementsByTagName("li");
+      for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
+        }
+      }
+    }
+    </script>
 
 </body>
 </html>
-

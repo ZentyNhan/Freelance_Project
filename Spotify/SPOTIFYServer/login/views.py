@@ -23,12 +23,16 @@ import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import json
+import xlsxwriter
+from io import BytesIO
+
 
 #Lib:
 import login.static.lib as lib
 
 #DJANGO:
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -61,12 +65,8 @@ def DB_Input(id_,User_,PassW_,FamLink_,Addr_,isJoin_,Detail_):
     
 ########## ANCHOR: VIEWS ##########
 # Create your views here.
-def get_login(request):
-    return render(request, 'Spotify_login.html')
 
-def SysCtrlSpotify(request):
-    return render(request, 'Spotify_control.html')
-
+### PAGES ###
 def AdminSpotify(request):
     if request.method == 'POST':
         AD_UserN = request.POST.get('uname')
@@ -77,7 +77,7 @@ def AdminSpotify(request):
             return render(request, 'Spotify_admin.html', ret_dict)
         elif AD_User is not None:
             login(request, AD_User)
-            return render(request, 'Spotify_control.html')
+            return redirect('ControlPanel')
         else:
             ret_dict = ret_dict_met('Error: ', 'incorrect username or password. Please try again!')
             return render(request, 'Spotify_admin.html', ret_dict)
@@ -179,9 +179,59 @@ def joinSpotify(request):
     else:
         #Return: 
         return render(request, 'Spotify_login.html')
+    
+### EVENTS ###
+@login_required(login_url='/Spot-admin')
+def ExportReport(request):   
+    length  = len(MainDB.objects.all().values())
+    DB_data = MainDB.objects.all().values()
+    
+    ### Excel handling ###
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet('Report')
+    #Header:
+    header_data = ['ID', 'Email/PhoneNumber', 'Famimy link', 'Address', 'Joined Family', 'Detail']
+    header_format = workbook.add_format({'bold': True,'bottom': 2,'bg_color': '#F9DA04'})
+    for col_num, data in enumerate(header_data):
+        worksheet.write(0, col_num, data, header_format)
+    #Data in excel:
+    for row in range(1,length+1):
+        for column in range(len(header_data)):
+            if column == 0:   worksheet.write(row, column, DB_data[row-1]['id'])
+            elif column == 1: worksheet.write(row, column, DB_data[row-1]['Username'])
+            elif column == 2: worksheet.write(row, column, DB_data[row-1]['FamLink'])
+            elif column == 3: worksheet.write(row, column, DB_data[row-1]['Address'])
+            elif column == 4: worksheet.write(row, column, DB_data[row-1]['isJoined'])
+            elif column == 5: worksheet.write(row, column, DB_data[row-1]['Detail'])
+            else:
+                #For next release
+                pass
+    workbook.close()
 
+    ### Reponse handling ###
+    # create a response
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # tell the browser what the file is named
+    response['Content-Disposition'] = f'attachment;filename="SAReport_{datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}.xlsx"'
+    # put the spreadsheet data into the response
+    response.write(output.getvalue())
+    # return the response
+    return response
+
+def LogoutAdmin(request):   
+    logout(request)
+    return redirect('Administrator')
+
+### OTHERS ###
 def get_test(request):
     return render(request, 'test.html')
 
 def get_test_rep(request):
-    return HttpResponse()
+    return HttpResponse('')
+
+def get_login(request):
+    return render(request, 'Spotify_login.html')
+
+def SysCtrlSpotify(request):
+    return render(request, 'Spotify_control.html')
