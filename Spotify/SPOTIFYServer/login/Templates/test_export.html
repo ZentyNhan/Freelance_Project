@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Administrator Panel</title> 
+<link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
@@ -57,6 +59,8 @@ body {
 .right {
   flex: 144%;
   padding: 15px;
+  border: 5px solid green;
+  margin: 20px;
 }
 
 /* Style the search box */
@@ -92,12 +96,13 @@ body {
 <div class="topnav">
   <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a>
   <a href="#"><i class="fa fa-fw fa-search"></i> Search</a>
+  <a href="#"><i class="fa fa-fw fa-search"></i> Functions</a>
   <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
   <a href="#about"><i class="fa fa-fw fa-info-circle"></i>About</a>
-  <a href="#Logout" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
+  <a href="{% url 'LogoutAdmin' %}" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
 </div>
 
-<div class="row">
+{% comment %} <div class="row">
     <div class="left" style="background-color:#bbb;">
       <h2>Menu</h2>
       <input type="text" id="mySearch" onkeyup="myFunction()" placeholder="Search.." title="Type in a category">
@@ -114,7 +119,50 @@ body {
       <p>Some other text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
       <p>Some text..</p>
     </div>
-</div>
+</div> {% endcomment %}
+
+<div class="right" style="background-color:#ddd;">
+    <h2>Import Data</h2>
+    <p>Start to type for a specific category inside the search bar to "filter" the search options.</p>
+    <p>Some text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
+    <p>Some other text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
+    <p>Some text..</p>
+  </div>
+  
+  <div class="right" style="background-color:#ddd;">
+    <h2>Export Report</h2>
+    {%if user.is_superuser %}
+    <p>Export all accounts which has access <a href='http://127.0.0.1:8000/Spot-join/'>Join Family Gate</a></p>
+    <br><br>
+    <form action="PageObjects" method="post">
+    <div class ="export-sel">
+        <label>Month filter: </label>
+        <select name = "monthfilter_n" class = "monthfilter_c"> 
+          <optgroup label="Choose month">
+            <option value ="01">Jan</option>
+            <option value ="02">Feb</option>
+            <option value ="03">Mar</option>
+            <option value ="04">Apr</option>
+            <option value ="05">May</option>
+            <option value ="06">Jun</option>
+            <option value ="07">Jul</option>
+            <option value ="08">Aug</option>
+            <option value ="09">Sep</option>
+            <option value ="10">Oct</option>
+            <option value ="11">Nov</option>
+            <option value ="12">Sep</option>
+            </optgroup>    
+        </select>
+    </div>
+    <br><br>
+    <form action="exportReport">
+        <button href="{% url 'LogoutAdmin' %}" id="exportReport-btn" class='er-btn'>Export</button>
+    </form>
+
+    {% else %}
+    <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
+    {% endif %}
+  </div>
 
   <script>
     function myFunction() {

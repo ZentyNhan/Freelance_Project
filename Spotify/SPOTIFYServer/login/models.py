@@ -10,17 +10,36 @@ class TEST(models.Model):
     
 class MainDB(models.Model):
     #Attributes:
+    Username     = models.CharField(max_length=200)
+    Password     = models.CharField(max_length=200)
+    MasterAccout = models.CharField(max_length=200)
+    FamLink      = models.CharField(max_length=200)
+    Address      = models.CharField(max_length=200)
+    isJoined     = models.BooleanField()
+    Detail       = models.CharField(max_length=200)
+    Datetime     = models.CharField(max_length=200)
+    
+    #Method
+    def __str__(self):
+        return self.Username
+    
+class MasterAccountDB(models.Model):
+    #Attributes:
     Username = models.CharField(max_length=200)
     Password = models.CharField(max_length=200)
     FamLink  = models.CharField(max_length=200)
     Address  = models.CharField(max_length=200)
-    isJoined = models.BooleanField()
-    Detail   = models.CharField(max_length=200)
+    Nation   = models.CharField(max_length=20)
+    MemNum   = models.IntegerField()
     Date     = models.CharField(max_length=200)
     
     #Method
     def __str__(self):
         return self.Username
+    
+    
+    
+
 
 
     

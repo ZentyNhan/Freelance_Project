@@ -36,32 +36,29 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from login.models import MainDB
+from login.models import MainDB, MasterAccountDB
+from tablib import Dataset
 
+########## ANCHOR: GLOBAL ATTIRIBUTES ##########
 
-########## ANCHOR: DATA ##########
-ResponseCode = {
-    '200' :	{'status':'Thành công'  ,'detail':'Tham gia Spotify Family thành công'},
-    '400' :	{'status':'Thất bại'    ,'detail':'Tham gia Spotify Family thất bại'},
-    '401' :	{'status':'Thất bại'    ,'detail':'Đăng nhập không thành công'},
-    '402' :	{'status':'Thất bại'    ,'detail':'Chuyển quốc gia không thành công'},
-    '403' :	{'status':'Thất bại'    ,'detail':'Liên kết tham gia đã hết hạn'},
-    '404' :	{'status':'Thất bại'    ,'detail':'Tham gia Spotify Family thất bại'},
-    '405' :	{'status':'Thất bại'    ,'detail':'Tham gia Premium Family từ một quốc gia khác'},
-    '406' :	{'status':'Thất bại'    ,'detail':'Tài khoản hoặc mật khẩu không chính xác'},
-    '408' : {'status':'Thất bại'    ,'detail':'Request Timeout'},
-    '409' :	{'status':'Thất bại'    ,'detail':'Thất bại, không thể thực hiện được'}
-}
-ResponseProg = {
-    
-}
-########## ANCHOR: METHODS ##########
+ret_dict = {}
+DT_format = "%d/%m/%Y %H:%M:%S"
+D_format  = "%d/%m/%Y"
+DTRes_format  = "%H:%M:%S - %d/%m/%Y "
+
+########## ANCHOR: GLOBAL METHODS ##########
 def ret_dict_met(stt_, detl_):
-    return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
+    return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime(DT_format)}
 
-def DB_Input(id_,User_,PassW_,FamLink_,Addr_,isJoin_,Detail_):
-    UserInfo = MainDB(id_, User_, PassW_, FamLink_, Addr_, isJoin_, Detail_,datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, isJoin_, Detail_):
+    UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, isJoin_, Detail_,datetime.datetime.now().strftime(DT_format))
     UserInfo.save()
+    
+def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Remark_, Date_):
+    if Date_ in [None, 'None', '']:    
+        Date_ = datetime.datetime.now().strftime(DT_format)
+    MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
+    MasterUserInfo.save()
     
 ########## ANCHOR: VIEWS ##########
 # Create your views here.
@@ -100,6 +97,7 @@ def joinSpotify(request):
                 # #Get information from PHP:
                 Username    = UserN
                 Password    = PassW
+                MasterAcc   = 'MasterUser_1'
                 familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
                 Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
                 Nation      = 'VN'
@@ -134,6 +132,8 @@ def joinSpotify(request):
                             code     = '200'
                         elif Status in 'Join Link expired':
                             code     = '403'
+                        elif Status in 'Join Link error':
+                            code     = '410'
                         else: 
                             code     = '400'
                     elif Debug_2 in 'Join Link expired':
@@ -154,25 +154,25 @@ def joinSpotify(request):
                     Debug_2[:7] in failure[1] or \
                     Status[:7] in failure[1]:
                     code = '408'
-                    ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
                 else:
-                    ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
                 
                 #Update on DB:
-                if code == '200': DB_Input(id, Username, Password, familyURL, Address, True, ResponseCode[code]['detail'])
-                else:             DB_Input(id, Username, Password, familyURL, Address, False, ResponseCode[code]['detail'])
+                if code == '200': DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail'])
+                else:             DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail'])
                 
             ### Exception ###
             #Timeout:
             except TimeoutException as error:
                 code = '408'
-                ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
-                DB_Input(id, Username, Password, familyURL, Address, False, ResponseCode[code]['detail'])
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
+                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail'])
             #Others:
             except:
                 code = '409'
-                ret_dict = ret_dict_met(ResponseCode[code]['status'], ResponseCode[code]['detail'])
-                DB_Input(id, Username, Password, familyURL, Address, False, ResponseCode[code]['detail'])
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
+                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail'])
                 
             #Return: 
             return render(request, 'Spotify_login.html',ret_dict)
@@ -181,44 +181,130 @@ def joinSpotify(request):
         return render(request, 'Spotify_login.html')
     
 ### EVENTS ###
+########## ANCHOR: ExportReport ##########
 @login_required(login_url='/Spot-admin')
 def ExportReport(request):   
-    length  = len(MainDB.objects.all().values())
-    DB_data = MainDB.objects.all().values()
-    
-    ### Excel handling ###
-    output = BytesIO()
-    workbook = xlsxwriter.Workbook(output)
-    worksheet = workbook.add_worksheet('Report')
-    #Header:
-    header_data = ['ID', 'Email/PhoneNumber', 'Famimy link', 'Address', 'Joined Family', 'Detail', 'Date']
-    header_format = workbook.add_format({'bold': True,'bottom': 2,'bg_color': '#5BC85B'})
-    for col_num, data in enumerate(header_data):
-        worksheet.write(0, col_num, data, header_format)
-    #Data in excel:
-    for row in range(1,length+1):
-        for column in range(len(header_data)):
-            if column == 0:   worksheet.write(row, column, DB_data[row-1]['id'])
-            elif column == 1: worksheet.write(row, column, DB_data[row-1]['Username'])
-            elif column == 2: worksheet.write(row, column, DB_data[row-1]['FamLink'])
-            elif column == 3: worksheet.write(row, column, DB_data[row-1]['Address'])
-            elif column == 4: worksheet.write(row, column, DB_data[row-1]['isJoined'])
-            elif column == 5: worksheet.write(row, column, DB_data[row-1]['Detail'])
-            elif column == 6: worksheet.write(row, column, DB_data[row-1]['Date'])
-            else:
-                #For next release
-                pass
-    workbook.close()
+    if request.method == 'POST':
+        ### Input ###
+        Sel_month  = request.POST.get('monthfilter_n')
+        DB_rawdata = MainDB.objects.all().values()
+        fil_data   = []
+        ### Raw data handling ###
+        for raw in DB_rawdata:
+            if str(raw['Datetime'][3:5]) == str(Sel_month):
+                fil_data.append(raw)
+        #length/data:  
+        if Sel_month == 'All':  
+            length = len(DB_rawdata)
+            data   = DB_rawdata
+        else:                   
+            length = len(fil_data) 
+            data   = fil_data
+            
+        ### Excel handling ###
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet('Report')
+        #Tittle:
+        tittle_format = workbook.add_format({
+            'bold':     True,
+            'border':   6,
+            'font_size':   20,
+            'align':    'center',
+            'valign':   'vcenter',
+            'fg_color': '#D7E4BC',
+        })
+        worksheet.merge_range('A1:G2', 'Spotify Family Report', tittle_format)
+        #Header:
+        header_data = ['ID', 'Email/PhoneNumber', 'Master Account', 'Famimy link', 'Address', 'Joined Family', 'Detail', 'Date']
+        header_format = workbook.add_format({'bold': True,'border': 1, 'align': 'center','bg_color': '#5BC85B'})
+        for col_num, x_data in enumerate(header_data):
+            worksheet.write(2, col_num, x_data, header_format)
+        #Data in excel:
+        if data == []:
+            error_format = workbook.add_format({'bold': True, 
+                                                'border': 1, 
+                                                'font_color': 'red', 
+                                                'text_wrap': True,
+                                                'align':'center',
+                                                'valign': 'vcenter', 
+                                                'fg_color': '#FFFF00',})
+            worksheet.merge_range('A4:G7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
+        else:
+            data_format = workbook.add_format({'border': 1, 'align':'center'})
+            for row in range(3,length+3):
+                for column in range(len(header_data)):
+                    if column == 0:   worksheet.write(row, column, data[row-3]['id']          , data_format)
+                    elif column == 1: worksheet.write(row, column, data[row-3]['Username']    , data_format)
+                    elif column == 2: worksheet.write(row, column, data[row-3]['MasterAccout'], data_format)
+                    elif column == 3: worksheet.write(row, column, data[row-3]['FamLink']     , data_format)
+                    elif column == 4: worksheet.write(row, column, data[row-3]['Address']     , data_format)
+                    elif column == 5: worksheet.write(row, column, data[row-3]['isJoined']    , data_format)
+                    elif column == 6: worksheet.write(row, column, data[row-3]['Detail']      , data_format)
+                    elif column == 7: worksheet.write(row, column, data[row-3]['Datetime']    , data_format)
+                    else:
+                        #For next release
+                        pass
+        worksheet.autofit()
+        workbook.close()
 
-    ### Reponse handling ###
-    # create a response
-    response = HttpResponse(content_type='application/vnd.ms-excel')
-    # tell the browser what the file is named
-    response['Content-Disposition'] = f'attachment;filename="SAReport_{datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}.xlsx"'
-    # put the spreadsheet data into the response
-    response.write(output.getvalue())
-    # return the response
-    return response
+        ### Reponse handling ###
+        # create a response
+        response = HttpResponse(content_type='application/vnd.ms-excel')
+        # tell the browser what the file is named
+        response['Content-Disposition'] = f'attachment;filename="SFReport_{datetime.datetime.now().strftime(DT_format)}.xlsx"'
+        # put the spreadsheet data into the response
+        response.write(output.getvalue())
+        # return the response
+        return response
+
+@login_required(login_url='/Spot-admin')
+########## ANCHOR: UploadData ##########
+def UploadData(request):   
+    if request.method == 'POST':
+        try: 
+            ### Input ###
+            dataset = Dataset()
+            data    = []
+            
+            #Import excel:
+            excel_file = request.FILES['uploadData-name']
+            import_data = dataset.load(excel_file.read(), format='xlsx')
+            # Change "Dataset" to "List"
+            for data_col in import_data:
+                if data_col[6] not in [None, 'None', 'Date']:
+                    data.append({'Username' : data_col[0], 
+                                'Password' : data_col[1], 
+                                'FamLink'  : data_col[2], 
+                                'Address'  : data_col[3], 
+                                'Nation'   : data_col[4], 
+                                'MemNum'   : data_col[5], 
+                                'Date'     : (data_col[6]).strftime(D_format),
+                                'Remark'   : data_col[7]})
+            #Update on DB:
+            for Master_acc in data:
+                length  = len(MasterAccountDB.objects.all().values())
+                id      = length + 1
+                if Master_acc['Username'] not in ['Master Username', None]:
+                    DB_upload(id,
+                            Master_acc['Username'],  
+                            Master_acc['Password'],
+                            Master_acc['FamLink'],
+                            Master_acc['Address'],
+                            lib.ResConfig.langcode[Master_acc['Nation']],
+                            Master_acc['MemNum'],
+                            'Nothing to note',
+                            Master_acc['Date'])
+
+            #Return:
+            ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{datetime.datetime.now().strftime(DT_format)}'}
+            return render(request, 'Spotify_control.html',ret_dict)
+        except Exception as error:
+            ret_dict = {'status' : f'Upload failed' , 'reason' : error , 'datetime' : f'{datetime.datetime.now().strftime(DT_format)}'}
+            return render(request, 'Spotify_control.html',ret_dict)
+    else:
+        ret_dict = {'status' : '' , 'datetime': ''}
+        return render(request, 'Spotify_control.html',ret_dict)
 
 def LogoutAdmin(request):   
     logout(request)

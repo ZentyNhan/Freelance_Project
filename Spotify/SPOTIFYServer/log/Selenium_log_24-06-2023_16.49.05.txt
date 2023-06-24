@@ -1,0 +1,13 @@
+[24-06-2023_16.49.05]: ########## START RECORDING LOG ##########
+[24-06-2023_16.49.06]: In accessSpotify - Start accessing Spotify ... Done
+[24-06-2023_16.49.06]: In accessSpotify - Tried to insert username/password ... Done
+[24-06-2023_16.49.09]: In accessSpotify - Waiting to check validation ... Done
+[24-06-2023_16.49.09]: In accessSpotify - Username is "Valid" ... Done
+[24-06-2023_16.49.10]: In switchNation - Start switching Nation ... Done
+[24-06-2023_16.49.11]: In switchNation - Selected Nation ... Done
+[24-06-2023_16.49.11]: In switchNation - Closed Onetrust ... Done
+[24-06-2023_16.49.12]: In switchNation - Saved profile ... Done
+[24-06-2023_16.49.15]: In accessSpotify - Waiting to check Nation validation ... Done
+[24-06-2023_16.49.16]: In joinPremium - Start joining Premium family ... Done
+[24-06-2023_16.49.17]: In joinPremium - Checking for expired join link ... Done
+[24-06-2023_16.49.17]: In joinPremium - Join link expired ... Done

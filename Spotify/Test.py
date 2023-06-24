@@ -1,8 +1,3 @@
-# try:
-#     print(x)
-# except Exception as e:
-#     print(e)
-
 ########## SECTION: Library ##########
 from ast import Try, keyword
 from contextlib import nullcontext
@@ -33,6 +28,7 @@ from selenium.webdriver.chrome.options import Options
 import json
 import string
 import time
+import random
 
 #Excel Processing:
 from openpyxl import Workbook 
@@ -195,13 +191,14 @@ print(django.get_version())
 # print(os.getcwd())
 # log = logging(os.getcwd())
 
+WB = Workbook()
+WS = WB.active
+list = []
+def id_generator(size=14, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
-def ret_dict_met(stt_, detl_):
-    yield {"status": stt_, "detail": detl_}
-    yield 'hihihi'
-    yield 'hahaha'
-    return 'hehehe'
+for i in range(26):
+    str =  f'https://www.spotify.com/vn-vi/family/join/invite/{id_generator()}/'
+    list.append(str)
 
 
-
-print(ret_dict_met('Đang xử lý', 'Đang đăng nhập Spotify'))

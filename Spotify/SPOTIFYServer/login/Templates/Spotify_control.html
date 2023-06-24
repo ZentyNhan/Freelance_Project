@@ -102,40 +102,73 @@ body {
   <a href="{% url 'LogoutAdmin' %}" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
 </div>
 
-{% comment %} <div class="row">
-    <div class="left" style="background-color:#bbb;">
-      <h2>Menu</h2>
-      <input type="text" id="mySearch" onkeyup="myFunction()" placeholder="Search.." title="Type in a category">
-      <ul id="myMenu">
-        <li><a href="#">Import data</a></li>
-        <li><a href="#">Export report</a></li>
-      </ul>
-    </div>
-    
-    <div class="right" style="background-color:#ddd;">
-      <h2>Page Content</h2>
-      <p>Start to type for a specific category inside the search bar to "filter" the search options.</p>
-      <p>Some text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
-      <p>Some other text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
-      <p>Some text..</p>
-    </div>
-</div> {% endcomment %}
-
-<div class="right" style="background-color:#ddd;">
-    <h2>Import Data</h2>
-    <p>Start to type for a specific category inside the search bar to "filter" the search options.</p>
-    <p>Some text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
-    <p>Some other text..Some text..Some text..Some text..Some text..Some text..Some text..Some text..</p>
-    <p>Some text..</p>
+ <div class="right" style="background-color:#ddd;">
+    <h2>Upload Data</h2>
+    {%if user.is_superuser %}
+    <p>Upload data <strong> &#91;Master accounts, Fammily join link, Nation, Member capacity...&#93;</strong> to database. It's stored for customer to join in system.</p>
+    <br><br>
+    <form action="uploadData" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type = "file" value = "Choose" name = "uploadData-name">
+      <button type = "submit" id="zzz-btn" class='ud-btn'>Upload</button>
+      {% if status == 'Upload successfully' %}
+        <p class="status">Status : <strong style="color: green;">{{ status }}</strong></p>
+        <p class="dateime">Date/Time : {{ datetime }}</p>
+      {% elif status == 'Upload failed' %}
+        <p class="status">Status : <strong style="color: red;">{{ status }}</strong></p>
+        <p class="reason">Reason : {{ reason }}</p>
+        <p class="dateime">Date/Time : {{ datetime }}</p>
+      {% else %}
+      {% endif %}
+     </form>
+    {% else %}
+    <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
+    {% endif %}
   </div>
   
   <div class="right" style="background-color:#ddd;">
     <h2>Export Report</h2>
     {%if user.is_superuser %}
-    <p>Export all accounts which has access <a href='http://127.0.0.1:8000/Spot-join/'>Join Family Gate</a></p>
-    <form action="exportReport">
-        <button href="{% url 'LogoutAdmin' %}" id="exportReport-btn" class='er-btn'>Export</button>
+    <p>Export all accounts which has access <a href='http://127.0.0.1:8000/Spot-join/'>Join Family Gate</a>.</p>
+    <br><br>
+    <form action="exportReport" method="post">
+      {% csrf_token %} 
+      <div class ="export-sel">
+          <label>Month/Year filter: </label>
+          <select name = "monthfilter_n" class = "monthfilter_cls"> 
+            <optgroup label="Choose month">
+              <option value ="01">Jan</option>
+              <option value ="02">Feb</option>
+              <option value ="03">Mar</option>
+              <option value ="04">Apr</option>
+              <option value ="05">May</option>
+              <option value ="06">Jun</option>
+              <option value ="07">Jul</option>
+              <option value ="08">Aug</option>
+              <option value ="09">Sep</option>
+              <option value ="10">Oct</option>
+              <option value ="11">Nov</option>
+              <option value ="12">Sep</option>
+              <option value ="All">All</option>
+            </optgroup>    
+          </select>
+          <select name = "yearfilter_n" class = "yearfilter_cls"> 
+            <optgroup label="Choose year">
+              <option value ="2023">2023</option>
+              <option value ="2024">2024</option>
+              <option value ="2025">2025</option>
+              <option value ="2026">2026</option>
+              <option value ="2027">2027</option>
+              <option value ="2028">2028</option>
+              <option value ="2029">2029</option>
+              <option value ="2030">2030</option>
+            </optgroup>    
+          </select>
+      </div>
+      <br><br>
+        <input type = "submit" value = "Export" id="exportReport-btn" class='er-btn' name="exportReport-name" >
     </form>
+
     {% else %}
     <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
     {% endif %}

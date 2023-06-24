@@ -35,7 +35,40 @@ class delay():
     MASSIVE_DELAY = 10  #second
     SUPER_DELAY   = 30  #second
     WORLD_DELAY   = 60  #second
-
+    
+class Responseconfig():
+    #Attributes:
+    ResponseCode = {
+    '200' :	{'status':'Thành công'  ,'detail':'Tham gia Spotify Family thành công'},
+    '400' :	{'status':'Thất bại'    ,'detail':'Tham gia Spotify Family thất bại'},
+    '401' :	{'status':'Thất bại'    ,'detail':'Đăng nhập không thành công'},
+    '402' :	{'status':'Thất bại'    ,'detail':'Chuyển quốc gia không thành công'},
+    '403' :	{'status':'Thất bại'    ,'detail':'Liên kết tham gia đã hết hạn'},
+    '404' :	{'status':'Thất bại'    ,'detail':'Tham gia Spotify Family thất bại'},
+    '405' :	{'status':'Thất bại'    ,'detail':'Tham gia Premium Family từ một quốc gia khác'},
+    '406' :	{'status':'Thất bại'    ,'detail':'Tài khoản hoặc mật khẩu không chính xác'},
+    '408' : {'status':'Thất bại'    ,'detail':'Request Timeout'},
+    '409' :	{'status':'Thất bại'    ,'detail':'Thất bại, không thể thực hiện được'},
+    '410' :	{'status':'Thất bại'    ,'detail':'Liên kết tham gia lỗi'}
+    }
+    
+    ResponseError = {
+        'database is locked'    : 'Database is locked'    # --> Database is open and not saved yet.
+        # """'uploadData-name'""" : 'Choosen file is empty',
+        
+    }
+    
+    DT_format = "%d/%m/%Y %H:%M:%S"
+    D_format = "%d/%m/%Y"
+    
+    langcode  = {
+        'Japan'                   : 'JP',
+        'Turkey'                  : 'TR',
+        'Vietnam'                 : 'VN',
+        'USA'                     : 'US',
+        'India'                   : 'IN'
+    }
+    
 class logging():
     #Attributes:
     dt_format = "%d-%m-%Y_%H.%M.%S"
@@ -103,7 +136,8 @@ class Process(delay, logging):
         'USA'                     : 'US',
         'India'                   : 'IN'
     }
-    Expired_list         = ['Liên kết đó đã hết hạn', 'That link has expired' ,'Bu bağlantının süresi doldu.']
+    Expired_list         = ['Liên kết đó đã hết hạn',  'That link has expired' ,'Bu bağlantının süresi doldu.']
+    Error_list           = ['Đã xảy ra lỗi', 'An error occurred', 'Analňyşlyk ýüze çykdy']
     Invalid_list         = ['Tên người dùng hoặc mật khẩu không chính xác.','Incorrect username or password.','Kullanıcı adı veya parola yanlış.']
     # Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác. 
     # Premium Family chỉ dành cho các thành viên gia đình sống cùng nhau. 
@@ -195,12 +229,19 @@ class Process(delay, logging):
             sleep(self.FLEX_DELAY)
             self.log.write_log(f'In {self.joinPremium.__name__} - Checking for expired join link')
             for text in self.Expired_list:
-                if self.checkText(driver, text,'Joinfamily'): 
-                    out = True 
+                if self.checkText(driver, text,'Joinfamily_Expire'): 
+                    out = 'Joinfamily_Expire' 
                     break 
-            if out == True: 
+            for text in self.Error_list:
+                if self.checkText(driver, text,'Joinfamily_Error'): 
+                    out = 'Joinfamily_Error' 
+                    break 
+            if out == 'Joinfamily_Expire': 
                 self.log.write_log(f'In {self.joinPremium.__name__} - Join link expired')
                 return 'Join Link expired'
+            elif out == 'Joinfamily_Error': 
+                self.log.write_log(f'In {self.joinPremium.__name__} - Join link error')
+                return 'Join Link error'
             else:
                 WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_element_located((By.XPATH, self.Element_dict['join_invite']))).click()
                 self.log.write_log(f'In {self.joinPremium.__name__} - Accepted invite')
@@ -241,10 +282,11 @@ class Process(delay, logging):
 
     @classmethod
     def checkText(self, driver, text, option=None):
-        if option == 'Joinfamily':     OCCUR = 1
-        elif option == 'Usercheck':    OCCUR = 0
-        elif option == 'Addresscheck': OCCUR = 0
-        else:                          OCCUR = 0  
+        if option == 'Joinfamily_Expire':     OCCUR = 1
+        elif option == 'Joinfamily_Error':    OCCUR = 1
+        elif option == 'Usercheck':           OCCUR = 0
+        elif option == 'Addresscheck':        OCCUR = 0
+        else:                                 OCCUR = 0  
         ps = driver.page_source
         if (text in driver.page_source) and (self.Occurrences(text, ps) > OCCUR): return True
         else:                                                                     return False
@@ -275,5 +317,6 @@ class Process(delay, logging):
             return f'Failure: {e}'
         
 #Instance:
-Ins = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5', 'dummy_6')
+Ins       = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5', 'dummy_6')
+ResConfig = Responseconfig()
 
