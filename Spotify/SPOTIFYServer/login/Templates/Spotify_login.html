@@ -139,12 +139,16 @@
     }
 
     .box{
-        background-color: lightgrey;
-        width: 600px;
+        font-family: 'Poppins',sans-serif;
+        display: block;
+        background-color: lightgreen;
+        width: 500px;
         height: 300px;
         border: 5px solid green;
-        padding: 50px;
-        margin: 20px;
+        backdrop-filter: blur(5px);
+        padding: 30px;
+        margin: 30px;
+        margin-left: 1250px;
     }
 
 
@@ -171,10 +175,17 @@
     </form>
 
     <div class="box">
-        <h4>Quá trình:</h4>
-        <p class="status">1.Trạng thái : {{ status }}</p>
-        <p class="status">2.Chi tiết : {{ detail }}</p>
-        <p class="status">3.Thời gian : {{ time }}</p>
+        <h4 style ="text-align:center;">Bảng trả kết quả:</h4>
+        
+       {% if status == 'Thành công' %}
+        <p class="status"><strong>Kết quả</strong> : <strong style="color: green;">{{ status }}</strong></p>
+        <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
+      {% elif status == 'Thất bại' or status == 'Lỗi' %}
+        <p class="status"><strong>Kết quả</strong> : <strong style="color: red;">{{ status }}</strong></p>
+        <p class="reason"><strong>Chi tiết</strong> : {{ detail }}</p>
+        <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
+      {% else %}
+      {% endif %}
     </div>
 
 

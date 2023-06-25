@@ -39,17 +39,18 @@ class delay():
 class Responseconfig():
     #Attributes:
     ResponseCode = {
-    '200' :	{'status':'Thành công'  ,'detail':'Tham gia Spotify Family thành công'},
-    '400' :	{'status':'Thất bại'    ,'detail':'Tham gia Spotify Family thất bại'},
-    '401' :	{'status':'Thất bại'    ,'detail':'Đăng nhập không thành công'},
-    '402' :	{'status':'Thất bại'    ,'detail':'Chuyển quốc gia không thành công'},
-    '403' :	{'status':'Thất bại'    ,'detail':'Liên kết tham gia đã hết hạn'},
-    '404' :	{'status':'Thất bại'    ,'detail':'Tham gia Spotify Family thất bại'},
-    '405' :	{'status':'Thất bại'    ,'detail':'Tham gia Premium Family từ một quốc gia khác'},
-    '406' :	{'status':'Thất bại'    ,'detail':'Tài khoản hoặc mật khẩu không chính xác'},
-    '408' : {'status':'Thất bại'    ,'detail':'Request Timeout'},
-    '409' :	{'status':'Thất bại'    ,'detail':'Thất bại, không thể thực hiện được'},
-    '410' :	{'status':'Thất bại'    ,'detail':'Liên kết tham gia lỗi'}
+    '200' :	{'status':'Thành công'  ,'detail':{'admin':'', 'customer':'Tham gia Spotify Family thành công'}},
+    '400' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tham gia Spotify Family thất bại'}},
+    '401' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Đăng nhập không thành công'}},
+    '402' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Chuyển quốc gia không thành công'}},
+    '403' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Liên kết tham gia đã hết hạn'}},
+    '404' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tham gia Spotify Family thất bại'}},
+    '405' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tham gia Premium Family từ một quốc gia khác'}},
+    '406' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tài khoản hoặc mật khẩu không chính xác'}},
+    '408' : {'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Request Timeout'}},
+    '409' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Thất bại, không thể thực hiện được'}},
+    '410' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Liên kết tham gia lỗi'}},
+    '411' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Không còn account premium trống'}}
     }
     
     ResponseError = {

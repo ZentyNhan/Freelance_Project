@@ -86,7 +86,7 @@ I.Syntax:
 II.Workloads
 1. Working with database (SQLite3) (Done) 
 2. Working with models (Done)
-3. Read Excel Requirements 
+3. Read Excel Requirements (Done)
 4. Xuất Excel từ database  (Done)
 5. Save trên database mà KH có thể thấy (Done)
 6. Phân luồng (Multi Threads) nhiều account access 1 lúc (Done)
@@ -97,4 +97,16 @@ II.Workloads
 11. trạng thái đang chờ, disable nút "Tham Gia"
 12. Check có Master account hoặc link trùng không?
 13. lấy thông tin từ MasteracountDB để tham gia Family (Hiện tại là hardcode)
+14. Thay đổi link join của master account
+15. Thêm 1 thông báo lỗi mới: Hết accounts master
+16. Sửa bảng thông báo (admin, customer) --> ƯU TIÊN
+17. Remove KH từ site admin (low priority)
+18. Display bảng DB thẳng từ trên admin page
 ==========================================================================================================
+1 khách
++ Thành công  -> xong 
++ Thất bại -> lý do (Không có account premium trống, liên hệ admin)
++ Chi tiết hơn cho admin
+
+2. admin
++ Remove KH từ site admin (low priority)

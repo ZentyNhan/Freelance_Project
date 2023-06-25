@@ -112,7 +112,7 @@ def joinSpotify(request):
                 
                 #Instances:
                 ops = webdriver.ChromeOptions()
-                ops.add_argument('headless')
+                # ops.add_argument('headless')
                 DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=ops)
                 LOGGING        = lib.logging(os.getcwd())
                 USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
@@ -214,7 +214,7 @@ def ExportReport(request):
             'valign':   'vcenter',
             'fg_color': '#D7E4BC',
         })
-        worksheet.merge_range('A1:G2', 'Spotify Family Report', tittle_format)
+        worksheet.merge_range('A1:H2', 'Spotify Family Report', tittle_format)
         #Header:
         header_data = ['ID', 'Email/PhoneNumber', 'Master Account', 'Famimy link', 'Address', 'Joined Family', 'Detail', 'Date']
         header_format = workbook.add_format({'bold': True,'border': 1, 'align': 'center','bg_color': '#5BC85B'})
@@ -229,7 +229,7 @@ def ExportReport(request):
                                                 'align':'center',
                                                 'valign': 'vcenter', 
                                                 'fg_color': '#FFFF00',})
-            worksheet.merge_range('A4:G7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
+            worksheet.merge_range('A4:H7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
         else:
             data_format = workbook.add_format({'border': 1, 'align':'center'})
             for row in range(3,length+3):
