@@ -36,21 +36,21 @@ class delay():
     SUPER_DELAY   = 30  #second
     WORLD_DELAY   = 60  #second
     
-class Responseconfig():
+class ResponseConfig():
     #Attributes:
     ResponseCode = {
-    '200' :	{'status':'Thành công'  ,'detail':{'admin':'', 'customer':'Tham gia Spotify Family thành công'}},
-    '400' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tham gia Spotify Family thất bại'}},
-    '401' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Đăng nhập không thành công'}},
-    '402' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Chuyển quốc gia không thành công'}},
-    '403' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Liên kết tham gia đã hết hạn'}},
-    '404' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tham gia Spotify Family thất bại'}},
-    '405' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tham gia Premium Family từ một quốc gia khác'}},
-    '406' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Tài khoản hoặc mật khẩu không chính xác'}},
-    '408' : {'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Request Timeout'}},
-    '409' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Thất bại, không thể thực hiện được'}},
-    '410' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Liên kết tham gia lỗi'}},
-    '411' :	{'status':'Thất bại'    ,'detail':{'admin':'', 'customer':'Không còn account premium trống'}}
+    '200' :	{'status':'Thành công'  ,'detail':{'admin':'Joined Spotify Family Successfully',                      'customer':'Chúc mừng. Đã tham gia Spotify Family thành công'}},
+    '400' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when joining Premium',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '401' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when accessing Spotify', 'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Failed
+    '402' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when switching nation',  'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '403' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link expired',                          'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #Admin: Join Link expired 
+    '404' :	{'status':'Thất bại'    ,'detail':{'admin':'Reserved',                                                'customer':'Reserved'}},
+    '405' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link error',                            'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '406' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
+    '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Reuqest Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
+    '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from another country',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR:',                                            'customer':'Không còn account premium trống'}}
     }
     
     ResponseError = {
@@ -75,8 +75,12 @@ class logging():
     dt_format = "%d-%m-%Y_%H.%M.%S"
     dt = datetime.datetime.now().strftime(dt_format)
 
-    def __init__(self, curdir_):
-        self.curdir = curdir_
+    def __init__(self, user_, familyURL_, masteracc_, nation_, curdir_):
+        self.user      = user_
+        self.familyURL = familyURL_
+        self.masteracc = masteracc_
+        self.nation    = nation_
+        self.curdir    = curdir_
         self.curdirpath = os.path.join(self.curdir, 'log')
         self.create_log_folder()
         self.curlogpath = os.path.join(self.curdirpath, f'Selenium_log_{datetime.datetime.now().strftime(self.dt_format)}.txt')
@@ -85,7 +89,17 @@ class logging():
     def create_log(self):
         try:
             f  = open(self.curlogpath, 'w')
-            f.writelines(f'[{datetime.datetime.now().strftime(self.dt_format)}]: ########## START RECORDING LOG ##########')
+            f.writelines('=========================================================================')
+            f.writelines('\n============================== INFORMATION ==============================')
+            f.writelines('\n=========================================================================')
+            f.writelines(f'\nEmail/Phone    : {self.user}')
+            f.writelines(f'\nMaster Account : {self.familyURL}')
+            f.writelines(f'\nFamily URL     : {self.masteracc}')
+            f.writelines(f'\nNation         : {self.nation}')
+            f.writelines('\n=========================================================================')
+            f.writelines('\n=========================================================================')
+            f.writelines('\n=========================================================================')
+            f.writelines(f'\n[{datetime.datetime.now().strftime(self.dt_format)}]: ########## START RECORDING LOG ##########')
         except Exception as e:
             print(f'Failed: {e}')
 
@@ -110,7 +124,7 @@ class logging():
             pass
         except Exception as e:
             print(f'Failed: {e}')
-
+            
 class Process(delay, logging):
     #Attributes:
     whoer_url    = f'https://whoer.net/fr'
@@ -319,5 +333,5 @@ class Process(delay, logging):
         
 #Instance:
 Ins       = Process('dummy_1', 'dummy_2', 'dummy_3', 'dummy_4', 'dummy_5', 'dummy_6')
-ResConfig = Responseconfig()
+ResConfig = ResponseConfig()
 

@@ -96,17 +96,18 @@ II.Workloads
 10. Thêm cột date trên models (Done)
 11. trạng thái đang chờ, disable nút "Tham Gia"
 12. Check có Master account hoặc link trùng không?
-13. lấy thông tin từ MasteracountDB để tham gia Family (Hiện tại là hardcode)
+13. lấy thông tin từ MasteracountDB để tham gia Family (Hiện tại là hardcode) --> ưu tiên
 14. Thay đổi link join của master account
-15. Thêm 1 thông báo lỗi mới: Hết accounts master
-16. Sửa bảng thông báo (admin, customer) --> ƯU TIÊN
+15. Thêm 1 thông báo lỗi mới: Hết accounts master --> ưu tiên
+16. Sửa bảng thông báo (admin, customer) (Done)
 17. Remove KH từ site admin (low priority)
 18. Display bảng DB thẳng từ trên admin page
+19. Hiện thông tin account trên log  (Done)
 ==========================================================================================================
 1 khách
 + Thành công  -> xong 
 + Thất bại -> lý do (Không có account premium trống, liên hệ admin)
 + Chi tiết hơn cho admin
 
-2. admin
+2. admins
 + Remove KH từ site admin (low priority)

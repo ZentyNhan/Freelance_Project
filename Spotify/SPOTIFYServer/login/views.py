@@ -94,12 +94,12 @@ def joinSpotify(request):
         else:
             try: 
                 ########## ANCHOR: DO NOT CHANGE ##########
-                # #Get information from PHP:
+                # #Get information from DB:
                 Username    = UserN
                 Password    = PassW
                 MasterAcc   = 'MasterUser_1'
                 familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
-                Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/İstanbul, Türkiye'
+                Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/ İstanbul, Türkiye'
                 Nation      = 'VN'
                 
                 #String Handling:
@@ -114,7 +114,7 @@ def joinSpotify(request):
                 ops = webdriver.ChromeOptions()
                 # ops.add_argument('headless')
                 DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=ops)
-                LOGGING        = lib.logging(os.getcwd())
+                LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
                 USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
                 code           = '400'
                 failure        = ['Failure', 'Timeout']
@@ -130,16 +130,16 @@ def joinSpotify(request):
                         Status  = USER.joinPremium(DRIVER)
                         if Status in 'Success':
                             code     = '200'
+                        elif Status in 'Wrong nation address':
+                            code     = '410'
                         elif Status in 'Join Link expired':
                             code     = '403'
                         elif Status in 'Join Link error':
-                            code     = '410'
+                            code     = '405'
                         else: 
                             code     = '400'
                     elif Debug_2 in 'Join Link expired':
                         code     = '403'
-                    elif Debug_2 in 'Wrong nation address':
-                        code     = '405'
                     else:
                         code     = '402'
                 elif Debug_1 in 'Invalid':
@@ -149,30 +149,30 @@ def joinSpotify(request):
                 #Close driver:
                 DRIVER.close()
                 
-                #Check ret
+                #Check error ret:
                 if Debug_1[:7] in failure[1] or \
                     Debug_2[:7] in failure[1] or \
                     Status[:7] in failure[1]:
                     code = '408'
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                 else:
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                 
                 #Update on DB:
-                if code == '200': DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail'])
-                else:             DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail'])
+                if code == '200': DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                else:             DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
             ### Exception ###
             #Timeout:
             except TimeoutException as error:
                 code = '408'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
-                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail'])
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
             #Others:
             except:
                 code = '409'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail'])
-                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail'])
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
             #Return: 
             return render(request, 'Spotify_login.html',ret_dict)
