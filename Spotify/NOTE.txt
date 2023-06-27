@@ -95,14 +95,14 @@ II.Workloads
 9. Link button to function https://www.youtube.com/watch?v=4VHtGm-4iBw (Done)
 10. Thêm cột date trên models (Done)
 11. trạng thái đang chờ, disable nút "Tham Gia"
-12. Check có Master account hoặc link trùng không?
-13. lấy thông tin từ MasteracountDB để tham gia Family (Hiện tại là hardcode) --> ưu tiên
+12. Check có Master account hoặc link trùng không? --> Khi upload lên DB
+13. lấy thông tin từ MasteracountDB để tham gia Family (Hiện tại là hardcode) (Done 80%) --> sau khi thành công thì trừ 1 ở MemNum dựa vào Master_id
 14. Thay đổi link join của master account
-15. Thêm 1 thông báo lỗi mới: Hết accounts master --> ưu tiên
-16. Sửa bảng thông báo (admin, customer) (Done)
+15. Thêm 1 thông báo lỗi mới: Hết accounts master, DB trống (Done)
+16. Sửa bảng thông báo (admin, customer) (Done) (anh Hải request)
 17. Remove KH từ site admin (low priority)
 18. Display bảng DB thẳng từ trên admin page
-19. Hiện thông tin account trên log  (Done)
+19. Hiện thông tin account trên log (Done)
 ==========================================================================================================
 1 khách
 + Thành công  -> xong 

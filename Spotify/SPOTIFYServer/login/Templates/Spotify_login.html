@@ -151,7 +151,6 @@
         margin-left: 1250px;
     }
 
-
     </style>
 </head>
 <body>
@@ -177,7 +176,7 @@
     <div class="box">
         <h4 style ="text-align:center;">Bảng trả kết quả:</h4>
         
-       {% if status == 'Thành công' %}
+      {% if status == 'Thành công' %}
         <p class="status"><strong>Kết quả</strong> : <strong style="color: green;">{{ status }}</strong></p>
         <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
       {% elif status == 'Thất bại' or status == 'Lỗi' %}

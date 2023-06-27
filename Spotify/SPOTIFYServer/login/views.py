@@ -60,6 +60,20 @@ def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Remark_, Date_):
     MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
     MasterUserInfo.save()
     
+def DB_get_master_info():
+    master_info_list  = list(MasterAccountDB.objects.all().values())
+    if master_info_list != []:
+        for master_info in master_info_list:
+            if master_info['MemNum'] != 0:
+                id_        = master_info['id']
+                MasterAcc_ = master_info['Username']
+                familyURL_ = master_info['FamLink']
+                Address_   = master_info['Address']
+                Nation_    = master_info['Nation']
+                return [id_,MasterAcc_,familyURL_,Address_,Nation_]
+    else:
+        return 'Database is null'
+    return 'No available slot'
 ########## ANCHOR: VIEWS ##########
 # Create your views here.
 
@@ -94,73 +108,87 @@ def joinSpotify(request):
         else:
             try: 
                 ########## ANCHOR: DO NOT CHANGE ##########
-                # #Get information from DB:
-                Username    = UserN
-                Password    = PassW
-                MasterAcc   = 'MasterUser_1'
-                familyURL   = 'https://www.spotify.com/vn-vi/family/join/invite/x69cx223A8cbcbY/'
-                Address     = 'Binbirdirek, Peykhane Cd. 10/A, 34122 Fatih/ İstanbul, Türkiye'
-                Nation      = 'VN'
-                
-                #String Handling:
-                dt_format  = "%d-%m-%Y_%H:%M:%S"
-                ls         = familyURL.split('/')
-                Ind        = ls.index('invite') + 1
-                Premium_ID = ls[Ind]
-                length     = len(MainDB.objects.all().values()) 
-                id         = length + 1 #Calculate ID from current length Users in DB
-                
-                #Instances:
-                ops = webdriver.ChromeOptions()
-                # ops.add_argument('headless')
-                DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=ops)
-                LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
-                USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
-                code           = '400'
-                failure        = ['Failure', 'Timeout']
-                Debug_1        = 'none'
-                Debug_2        = 'none'
-                Status         = 'none'
+                ### Check information from DB:
+                # id handling:
+                length       = len(MainDB.objects.all().values()) 
+                id           = length + 1 #Calculate ID from current length Users in DB
+                # get master information:
+                Master_infor = DB_get_master_info()
+                if  Master_infor in ['Database is null']:
+                    code = '411'
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                elif  Master_infor in ['No available slot']:
+                    code = '412'
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                else:
+                    # Customer information:
+                    Username    = UserN
+                    Password    = PassW
+                    Master_id   = Master_infor[0]
+                    MasterAcc   = Master_infor[1]
+                    familyURL   = Master_infor[2]
+                    Address     = Master_infor[3]
+                    Nation      = Master_infor[4]
+                    
+                    #String Handling:
+                    dt_format  = "%d-%m-%Y_%H:%M:%S"
+                    ls         = familyURL.split('/')
+                    Ind        = ls.index('invite') + 1
+                    Premium_ID = ls[Ind]
+                    
+                    #Instances:
+                    ops = webdriver.ChromeOptions()
+                    # ops.add_argument('headless')
+                    DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=ops)
+                    LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
+                    USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
+                    code           = '400'
+                    failure        = ['Failure', 'Timeout']
+                    Debug_1        = 'none'
+                    Debug_2        = 'none'
+                    Status         = 'none'
 
-                #Method:
-                Debug_1 = USER.accessSpotify(DRIVER)
-                if Debug_1 in 'Valid':
-                    Debug_2 = USER.switchNation(DRIVER)
-                    if Debug_2 in 'Success':
-                        Status  = USER.joinPremium(DRIVER)
-                        if Status in 'Success':
-                            code     = '200'
-                        elif Status in 'Wrong nation address':
-                            code     = '410'
-                        elif Status in 'Join Link expired':
+                    #Method:
+                    Debug_1 = USER.accessSpotify(DRIVER)
+                    if Debug_1 in 'Valid':
+                        Debug_2 = USER.switchNation(DRIVER)
+                        if Debug_2 in 'Success':
+                            Status  = USER.joinPremium(DRIVER)
+                            if Status in 'Success':
+                                code     = '200'
+                            elif Status in 'Wrong nation address':
+                                code     = '410'
+                            elif Status in 'Join Link expired':
+                                code     = '403'
+                            elif Status in 'Join Link error':
+                                code     = '405'
+                            else: 
+                                code     = '400'
+                        elif Debug_2 in 'Join Link expired':
                             code     = '403'
-                        elif Status in 'Join Link error':
-                            code     = '405'
-                        else: 
-                            code     = '400'
-                    elif Debug_2 in 'Join Link expired':
-                        code     = '403'
+                        else:
+                            code     = '402'
+                    elif Debug_1 in 'Invalid':
+                        code     = '406'
                     else:
-                        code     = '402'
-                elif Debug_1 in 'Invalid':
-                    code     = '406'
-                else:
-                    code     = '401'
-                #Close driver:
-                DRIVER.close()
-                
-                #Check error ret:
-                if Debug_1[:7] in failure[1] or \
-                    Debug_2[:7] in failure[1] or \
-                    Status[:7] in failure[1]:
-                    code = '408'
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                else:
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                
-                #Update on DB:
-                if code == '200': DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
-                else:             DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                        code     = '401'
+                    #Close driver:
+                    DRIVER.close()
+                    
+                    #Check error ret:
+                    if Debug_1[:7] in failure[1] or \
+                        Debug_2[:7] in failure[1] or \
+                        Status[:7] in failure[1]:
+                        code = '408'
+                        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                    else:
+                        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                    
+                    #Update on DB:
+                    if code == '200': DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    else:             DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
             ### Exception ###
             #Timeout:
@@ -168,7 +196,7 @@ def joinSpotify(request):
                 code = '408'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                 DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
-            #Others:
+            # Others:
             except:
                 code = '409'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])

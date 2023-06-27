@@ -50,7 +50,8 @@ class ResponseConfig():
     '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Reuqest Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
     '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from another country',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR:',                                            'customer':'Không còn account premium trống'}}
+    '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}
     }
     
     ResponseError = {
