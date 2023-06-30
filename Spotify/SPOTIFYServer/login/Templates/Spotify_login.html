@@ -170,7 +170,7 @@
         <label for="Pwd">Password</label>
         <input type="password" placeholder="Enter Password" id="Pwd" name="Pwd">
 
-        <button type="submit">Tham Gia</button>
+        <button type="submit" id="subBut">Tham Gia</button>
     </form>
 
     <div class="box">
@@ -186,6 +186,12 @@
       {% else %}
       {% endif %}
     </div>
+
+    <script>
+            function myFunction() {
+              document.getElementById("mySubmit").disabled = true; //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_submit_disabled2
+            }
+    </script>
 
 
 

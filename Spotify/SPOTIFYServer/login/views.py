@@ -69,8 +69,9 @@ def DB_get_master_info():
                 MasterAcc_ = master_info['Username']
                 familyURL_ = master_info['FamLink']
                 Address_   = master_info['Address']
+                NemNum_    = master_info['MemNum']
                 Nation_    = master_info['Nation']
-                return [id_,MasterAcc_,familyURL_,Address_,Nation_]
+                return [id_,MasterAcc_,familyURL_,Address_,NemNum_,Nation_]
     else:
         return 'Database is null'
     return 'No available slot'
@@ -130,8 +131,10 @@ def joinSpotify(request):
                     MasterAcc   = Master_infor[1]
                     familyURL   = Master_infor[2]
                     Address     = Master_infor[3]
-                    Nation      = Master_infor[4]
+                    MemNum      = Master_infor[4] #Current member number.
+                    Nation      = Master_infor[5]
                     
+                    print('Master_id: ',Master_id)
                     #String Handling:
                     dt_format  = "%d-%m-%Y_%H:%M:%S"
                     ls         = familyURL.split('/')
@@ -177,7 +180,12 @@ def joinSpotify(request):
                     #Close driver:
                     DRIVER.close()
                     
-                    #Check error ret:
+                    ########## ANCHOR: REPORT AND DB HANDLING ##########
+                    ##### "SUCCESS" TEST: #####
+                    # code = '200'
+                    ###########################
+                    
+                    ### Check error ret: ###
                     if Debug_1[:7] in failure[1] or \
                         Debug_2[:7] in failure[1] or \
                         Status[:7] in failure[1]:
@@ -186,11 +194,17 @@ def joinSpotify(request):
                     else:
                         ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                     
-                    #Update on DB:
-                    if code == '200': DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
-                    else:             DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    ### Update on DB: ###
+                    if code == '200': 
+                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                        #Update member number:
+                        UpdateDB = MasterAccountDB.objects.get(id=Master_id)
+                        UpdateDB.MemNum = int(MemNum) - 1
+                        UpdateDB.save()
+                    else:             
+                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
-            ### Exception ###
+            ########## ANCHOR: EXCEPTIONS ##########
             #Timeout:
             except TimeoutException as error:
                 code = '408'
