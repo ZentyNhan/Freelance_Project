@@ -103,6 +103,7 @@ II.Workloads
 17. Remove KH từ site admin (low priority)
 18. Display bảng DB thẳng từ trên admin page
 19. Hiện thông tin account trên log (Done)
+20. Proxy --> ƯU TIÊN 
 ==========================================================================================================
 
 

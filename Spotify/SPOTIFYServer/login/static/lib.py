@@ -47,7 +47,7 @@ class ResponseConfig():
     '404' :	{'status':'Thất bại'    ,'detail':{'admin':'Reserved',                                                'customer':'Reserved'}},
     '405' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link error',                            'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '406' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
-    '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Reuqest Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
+    '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Request Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
     '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from another country',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
@@ -220,7 +220,8 @@ class Process(delay, logging):
             select = Select(WebDriverWait(driver, self.TO_wait).until(EC.presence_of_element_located((By.ID, 'country'))))
             select.select_by_value(self.nation)
             self.log.write_log(f'In {self.switchNation.__name__} - Selected Nation')
-            WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['onetrust_off']))).click()
+            try:    WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['onetrust_off']))).click() #if-any
+            except: pass
             self.log.write_log(f'In {self.switchNation.__name__} - Closed Onetrust')
             WebDriverWait(driver, self.TO_wait).until(EC.element_to_be_clickable((By.XPATH, self.Element_dict['Nation_Sel']))).click()
             self.log.write_log(f'In {self.switchNation.__name__} - Saved profile')

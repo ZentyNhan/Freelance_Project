@@ -5,7 +5,7 @@ from contextlib import nullcontext
 from pickle import FALSE, TRUE
 from subprocess import check_output
 from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -20,12 +20,11 @@ from datetime import date
 import time
 import pickle
 import datetime
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+# from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
 import json
 import xlsxwriter
 from io import BytesIO
-
 
 #Lib:
 import login.static.lib as lib
@@ -142,9 +141,24 @@ def joinSpotify(request):
                     Premium_ID = ls[Ind]
                     
                     #Instances:
+                    #Proxy:
+                    PROXY = [
+                            {'protocol': 'https',  'IP'  : '45.149.131.243:64560', 'Proxy_User': 'EAzGMRSu', 'Proxy_PW'  : 'ZiNQDnXh'}, #HTTPs
+                            {'protocol': 'socks5', 'IP'  : '45.149.131.243:64561', 'Proxy_User': 'EAzGMRSu', 'Proxy_PW'  : 'ZiNQDnXh'}, #SOCKS5
+                    ]
+                    
+                    #Options:
                     ops = webdriver.ChromeOptions()
                     # ops.add_argument('headless')
-                    DRIVER         = webdriver.Chrome(ChromeDriverManager().install(), options=ops)
+                    options = {
+                        'proxy': {
+                            'http':  '{0}://{1}:{2}@{3}'.format(PROXY[0]['protocol'], PROXY[0]['Proxy_User'], PROXY[0]['Proxy_PW'], PROXY[0]['IP']),
+                            'https': '{0}://{1}:{2}@{3}'.format(PROXY[0]['protocol'], PROXY[0]['Proxy_User'], PROXY[0]['Proxy_PW'], PROXY[0]['IP']),
+                            'no_proxy': 'localhost,127.0.0.1'
+                        }
+                    }
+                    
+                    DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=options)
                     LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
                     USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
                     code           = '400'
@@ -276,14 +290,14 @@ def ExportReport(request):
             data_format = workbook.add_format({'border': 1, 'align':'center'})
             for row in range(3,length+3):
                 for column in range(len(header_data)):
-                    if column == 0:   worksheet.write(row, column, data[row-3]['id']          , data_format)
-                    elif column == 1: worksheet.write(row, column, data[row-3]['Username']    , data_format)
-                    elif column == 2: worksheet.write(row, column, data[row-3]['MasterAccout'], data_format)
-                    elif column == 3: worksheet.write(row, column, data[row-3]['FamLink']     , data_format)
-                    elif column == 4: worksheet.write(row, column, data[row-3]['Address']     , data_format)
-                    elif column == 5: worksheet.write(row, column, data[row-3]['isJoined']    , data_format)
-                    elif column == 6: worksheet.write(row, column, data[row-3]['Detail']      , data_format)
-                    elif column == 7: worksheet.write(row, column, data[row-3]['Datetime']    , data_format)
+                    if column == 0:   worksheet.write(row, column, data[row-3]['id']                                    , data_format)
+                    elif column == 1: worksheet.write(row, column, data[row-3]['Username']                              , data_format)
+                    elif column == 2: worksheet.write(row, column, data[row-3]['MasterAccout']                          , data_format)
+                    elif column == 3: worksheet.write(row, column, data[row-3]['FamLink']                               , data_format)
+                    elif column == 4: worksheet.write(row, column, data[row-3]['Address']                               , data_format)
+                    elif column == 5: worksheet.write(row, column, 'Yes' if data[row-3]['isJoined'] == True else 'No'   , data_format)
+                    elif column == 6: worksheet.write(row, column, data[row-3]['Detail']                                , data_format)
+                    elif column == 7: worksheet.write(row, column, data[row-3]['Datetime']                              , data_format)
                     else:
                         #For next release
                         pass

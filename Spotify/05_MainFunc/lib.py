@@ -4,7 +4,8 @@ from pickle import FALSE, TRUE
 from subprocess import check_output
 # from webdriver_manager.chrome import ChromeDriverManager #Window flatform only
 # from pyvirtualdisplay import Display #Window flatform only
-from selenium import webdriver
+# from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -20,8 +21,6 @@ import time
 import pickle
 import string
 import datetime
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import json
 
 class delay():
@@ -231,6 +230,7 @@ class Process(delay, logging):
     @classmethod
     def checkCurrentIP(cls, driver):
         driver.get(cls.whoer_url)
+        sleep(delay.HARD_DELAY+ 20)
 
     @classmethod
     def checkText(self, driver, text, option=None):
