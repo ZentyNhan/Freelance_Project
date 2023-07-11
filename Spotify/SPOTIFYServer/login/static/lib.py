@@ -16,6 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime
 from datetime import date
+from termcolor import colored 
 import time
 import pickle
 import string
@@ -35,6 +36,15 @@ class delay():
     MASSIVE_DELAY = 10  #second
     SUPER_DELAY   = 30  #second
     WORLD_DELAY   = 60  #second
+    
+class proxy():
+    #Attributes:
+    info = [
+            {'protocol': 'https',  'IP'  : '89.185.86.189:63738', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'IN'}, #HTTPs Indian
+            {'protocol': 'socks5', 'IP'  : '89.185.86.189:63739', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'IN'}, #SOCKS5 Indian
+            {'protocol': 'https',  'IP'  : '45.149.131.243:64560', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'TR'}, #HTTPs Turkey
+            {'protocol': 'socks5', 'IP'  : '45.149.131.243:64561', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'TR'}, #SOCKS5 Turkey
+            ] 
     
 class ResponseConfig():
     #Attributes:
@@ -108,6 +118,7 @@ class logging():
         try: 
             f  = open(self.curlogpath, 'a')
             f.writelines(f'\n[{datetime.datetime.now().strftime(self.dt_format)}]: {log} ... Done')
+            print(colored(f'\n[{datetime.datetime.now().strftime(self.dt_format)}]: {log} ... Done', 'yellow', attrs=["bold"]))
         except Exception as e:
             print(f'Failed: {e}')
 
@@ -160,8 +171,7 @@ class Process(delay, logging):
     # Hãy thử lại khi bạn cũng ở địa chỉ đó.
     Invalid_address_list = [
                             'Có vẻ như bạn đang cố tham gia Premium Family từ một quốc gia khác.',
-                            '''It looks like you're trying to join Premium Family from another country.''',
-                            '''Looks like you are trying to join Premium Family from another country.''',
+                            '''You need to live at the same address''',
                             ] 
 
     def __init__(self, user_, password_, familyURL_, address_, nation_, log_):
@@ -271,8 +281,10 @@ class Process(delay, logging):
                 WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_element_located((By.XPATH, self.Element_dict['join_submit']))).click()
                 self.log.write_log(f'In {self.joinPremium.__name__} - Tried to find address')
                 WebDriverWait(driver, self.TO_wait).until(EC.visibility_of_element_located((By.XPATH, self.Element_dict['join_address_confirm']))).click()
+                sleep(self.MASSIVE_DELAY) #MUST!
                 if self.addressCheck(driver) == 'Valid':
                     self.log.write_log(f'In {self.joinPremium.__name__} - Confirm the inserted address')
+                    self.log.write_log(f'In {self.joinPremium.__name__} - Join Family successfully')
                     self.log.close_log()
                     sleep(self.DELAY) #MUST!
                     #Return:
@@ -302,7 +314,7 @@ class Process(delay, logging):
         if option == 'Joinfamily_Expire':     OCCUR = 1
         elif option == 'Joinfamily_Error':    OCCUR = 1
         elif option == 'Usercheck':           OCCUR = 0
-        elif option == 'Addresscheck':        OCCUR = 0
+        elif option == 'Addresscheck':        OCCUR = 1
         else:                                 OCCUR = 0  
         ps = driver.page_source
         if (text in driver.page_source) and (self.Occurrences(text, ps) > OCCUR): return True

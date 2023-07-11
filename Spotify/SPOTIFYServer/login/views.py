@@ -141,19 +141,13 @@ def joinSpotify(request):
                     Premium_ID = ls[Ind]
                     
                     #Instances:
-                    #Proxy:
-                    PROXY = [
-                            {'protocol': 'https',  'IP'  : '45.149.131.243:64560', 'Proxy_User': 'EAzGMRSu', 'Proxy_PW'  : 'ZiNQDnXh'}, #HTTPs
-                            {'protocol': 'socks5', 'IP'  : '45.149.131.243:64561', 'Proxy_User': 'EAzGMRSu', 'Proxy_PW'  : 'ZiNQDnXh'}, #SOCKS5
-                    ]
-                    
                     #Options:
                     ops = webdriver.ChromeOptions()
                     # ops.add_argument('headless')
                     options = {
                         'proxy': {
-                            'http':  '{0}://{1}:{2}@{3}'.format(PROXY[0]['protocol'], PROXY[0]['Proxy_User'], PROXY[0]['Proxy_PW'], PROXY[0]['IP']),
-                            'https': '{0}://{1}:{2}@{3}'.format(PROXY[0]['protocol'], PROXY[0]['Proxy_User'], PROXY[0]['Proxy_PW'], PROXY[0]['IP']),
+                            'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[2]['protocol'], lib.proxy.info[2]['User'], lib.proxy.info[2]['PW'], lib.proxy.info[2]['IP']),
+                            'https': '{0}://{1}:{2}@{3}'.format(lib.proxy.info[2]['protocol'], lib.proxy.info[2]['User'], lib.proxy.info[2]['PW'], lib.proxy.info[2]['IP']),
                             'no_proxy': 'localhost,127.0.0.1'
                         }
                     }
