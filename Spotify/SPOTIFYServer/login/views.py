@@ -140,14 +140,18 @@ def joinSpotify(request):
                     Ind        = ls.index('invite') + 1
                     Premium_ID = ls[Ind]
                     
+                    #proxy:
+                    IND = 0
+                    NAT = 'Indian'
+                    
                     #Instances:
                     #Options:
                     ops = webdriver.ChromeOptions()
                     # ops.add_argument('headless')
                     options = {
                         'proxy': {
-                            'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[2]['protocol'], lib.proxy.info[2]['User'], lib.proxy.info[2]['PW'], lib.proxy.info[2]['IP']),
-                            'https': '{0}://{1}:{2}@{3}'.format(lib.proxy.info[2]['protocol'], lib.proxy.info[2]['User'], lib.proxy.info[2]['PW'], lib.proxy.info[2]['IP']),
+                            'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
+                            'https': '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
                             'no_proxy': 'localhost,127.0.0.1'
                         }
                     }

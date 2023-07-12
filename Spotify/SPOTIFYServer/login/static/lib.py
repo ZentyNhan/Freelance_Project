@@ -33,18 +33,24 @@ class delay():
     SPONGY_DELAY  = 2   #second
     DELAY         = 3   #second
     HARD_DELAY    = 5   #second
-    MASSIVE_DELAY = 10  #second
+    HUGH_DELAY    = 10  #second
+    MASSIVE_DELAY = 20  #second
     SUPER_DELAY   = 30  #second
     WORLD_DELAY   = 60  #second
     
 class proxy():
     #Attributes:
-    info = [
+    info = {
+        'Indian' : [
             {'protocol': 'https',  'IP'  : '89.185.86.189:63738', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'IN'}, #HTTPs Indian
             {'protocol': 'socks5', 'IP'  : '89.185.86.189:63739', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'IN'}, #SOCKS5 Indian
+        ],
+        
+        'Turkey' : [
             {'protocol': 'https',  'IP'  : '45.149.131.243:64560', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'TR'}, #HTTPs Turkey
             {'protocol': 'socks5', 'IP'  : '45.149.131.243:64561', 'User': 'EAzGMRSu', 'PW'  : 'ZiNQDnXh', 'Nation' : 'TR'}, #SOCKS5 Turkey
-            ] 
+        ]
+    }
     
 class ResponseConfig():
     #Attributes:
@@ -59,7 +65,7 @@ class ResponseConfig():
     '406' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
     '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Request Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
     '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from another country',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from other country',     'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}
     }
