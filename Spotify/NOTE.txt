@@ -103,7 +103,20 @@ II.Workloads
 17. Remove KH từ site admin (low priority)
 18. Display bảng DB thẳng từ trên admin page
 19. Hiện thông tin account trên log (Done)
-20. Proxy --> ƯU TIÊN 
+20. Proxy --> ƯU TIÊN -->  Rotate
+
+21. Thêm key xác thực, đã xài cho TK nào, nếu thành công mới set key thành đã xài
+    -  key, status (xài hay chưa), ghi chú, hiển thị trên admin luôn, có filter
+22. Chỉ lấy report thành công 
+23. Hiển thị list data trên admin 
+
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)
+
+
+https://www.spotify.com/in-en/family/join/invite/ZX24b1z48c40x5C/
+
+https://www.spotify.com/in-en/family/join/invite/ZX24b1z48c40x5C/
+
+tom@cloud-air.com

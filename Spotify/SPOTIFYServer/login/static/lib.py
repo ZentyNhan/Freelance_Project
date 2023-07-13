@@ -18,6 +18,7 @@ from datetime import datetime
 from datetime import date
 from termcolor import colored 
 import time
+import random
 import pickle
 import string
 import datetime
@@ -52,6 +53,14 @@ class proxy():
         ]
     }
     
+class VerificationCode():
+    #Attributes:
+    vc_Quantity = 10
+    
+    #Methods:
+    def generateVC(size=10, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+
 class ResponseConfig():
     #Attributes:
     ResponseCode = {
@@ -102,7 +111,8 @@ class logging():
         self.create_log_folder()
         self.curlogpath = os.path.join(self.curdirpath, f'Selenium_log_{datetime.datetime.now().strftime(self.dt_format)}.txt')
         self.create_log()
-
+        
+    #Methods:
     def create_log(self):
         try:
             f  = open(self.curlogpath, 'w')
@@ -188,6 +198,7 @@ class Process(delay, logging):
         self.nation    = str(nation_).upper()
         self.log       = log_
 
+    #Methods:
     def accessSpotify(self, driver):
         try:
             driver.get(self.Spotify_url)
