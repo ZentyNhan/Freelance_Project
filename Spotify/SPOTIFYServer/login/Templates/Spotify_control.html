@@ -94,9 +94,9 @@ body {
 <body>
 
 <div class="topnav">
-  <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a>
+  <a class="active" href="{% url 'ControlPanel' %}"><i class="fa fa-fw fa-home"></i> Home</a>
   <a href="#"><i class="fa fa-fw fa-search"></i> Search</a>
-  <a href="#"><i class="fa fa-fw fa-search"></i> Functions</a>
+  <a href="{% url 'VerificationTab' %}"><i class="fa fa-check-circle"></i> Verification Code</a>
   <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
   <a href="#about"><i class="fa fa-fw fa-info-circle"></i>About</a>
   <a href="{% url 'LogoutAdmin' %}" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>

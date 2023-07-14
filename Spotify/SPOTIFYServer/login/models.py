@@ -16,6 +16,7 @@ class MainDB(models.Model):
     FamLink      = models.CharField(max_length=200)
     Address      = models.CharField(max_length=200)
     isJoined     = models.BooleanField()
+    VerCode      = models.CharField(max_length=20)
     Detail       = models.CharField(max_length=200)
     Datetime     = models.CharField(max_length=200)
     
@@ -36,6 +37,16 @@ class MasterAccountDB(models.Model):
     #Method
     def __str__(self):
         return self.Username
+    
+class VerificationCodeDB(models.Model):
+    #Attributes:
+    VerCode = models.CharField(max_length=20)
+    Status  = models.CharField(max_length=20)
+    Remark  = models.CharField(max_length=200)
+    
+    #Method
+    def __str__(self):
+        return self.VerCode
     
     
     

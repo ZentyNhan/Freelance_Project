@@ -194,11 +194,14 @@ print(django.get_version())
 WB = Workbook()
 WS = WB.active
 list = []
-def id_generator(size=14, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+def generateVC(size=8, chars=string.ascii_uppercase + string.digits):
+        return 'SF' + ''.join(random.choice(chars) for _ in range(size))
 
 for i in range(26):
-    str =  f'https://www.spotify.com/vn-vi/family/join/invite/{id_generator()}/'
+    # str =  f'https://www.spotify.com/vn-vi/family/join/invite/{generateVC()}/'
+    str =  f'{generateVC()}'
     list.append(str)
+    
+print(list)
 
 

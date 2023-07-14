@@ -35,7 +35,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from login.models import MainDB, MasterAccountDB
+from login.models import MainDB, MasterAccountDB, VerificationCodeDB
 from tablib import Dataset
 
 ########## ANCHOR: GLOBAL ATTIRIBUTES ##########
@@ -58,6 +58,10 @@ def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Remark_, Date_):
         Date_ = datetime.datetime.now().strftime(DT_format)
     MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
     MasterUserInfo.save()
+    
+def DB_gencode(id_, Vercode_, Status_, Remark_):
+    VerificationCode = VerificationCodeDB(id_, Vercode_, Status_, Remark_)
+    VerificationCode.save()
     
 def DB_get_master_info():
     master_info_list  = list(MasterAccountDB.objects.all().values())
@@ -235,11 +239,41 @@ def joinSpotify(request):
         return render(request, 'Spotify_login.html')
     
 ### EVENTS ###
+########## ANCHOR: GenerateCode ##########
+@login_required(login_url='/Spot-admin')
+def GenerateCode(request):
+    if request.method == 'POST':
+        ### Input ###  
+        gen_amount     = lib.VerificationCode.vc_quantity
+        max_amount     = lib.VerificationCode.vc_quantity_max
+        current_amount = len(VerificationCodeDB.objects.all().values())
+        offset         = max_amount - current_amount
+
+        #Generate:
+        if (current_amount < max_amount) and offset >= 10:
+            for i in range(1, gen_amount + 1):
+                #id:
+                id = current_amount + i 
+                vercode = lib.VerificationCode.generateVC()
+                DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
+        elif (current_amount < max_amount) and offset < 10:
+            for i in range(1, offset + 1):
+                #id:
+                id = current_amount + i 
+                vercode = lib.VerificationCode.generateVC()
+                DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
+        else:
+            print('Đã đầy rồi')
+        ret_dict = {'status' : '' , 'datetime': ''}
+    return render(request, 'Spotify_control_vercode.html',ret_dict)
+    
+    
 ########## ANCHOR: ExportReport ##########
 @login_required(login_url='/Spot-admin')
 def ExportReport(request):   
     if request.method == 'POST':
         ### Input ###
+        mode = 'passed'
         Sel_month  = request.POST.get('monthfilter_n')
         DB_rawdata = MainDB.objects.all().values()
         fil_data   = []
@@ -268,9 +302,9 @@ def ExportReport(request):
             'valign':   'vcenter',
             'fg_color': '#D7E4BC',
         })
-        worksheet.merge_range('A1:H2', 'Spotify Family Report', tittle_format)
+        worksheet.merge_range('A1:I2', 'Spotify Family Report', tittle_format)
         #Header:
-        header_data = ['ID', 'Email/PhoneNumber', 'Master Account', 'Famimy link', 'Address', 'Joined Family', 'Detail', 'Date']
+        header_data = ['ID', 'Email/PhoneNumber', 'Master Account', 'Famimy link', 'Address', 'Verification Code','Joined Family', 'Detail', 'Date']
         header_format = workbook.add_format({'bold': True,'border': 1, 'align': 'center','bg_color': '#5BC85B'})
         for col_num, x_data in enumerate(header_data):
             worksheet.write(2, col_num, x_data, header_format)
@@ -283,8 +317,9 @@ def ExportReport(request):
                                                 'align':'center',
                                                 'valign': 'vcenter', 
                                                 'fg_color': '#FFFF00',})
-            worksheet.merge_range('A4:H7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
-        else:
+            worksheet.merge_range('A4:I7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
+        #All cases (Both passed and failed)        
+        elif mode == 'all':  
             data_format = workbook.add_format({'border': 1, 'align':'center'})
             for row in range(3,length+3):
                 for column in range(len(header_data)):
@@ -293,12 +328,34 @@ def ExportReport(request):
                     elif column == 2: worksheet.write(row, column, data[row-3]['MasterAccout']                          , data_format)
                     elif column == 3: worksheet.write(row, column, data[row-3]['FamLink']                               , data_format)
                     elif column == 4: worksheet.write(row, column, data[row-3]['Address']                               , data_format)
-                    elif column == 5: worksheet.write(row, column, 'Yes' if data[row-3]['isJoined'] == True else 'No'   , data_format)
-                    elif column == 6: worksheet.write(row, column, data[row-3]['Detail']                                , data_format)
-                    elif column == 7: worksheet.write(row, column, data[row-3]['Datetime']                              , data_format)
+                    elif column == 5: worksheet.write(row, column, data[row-3]['VerCode']                               , data_format)
+                    elif column == 6: worksheet.write(row, column, 'Yes' if data[row-3]['isJoined'] == True else 'No'   , data_format)
+                    elif column == 7: worksheet.write(row, column, data[row-3]['Detail']                                , data_format)
+                    elif column == 8: worksheet.write(row, column, data[row-3]['Datetime']                              , data_format)
                     else:
                         #For next release
                         pass
+        #Passed cases only (Customer requirememt)            
+        else: 
+            data_format = workbook.add_format({'border': 1, 'align':'center'})
+            row = 3
+            for id in range(3,length+3):
+                if data[id-3]['isJoined'] == True: 
+                    for column in range(len(header_data)):
+                        if column == 0:   worksheet.write(row, column, data[id-3]['id']                                    , data_format)
+                        elif column == 1: worksheet.write(row, column, data[id-3]['Username']                              , data_format)
+                        elif column == 2: worksheet.write(row, column, data[id-3]['MasterAccout']                          , data_format)
+                        elif column == 3: worksheet.write(row, column, data[id-3]['FamLink']                               , data_format)
+                        elif column == 4: worksheet.write(row, column, data[id-3]['Address']                               , data_format)
+                        elif column == 5: worksheet.write(row, column, data[id-3]['VerCode']                               , data_format)
+                        elif column == 6: worksheet.write(row, column, 'Yes' if data[id-3]['isJoined'] == True else 'No'   , data_format)
+                        elif column == 7: worksheet.write(row, column, data[id-3]['Detail']                                , data_format)
+                        elif column == 8: worksheet.write(row, column, data[id-3]['Datetime']                              , data_format)
+                        else:
+                            #For next release
+                            pass
+                    #row increase:
+                    row +=1
         worksheet.autofit()
         workbook.close()
 
@@ -311,6 +368,7 @@ def ExportReport(request):
         response.write(output.getvalue())
         # return the response
         return response
+
 
 @login_required(login_url='/Spot-admin')
 ########## ANCHOR: UploadData ##########
@@ -374,5 +432,8 @@ def get_test_rep(request):
 def get_login(request):
     return render(request, 'Spotify_login.html')
 
-def SysCtrlSpotify(request):
+def SysCtrlSpotifyTab(request):
     return render(request, 'Spotify_control.html')
+
+def VerificationTab(request):   
+    return render(request, 'Spotify_control_vercode.html')

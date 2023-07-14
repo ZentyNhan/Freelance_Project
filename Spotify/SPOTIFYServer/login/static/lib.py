@@ -55,11 +55,12 @@ class proxy():
     
 class VerificationCode():
     #Attributes:
-    vc_Quantity = 10
+    vc_quantity     = 10
+    vc_quantity_max = 50
     
     #Methods:
-    def generateVC(size=10, chars=string.ascii_uppercase + string.digits):
-        return ''.join(random.choice(chars) for _ in range(size))
+    def generateVC(size=8, chars=string.ascii_uppercase + string.digits):
+        return 'SF' + ''.join(random.choice(chars) for _ in range(size)) #Spotify Famlily
 
 class ResponseConfig():
     #Attributes:

@@ -63,6 +63,7 @@
         border: 2px solid rgba(255,255,255,0.1);
         box-shadow: 0 0 40px rgba(8,7,16,0.6);
         padding: 50px 35px;
+        resize: vertical;
     }
     form *{
         font-family: 'Poppins',sans-serif;
@@ -171,21 +172,17 @@
         <input type="password" placeholder="Enter Password" id="Pwd" name="Pwd">
 
         <button type="submit" id="subBut">Tham Gia</button>
+        <br></br>
+        {% if status == 'Thành công' %}
+            <p class="status"><strong>Kết quả</strong> : <strong style="color: green;">{{ status }}</strong></p>
+            <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
+        {% elif status == 'Thất bại' or status == 'Lỗi' %}
+            <p class="status"><strong>Kết quả</strong> : <strong style="color: red;">{{ status }}</strong></p>
+            <p class="reason"><strong>Chi tiết</strong> : {{ detail }}</p>
+            <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
+        {% else %}
+        {% endif %}
     </form>
-
-    <div class="box">
-        <h4 style ="text-align:center;">Bảng trả kết quả:</h4>
-        
-      {% if status == 'Thành công' %}
-        <p class="status"><strong>Kết quả</strong> : <strong style="color: green;">{{ status }}</strong></p>
-        <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
-      {% elif status == 'Thất bại' or status == 'Lỗi' %}
-        <p class="status"><strong>Kết quả</strong> : <strong style="color: red;">{{ status }}</strong></p>
-        <p class="reason"><strong>Chi tiết</strong> : {{ detail }}</p>
-        <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
-      {% else %}
-      {% endif %}
-    </div>
 
     <script>
             function myFunction() {
