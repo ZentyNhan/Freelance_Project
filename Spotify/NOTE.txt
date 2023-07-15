@@ -105,11 +105,11 @@ II.Workloads
 19. Hiện thông tin account trên log (Done)
 20. Proxy --> ƯU TIÊN -->  Rotate
 
-21. Thêm key xác thực, đã xài cho TK nào, nếu thành công mới set key thành đã xài (40%, đã xong gen code <=50 valid code) 
- -  key, status (xài hay chưa), ghi chú, hiển thị trên admin luôn, có filter
+21. Thêm key xác thực, đã xài cho TK nào, nếu thành công mới set key thành đã xài (80%, đã xong gen code <=50 valid code) 
+ -  key, status (xài hay chưa), ghi chú, hiển thị trên admin luôn, có filter --> Còn thiếu filter và hiển thị trên site admin (20% còn lại + point 23)
         ->  Thêm check valid, nếu invalid thì vẫn cho add thêm code. (Done)
-        ->  Merge vô login để thêm 1 chỗ nhập ver code 
-        ->  Check code có trên DB không, valid k?
+        ->  Merge vô login để thêm 1 chỗ nhập ver code (Done)
+        ->  Check code có trên DB không, valid k? (Done)
 
 22. Chỉ lấy report thành công (Done)
 23. Hiển thị list data trên admin 
@@ -117,8 +117,10 @@ II.Workloads
 24. Xóa bảng ở login, bỏ dưới form tham gia (80% -> kiếm cách flexible form)
 
 25. Rotate proxy
-26. Nếu expired link, set available number của link đó về 0, không xài nữa
+26. Nếu expired link, set available number của link đó về 0, không xài nữa, note là lỗi, yêu cầu lấy link mới
 
+27. Oops! Something went wrong, please try again or check out our help area --> Có thể là lỗi proxy
+28. Hiện thông báo đã gen xong verification code, gen bao nhiêu, hoặc đã full rồi
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)

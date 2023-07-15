@@ -49,8 +49,8 @@ DTRes_format  = "%H:%M:%S - %d/%m/%Y "
 def ret_dict_met(stt_, detl_):
     return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime(DT_format)}
 
-def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, isJoin_, Detail_):
-    UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, isJoin_, Detail_,datetime.datetime.now().strftime(DT_format))
+def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_):
+    UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_,datetime.datetime.now().strftime(DT_format))
     UserInfo.save()
     
 def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Remark_, Date_):
@@ -115,10 +115,6 @@ def joinSpotify(request):
         UserN   = request.POST.get('Uname')
         PassW   = request.POST.get('Pwd')
         Vercode = request.POST.get('Vercode')
-
-        print(UserN)
-        print(PassW)
-        print(Vercode)
         
         #Check vercode validation:
         VC_result = DB_check_vercode_validation(Vercode)
@@ -139,15 +135,15 @@ def joinSpotify(request):
                 if  Master_infor in ['Database is null']:
                     code = '411'
                     ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 elif  Master_infor in ['No available slot']:
                     code = '412'
                     ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 elif VC_result == 'Invalid':
                     code = '415'
                     ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 else:
                     # Customer information:
                     Username    = UserN
@@ -174,15 +170,16 @@ def joinSpotify(request):
                     #Options:
                     ops = webdriver.ChromeOptions()
                     # ops.add_argument('headless')
-                    options = {
-                        'proxy': {
-                            'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
-                            'https': '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
-                            'no_proxy': 'localhost,127.0.0.1'
-                        }
-                    }
+                    # options = {
+                    #     'proxy': {
+                    #         'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
+                    #         'https': '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
+                    #         'no_proxy': 'localhost,127.0.0.1'
+                    #     }
+                    # }
                     
-                    DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=options)
+                    # DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=options)
+                    DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops)
                     LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
                     USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
                     code           = '400'
@@ -234,25 +231,30 @@ def joinSpotify(request):
                     
                     ### Update on DB: ###
                     if code == '200': 
-                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                         #Update member number:
-                        UpdateDB = MasterAccountDB.objects.get(id=Master_id)
-                        UpdateDB.MemNum = int(MemNum) - 1
-                        UpdateDB.save()
+                        Update_MA_DB = MasterAccountDB.objects.get(id=Master_id)
+                        Update_MA_DB.MemNum = int(MemNum) - 1
+                        Update_MA_DB.save()
+                        #Update vercode to invalid:
+                        Update_VC_DB = VerificationCodeDB.objects.get(VerCode=Vercode)
+                        Update_VC_DB.Status = 'invalid'
+                        Update_VC_DB.Remark = f'''Used by User "{Username}" on {datetime.datetime.now().strftime(DT_format)}'''
+                        Update_VC_DB.save()
                     else:             
-                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
             ########## ANCHOR: EXCEPTIONS ##########
             #Timeout:
             except TimeoutException as error:
                 code = '408'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
             # Others:
             except:
                 code = '409'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
-                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
             #Return: 
             return render(request, 'Spotify_login.html',ret_dict)
@@ -274,7 +276,6 @@ def GenerateCode(request):
         #Others:
         rawdata        = VerificationCodeDB.objects.all().values()
         
-
         ### Functions ###  
         #Counting valid vercode:
         for data in rawdata:

@@ -15,8 +15,8 @@ class MainDB(models.Model):
     MasterAccout = models.CharField(max_length=200)
     FamLink      = models.CharField(max_length=200)
     Address      = models.CharField(max_length=200)
-    isJoined     = models.BooleanField()
     VerCode      = models.CharField(max_length=20)
+    isJoined     = models.BooleanField()
     Detail       = models.CharField(max_length=200)
     Datetime     = models.CharField(max_length=200)
     
