@@ -78,6 +78,16 @@ def DB_get_master_info():
     else:
         return 'Database is null'
     return 'No available slot'
+
+def DB_check_vercode_validation(vercode_):
+    vercode_info_list  = list(VerificationCodeDB.objects.all().values())
+    for data in vercode_info_list:
+        if data['Status'] == 'valid' and\
+           str(data['VerCode']) == str(vercode_):
+            return 'Valid'
+    return 'Invalid'
+            
+
 ########## ANCHOR: VIEWS ##########
 # Create your views here.
 
@@ -102,12 +112,20 @@ def AdminSpotify(request):
 def joinSpotify(request):
     if request.method == 'POST':
         #Get info from customer:
-        UserN = request.POST.get('Uname')
-        PassW = request.POST.get('Pwd')
+        UserN   = request.POST.get('Uname')
+        PassW   = request.POST.get('Pwd')
+        Vercode = request.POST.get('Vercode')
+
+        print(UserN)
+        print(PassW)
+        print(Vercode)
         
+        #Check vercode validation:
+        VC_result = DB_check_vercode_validation(Vercode)
+
         #Process:
-        if UserN in ""  or PassW in "" :
-            ret_dict = ret_dict_met("Lỗi" , "Tài khoản và mật khẩu không được để trống")
+        if UserN in "" or PassW in "" or Vercode in "":
+            ret_dict = ret_dict_met("Lỗi" , "Xin hãy điền đầy đủ thông tin")
             return render(request, 'Spotify_login.html',ret_dict)
         else:
             try: 
@@ -124,6 +142,10 @@ def joinSpotify(request):
                     DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 elif  Master_infor in ['No available slot']:
                     code = '412'
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
+                    DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                elif VC_result == 'Invalid':
+                    code = '415'
                     ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                     DB_Input(id, UserN, PassW, 'null', 'null', 'null', False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 else:
@@ -244,19 +266,32 @@ def joinSpotify(request):
 def GenerateCode(request):
     if request.method == 'POST':
         ### Input ###  
+        #Amount:
         gen_amount     = lib.VerificationCode.vc_quantity
         max_amount     = lib.VerificationCode.vc_quantity_max
         current_amount = len(VerificationCodeDB.objects.all().values())
-        offset         = max_amount - current_amount
+        valid_amount   = 0
+        #Others:
+        rawdata        = VerificationCodeDB.objects.all().values()
+        
+
+        ### Functions ###  
+        #Counting valid vercode:
+        for data in rawdata:
+            if data['Status'] == 'valid':
+                valid_amount += 1
+
+        #Counting offset:
+        offset = max_amount - valid_amount
 
         #Generate:
-        if (current_amount < max_amount) and offset >= 10:
+        if (valid_amount < max_amount) and offset >= 10:
             for i in range(1, gen_amount + 1):
                 #id:
                 id = current_amount + i 
                 vercode = lib.VerificationCode.generateVC()
                 DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
-        elif (current_amount < max_amount) and offset < 10:
+        elif (valid_amount < max_amount) and offset < 10:
             for i in range(1, offset + 1):
                 #id:
                 id = current_amount + i 

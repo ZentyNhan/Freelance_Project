@@ -107,8 +107,8 @@ II.Workloads
 
 21. Thêm key xác thực, đã xài cho TK nào, nếu thành công mới set key thành đã xài (40%, đã xong gen code <=50 valid code) 
  -  key, status (xài hay chưa), ghi chú, hiển thị trên admin luôn, có filter
-        ->  Thêm check valid, nếu invalid thì vẫn cho add thêm code.
-        ->  Merge vô login để thêm 1 chỗ nhập ver code
+        ->  Thêm check valid, nếu invalid thì vẫn cho add thêm code. (Done)
+        ->  Merge vô login để thêm 1 chỗ nhập ver code 
         ->  Check code có trên DB không, valid k?
 
 22. Chỉ lấy report thành công (Done)
@@ -117,6 +117,7 @@ II.Workloads
 24. Xóa bảng ở login, bỏ dưới form tham gia (80% -> kiếm cách flexible form)
 
 25. Rotate proxy
+26. Nếu expired link, set available number của link đó về 0, không xài nữa
 
 ==========================================================================================================
 

@@ -77,7 +77,8 @@ class ResponseConfig():
     '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from other country',     'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
     '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}
+    '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+    '415' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Wrong verification code',                 'customer':'Verification code chưa đúng. Vui lòng thử lại hoặc liên hệ admin để mua code'}}
     }
     
     ResponseError = {
