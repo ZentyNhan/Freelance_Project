@@ -49,6 +49,10 @@ DTRes_format  = "%H:%M:%S - %d/%m/%Y "
 def ret_dict_met(stt_, detl_):
     return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime(DT_format)}
 
+def DB_VC_list():
+    rawdata = VerificationCodeDB.objects.all()
+    return rawdata   
+
 def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_):
     UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_,datetime.datetime.now().strftime(DT_format))
     UserInfo.save()
@@ -262,7 +266,16 @@ def joinSpotify(request):
         #Return: 
         return render(request, 'Spotify_login.html')
     
-### EVENTS ###
+### EVENTS ### 
+########## ANCHOR: UpdateCode ##########
+@login_required(login_url='/Spot-admin')
+def UpdateCode(request):
+    if request.method == 'POST':
+        ### Input ###  
+        VC_list = DB_VC_list()
+        ret_dict = {'table' : VC_list}
+    return render(request, 'Spotify_control_vercode.html',ret_dict)
+
 ########## ANCHOR: GenerateCode ##########
 @login_required(login_url='/Spot-admin')
 def GenerateCode(request):
@@ -275,6 +288,7 @@ def GenerateCode(request):
         valid_amount   = 0
         #Others:
         rawdata        = VerificationCodeDB.objects.all().values()
+        VC_list        = DB_VC_list()
         
         ### Functions ###  
         #Counting valid vercode:
@@ -292,15 +306,16 @@ def GenerateCode(request):
                 id = current_amount + i 
                 vercode = lib.VerificationCode.generateVC()
                 DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
+                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_list, 'datetime': datetime.datetime.now().strftime(DT_format)}
         elif (valid_amount < max_amount) and offset < 10:
             for i in range(1, offset + 1):
                 #id:
                 id = current_amount + i 
                 vercode = lib.VerificationCode.generateVC()
                 DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
+                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_list, 'datetime': datetime.datetime.now().strftime(DT_format)}
         else:
-            print('Đã đầy rồi')
-        ret_dict = {'status' : '' , 'datetime': ''}
+            ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'datetime': datetime.datetime.now().strftime(DT_format)}
     return render(request, 'Spotify_control_vercode.html',ret_dict)
     
     
@@ -471,5 +486,8 @@ def get_login(request):
 def SysCtrlSpotifyTab(request):
     return render(request, 'Spotify_control.html')
 
-def VerificationTab(request):   
-    return render(request, 'Spotify_control_vercode.html')
+def VerificationTab(request): 
+    ### Input ###  
+    VC_list = DB_VC_list()
+    ret_dict = {'table' : VC_list}  
+    return render(request, 'Spotify_control_vercode.html',ret_dict)
