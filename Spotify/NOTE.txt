@@ -126,6 +126,7 @@ II.Workloads
 
 27. Oops! Something went wrong, please try again or check out our help area --> Có thể là lỗi proxy
 28. Hiện thông báo đã gen xong verification code, gen bao nhiêu, hoặc đã full rồi (Done)
+30. account đã join, join nữa đc k? --> manual (Done)
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)
