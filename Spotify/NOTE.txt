@@ -101,22 +101,23 @@ II.Workloads
 15. Thêm 1 thông báo lỗi mới: Hết accounts master, DB trống (Done) (anh Hải request)
 16. Sửa bảng thông báo (admin, customer) (Done) (anh Hải request)
 17. Remove KH từ site admin (low priority)
-18. Display bảng DB thẳng từ trên admin page
+18. Display bảng DB thẳng từ trên admin page (Done)
 19. Hiện thông tin account trên log (Done)
 20. Proxy --> ƯU TIÊN -->  Rotate
 
-21. Thêm key xác thực, đã xài cho TK nào, nếu thành công mới set key thành đã xài (80%, đã xong gen code <=50 valid code) 
- -  key, status (xài hay chưa), ghi chú, hiển thị trên admin luôn, có filter --> Còn thiếu filter và hiển thị trên site admin (20% còn lại + point 23)
+21. Thêm key xác thực, đã xài cho TK nào, nếu thành công mới set key thành đã xài (100%, đã xong gen code <=50 valid code) 
+ -  key, status (xài hay chưa), ghi chú, hiển thị trên admin luôn, có filter --> Còn thiếu filter và hiển thị trên site admin (Done)
         -> Thêm check valid, nếu invalid thì vẫn cho add thêm code. (Done)
         -> Merge vô login để thêm 1 chỗ nhập ver code (Done)
         -> Check code có trên DB không, valid k? (Done)
 
 22. Chỉ lấy report thành công (Done)
-23. Hiển thị list data trên admin 
+23. Hiển thị list data trên admin (Done)
         -> Hiển thị list code (Done)
-        -> Có thể idit (offer a Hải k edit status), xóa
+        -> Có thể edit (Hỏi a Hải có edit status k?), xóa -> xóa thì fix lại cái id trong database(k thực hiện đc) (Done)
         -> Tự động update list (Done)
-        -> Có thể filter
+        -> Có thể filter (Done)
+        -> Xóa đồng loạt 1 mảng code (Done)
 
 24. Xóa bảng ở login, bỏ dưới form tham gia (80% -> kiếm cách flexible form)
 

@@ -65,20 +65,32 @@ class VerificationCode():
 class ResponseConfig():
     #Attributes:
     ResponseCode = {
-    '200' :	{'status':'Thành công'  ,'detail':{'admin':'Joined Spotify Family Successfully',                      'customer':'Chúc mừng. Đã tham gia Spotify Family thành công'}},
-    '400' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when joining Premium',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '401' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when accessing Spotify', 'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Failed
-    '402' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when switching nation',  'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '403' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link expired',                          'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #Admin: Join Link expired 
-    '404' :	{'status':'Thất bại'    ,'detail':{'admin':'Reserved',                                                'customer':'Reserved'}},
-    '405' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link error',                            'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '406' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
-    '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Request Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
-    '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from other country',     'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-    '415' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Wrong verification code',                 'customer':'Verification code chưa đúng. Vui lòng thử lại hoặc liên hệ admin để mua code'}}
+        #Customer:
+        '200' :	{'status':'Thành công'  ,'detail':{'admin':'Joined Spotify Family Successfully',                      'customer':'Chúc mừng. Đã tham gia Spotify Family thành công'}},
+        '400' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when joining Premium',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '401' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when accessing Spotify', 'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Failed
+        '402' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when switching nation',  'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '403' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link expired',                          'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #Admin: Join Link expired 
+        '404' :	{'status':'Thất bại'    ,'detail':{'admin':'Reserved',                                                'customer':'Reserved'}},
+        '405' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link error',                            'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '406' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
+        '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Request Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
+        '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from other country',     'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '415' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Wrong verification code',                 'customer':'Verification code chưa đúng. Vui lòng thử lại hoặc liên hệ admin để mua code'}},
+        # Admin::
+        '516' :	{'status':'Error'       ,'detail':{'admin':'ID empty',                                                'customer':'None'}},
+        '517' :	{'status':'Error'       ,'detail':{'admin':'ID out of range',                                         'customer':'None'}},
+        '518' :	{'status':'Error'       ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
+        '519' :	{'status':'Error'       ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
+        '530' :	{'status':'Success'     ,'detail':{'admin':'Deleted',                                                 'customer':'None'}},
+        '531' :	{'status':'Success'     ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
+        # Others:
+        '686' :	{'status':'Warning'     ,'detail':{'admin':'Warning: Others value',                                   'customer':'Warning: Others value'}},
+        '999' :	{'status':'Error'       ,'detail':{'admin':'Unknow Exception',                                        'customer':'Unknow Exception'}},
+
     }
     
     ResponseError = {

@@ -1,0 +1,15 @@
+=========================================================================
+============================== INFORMATION ==============================
+=========================================================================
+Email/Phone    : lee@cloud-air.com
+Master Account : https://www.spotify.com/vn-vi/family/join/invite/A4TTSK8HLRJPKE/
+Family URL     : MasterUser_7
+Nation         : VN
+=========================================================================
+=========================================================================
+=========================================================================
+[18-07-2023_15.52.29]: ########## START RECORDING LOG ##########
+[18-07-2023_15.52.37]: In accessSpotify - Start accessing Spotify ... Done
+[18-07-2023_15.52.37]: In accessSpotify - Tried to insert username/password ... Done
+[18-07-2023_15.52.40]: In accessSpotify - Waiting to check validation ... Done
+[18-07-2023_15.52.41]: In accessSpotify - Username is "Invalid" ... Done

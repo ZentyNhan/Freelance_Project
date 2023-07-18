@@ -1,6 +1,7 @@
 ########## SECTION: Library ##########
 import sys
 import os
+from multipledispatch import dispatch
 from contextlib import nullcontext
 from pickle import FALSE, TRUE
 from subprocess import check_output
@@ -46,20 +47,37 @@ D_format  = "%d/%m/%Y"
 DTRes_format  = "%H:%M:%S - %d/%m/%Y "
 
 ########## ANCHOR: GLOBAL METHODS ##########
+@dispatch(str,str)
 def ret_dict_met(stt_, detl_):
-    return {"status": stt_, "detail": detl_,"time" : datetime.datetime.now().strftime(DT_format)}
+    return {"status": stt_, "detail": detl_,"time" : current_datetime()}
+
+@dispatch(str,str,list)
+def ret_dict_met(stt_, detl_, table_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_}
+
+@dispatch(str,str,list,int)
+def ret_dict_met(stt_, detl_, table_, valid_amount_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_,"valid_amount":valid_amount_}
 
 def DB_VC_list():
-    rawdata = VerificationCodeDB.objects.all()
+    rawdata = list(VerificationCodeDB.objects.all().values())
     return rawdata   
 
+def DB_VC_Valid_amount():
+    valid_amount = 0
+    rawdata = list(VerificationCodeDB.objects.all().values())
+    for i in rawdata:
+        if i['Status'] == 'valid':
+            valid_amount += 1
+    return valid_amount
+
 def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_):
-    UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_,datetime.datetime.now().strftime(DT_format))
+    UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_,current_datetime())
     UserInfo.save()
     
 def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Remark_, Date_):
     if Date_ in [None, 'None', '']:    
-        Date_ = datetime.datetime.now().strftime(DT_format)
+        Date_ = current_datetime()
     MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
     MasterUserInfo.save()
     
@@ -90,7 +108,19 @@ def DB_check_vercode_validation(vercode_):
            str(data['VerCode']) == str(vercode_):
             return 'Valid'
     return 'Invalid'
-            
+
+def is_integer(n):
+    if isinstance(n, int): return True
+    else:                  return False
+
+def current_date():
+    return datetime.datetime.now().strftime(D_format)        
+
+def current_datetime():
+    return datetime.datetime.now().strftime(DT_format) 
+      
+def current_resdatetime():
+    return datetime.datetime.now().strftime(DTRes_format)        
 
 ########## ANCHOR: VIEWS ##########
 # Create your views here.
@@ -240,10 +270,10 @@ def joinSpotify(request):
                         Update_MA_DB = MasterAccountDB.objects.get(id=Master_id)
                         Update_MA_DB.MemNum = int(MemNum) - 1
                         Update_MA_DB.save()
-                        #Update vercode to invalid:
+                        #Update vercode to Used:
                         Update_VC_DB = VerificationCodeDB.objects.get(VerCode=Vercode)
-                        Update_VC_DB.Status = 'invalid'
-                        Update_VC_DB.Remark = f'''Used by User "{Username}" on {datetime.datetime.now().strftime(DT_format)}'''
+                        Update_VC_DB.Status = 'used'
+                        Update_VC_DB.Remark = f'''Used by User "{Username}" on {current_datetime()}'''
                         Update_VC_DB.save()
                     else:             
                         DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
@@ -255,7 +285,7 @@ def joinSpotify(request):
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                 DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
             # Others:
-            except:
+            except Exception as e:
                 code = '409'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['customer'])
                 DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
@@ -267,56 +297,183 @@ def joinSpotify(request):
         return render(request, 'Spotify_login.html')
     
 ### EVENTS ### 
-########## ANCHOR: UpdateCode ##########
+########## ANCHOR: UpdateCode ##########: Update / Delete / Edit
 @login_required(login_url='/Spot-admin')
 def UpdateCode(request):
-    if request.method == 'POST':
+    try:
         ### Input ###  
-        VC_list = DB_VC_list()
-        ret_dict = {'table' : VC_list}
-    return render(request, 'Spotify_control_vercode.html',ret_dict)
+        VC_list          = DB_VC_list()
+        #Get info from admin:
+        input_id         = request.POST.get('cid-input-name') #str
+        input_edit_value = request.POST.get('VClistedit_n')   #str
+        #Others:
+        length           = len(VerificationCodeDB.objects.all().values())
+        VC_ID            = []
+        VC_ID_RANGE      = []
+
+        ### Functions ###
+        #Get VC id info:
+        for i in VC_list:
+            VC_ID.append(i['id'])
+        
+        #id input handling: is_integer
+        if ":" in input_id and str(input_id).count(':') == 1:
+            lim     = str(input_id).split(':')
+            lim_max = int(max(lim))
+            lim_min = int(min(lim))
+            for i in VC_ID:
+                if i <= lim_max and i >= lim_min:
+                    VC_ID_RANGE.append(int(i))
+        elif input_id == 'all':
+            VC_ID_RANGE = VC_ID
+        else:
+            pass
+
+        #Update list:
+        if 'ul-btn-n' in request.POST: 
+            ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}
+
+        #Delete list:
+        elif 'dl-btn-n' in request.POST: 
+            if input_id == '':
+                code = '516'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
+                #Delete object:
+                for id_i in VC_ID_RANGE:
+                    VerificationCodeDB.objects.get(id=id_i).delete()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '530'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            elif int(input_id) not in VC_ID:
+                code = '517'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif int(input_id) in VC_ID:
+                #Delete object:
+                VerificationCodeDB.objects.get(id=input_id).delete()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '530'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            else:
+                code = '686'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                
+        #Edit list:
+        elif 'el-btn-n' in request.POST: 
+            if input_id == '':
+                code = '516'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
+                #Edit object:
+                for id_i in VC_ID_RANGE:
+                    Update_VC_Object = VerificationCodeDB.objects.get(id=id_i)
+                    Update_VC_Object.Status = input_edit_value
+                    Update_VC_Object.Remark = f'Editted on {current_datetime()}'
+                    Update_VC_Object.save()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '531'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            elif int(input_id) not in VC_ID:
+                code = '517'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif int(input_id) in VC_ID:
+                #Edit object:
+                Update_VC_Object = VerificationCodeDB.objects.get(id=input_id)
+                Update_VC_Object.Status = input_edit_value
+                Update_VC_Object.Remark = f'Editted on {current_datetime()}'
+                Update_VC_Object.save()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '531'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            else:
+                code = '686'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        
+        else:
+            code = '686'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+
+        #Return:
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+        #hello anh Nhan, Diem ngiu anh ne ahihi liu liu
+
+    # Value Error:
+    except ValueError:
+        code = '518'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+    # Others:
+    except Exception as e:
+        code = '999'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+    
 
 ########## ANCHOR: GenerateCode ##########
 @login_required(login_url='/Spot-admin')
 def GenerateCode(request):
-    if request.method == 'POST':
-        ### Input ###  
-        #Amount:
-        gen_amount     = lib.VerificationCode.vc_quantity
-        max_amount     = lib.VerificationCode.vc_quantity_max
-        current_amount = len(VerificationCodeDB.objects.all().values())
-        valid_amount   = 0
-        #Others:
-        rawdata        = VerificationCodeDB.objects.all().values()
-        VC_list        = DB_VC_list()
-        
-        ### Functions ###  
-        #Counting valid vercode:
-        for data in rawdata:
-            if data['Status'] == 'valid':
-                valid_amount += 1
+    try:
+        if request.method == 'POST':
+            ### Input ###  
+            #Data:
+            rawdata        = VerificationCodeDB.objects.all().values()
+            #Amount:
+            gen_amount     = lib.VerificationCode.vc_quantity
+            max_amount     = lib.VerificationCode.vc_quantity_max
+            current_amount = len(rawdata)
+            valid_amount   = 0
+            #Others:
+            VC_list        = DB_VC_list()
+            VC_ID          = []
+            ret_dict       = {}
 
-        #Counting offset:
-        offset = max_amount - valid_amount
+            
+            ### Functions ###  
+            #Counting valid vercode:
+            for data in rawdata:
+                if data['Status'] == 'valid':
+                    valid_amount += 1
+                    #id list:
+                    VC_ID.append(data['id'])
 
-        #Generate:
-        if (valid_amount < max_amount) and offset >= 10:
-            for i in range(1, gen_amount + 1):
-                #id:
-                id = current_amount + i 
-                vercode = lib.VerificationCode.generateVC()
-                DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
-                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_list, 'datetime': datetime.datetime.now().strftime(DT_format)}
-        elif (valid_amount < max_amount) and offset < 10:
-            for i in range(1, offset + 1):
-                #id:
-                id = current_amount + i 
-                vercode = lib.VerificationCode.generateVC()
-                DB_gencode(id, vercode, 'valid', f'Generated on {datetime.datetime.now().strftime(DT_format)}')
-                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_list, 'datetime': datetime.datetime.now().strftime(DT_format)}
-        else:
-            ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'datetime': datetime.datetime.now().strftime(DT_format)}
-    return render(request, 'Spotify_control_vercode.html',ret_dict)
+            #Max ID:
+            if VC_ID == []: max_id = 0
+            else:           max_id = max(VC_ID)
+
+            #Counting offset:
+            offset = max_amount - valid_amount
+
+            #Generate:
+            if (valid_amount < max_amount) and offset >= 10:
+                for i in range(1, gen_amount + 1):
+                    #id:
+                    id = max_id + i 
+                    vercode = lib.VerificationCode.generateVC()
+                    DB_gencode(id, vercode, 'valid', f'Generated on {current_datetime()}')
+                VC_update_list = DB_VC_list()
+                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_update_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+            elif (valid_amount < max_amount) and offset < 10:
+                for i in range(1, offset + 1):
+                    #id:
+                    id = max_id + i 
+                    vercode = lib.VerificationCode.generateVC()
+                    DB_gencode(id, vercode, 'valid', f'Generated on {current_datetime()}')
+                VC_update_list = DB_VC_list()
+                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_update_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+            else:
+                ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+        # Return:
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+    
+    # Others:
+    except Exception as e:
+        code = '999'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
     
     
 ########## ANCHOR: ExportReport ##########
@@ -324,7 +481,7 @@ def GenerateCode(request):
 def ExportReport(request):   
     if request.method == 'POST':
         ### Input ###
-        mode = 'passed'
+        mode = 'passed' ### REPORT ###
         Sel_month  = request.POST.get('monthfilter_n')
         DB_rawdata = MainDB.objects.all().values()
         fil_data   = []
@@ -414,7 +571,7 @@ def ExportReport(request):
         # create a response
         response = HttpResponse(content_type='application/vnd.ms-excel')
         # tell the browser what the file is named
-        response['Content-Disposition'] = f'attachment;filename="SFReport_{datetime.datetime.now().strftime(DT_format)}.xlsx"'
+        response['Content-Disposition'] = f'attachment;filename="SFReport_{current_datetime()}.xlsx"'
         # put the spreadsheet data into the response
         response.write(output.getvalue())
         # return the response
@@ -460,10 +617,10 @@ def UploadData(request):
                             Master_acc['Date'])
 
             #Return:
-            ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{datetime.datetime.now().strftime(DT_format)}'}
+            ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{current_datetime()}'}
             return render(request, 'Spotify_control.html',ret_dict)
         except Exception as error:
-            ret_dict = {'status' : f'Upload failed' , 'reason' : error , 'datetime' : f'{datetime.datetime.now().strftime(DT_format)}'}
+            ret_dict = {'status' : f'Upload failed' , 'reason' : error , 'datetime' : f'{current_datetime()}'}
             return render(request, 'Spotify_control.html',ret_dict)
     else:
         ret_dict = {'status' : '' , 'datetime': ''}
@@ -489,5 +646,5 @@ def SysCtrlSpotifyTab(request):
 def VerificationTab(request): 
     ### Input ###  
     VC_list = DB_VC_list()
-    ret_dict = {'table' : VC_list}  
+    ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}  
     return render(request, 'Spotify_control_vercode.html',ret_dict)
