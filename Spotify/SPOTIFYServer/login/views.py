@@ -75,10 +75,10 @@ def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_,
     UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_,current_datetime())
     UserInfo.save()
     
-def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Remark_, Date_):
+def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Date_, Remark_):
     if Date_ in [None, 'None', '']:    
         Date_ = current_datetime()
-    MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
+    MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_, Remark_)
     MasterUserInfo.save()
     
 def DB_gencode(id_, Vercode_, Status_, Remark_):
@@ -251,7 +251,7 @@ def joinSpotify(request):
                     
                     ########## ANCHOR: REPORT AND DB HANDLING ##########
                     ##### "SUCCESS" TEST: #####
-                    # code = '200'
+                    code = '200'
                     ###########################
                     
                     ### Check error ret: ###
@@ -275,6 +275,20 @@ def joinSpotify(request):
                         Update_VC_DB.Status = 'used'
                         Update_VC_DB.Remark = f'''Used by User "{Username}" on {current_datetime()}'''
                         Update_VC_DB.save()
+                    elif code == '403':
+                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                        #Update member number:
+                        Update_MA_DB = MasterAccountDB.objects.get(id=Master_id)
+                        Update_MA_DB.MemNum = 0
+                        Update_MA_DB.Remark = '### Join Link expired ###\nPlease check and update join link'
+                        Update_MA_DB.save()
+                    elif code == '405':
+                        DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, True, lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                        #Update member number:
+                        Update_MA_DB = MasterAccountDB.objects.get(id=Master_id)
+                        Update_MA_DB.MemNum = 0
+                        Update_MA_DB.Remark = '### Join Link error ###\nPlease check and update join link'
+                        Update_MA_DB.save()
                     else:             
                         DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
@@ -308,13 +322,19 @@ def UpdateCode(request):
         input_edit_value = request.POST.get('VClistedit_n')   #str
         #Others:
         length           = len(VerificationCodeDB.objects.all().values())
+        isUsedCode       = False
         VC_ID            = []
         VC_ID_RANGE      = []
 
         ### Functions ###
-        #Get VC id info:
+        #Get VC id info and check if used code:
         for i in VC_list:
+            #Get VC id info:
             VC_ID.append(i['id'])
+            #Check if used code:
+            if str(i['id']) == input_id and \
+               i['Status'] == 'used':
+                isUsedCode = True
         
         #id input handling: is_integer
         if ":" in input_id and str(input_id).count(':') == 1:
@@ -361,7 +381,7 @@ def UpdateCode(request):
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
                 
         #Edit list:
-        elif 'el-btn-n' in request.POST: 
+        elif 'el-btn-n' in request.POST and isUsedCode == False: 
             if input_id == '':
                 code = '516'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
@@ -392,7 +412,10 @@ def UpdateCode(request):
             else:
                 code = '686'
                 ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-        
+        #Used code:
+        elif isUsedCode == True:
+            code = '520'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         else:
             code = '686'
             ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
@@ -613,8 +636,8 @@ def UploadData(request):
                             Master_acc['Address'],
                             lib.ResConfig.langcode[Master_acc['Nation']],
                             Master_acc['MemNum'],
-                            'Nothing to note',
-                            Master_acc['Date'])
+                            Master_acc['Date'],
+                            Master_acc['Remark'])
 
             #Return:
             ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{current_datetime()}'}
@@ -648,3 +671,7 @@ def VerificationTab(request):
     VC_list = DB_VC_list()
     ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}  
     return render(request, 'Spotify_control_vercode.html',ret_dict)
+
+def JoinLinkTab(request): 
+    ### Input ###  
+    return render(request, 'Spotify_control_joinlink.html',ret_dict)

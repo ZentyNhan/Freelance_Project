@@ -9,6 +9,7 @@ urlpatterns = [
     #TAB:        
     path('Spot-SysCtrl/',                     API.SysCtrlSpotifyTab, name='ControlPanel'),
     path('Spot-SysCtrl/verification',         API.VerificationTab, name='VerificationTab'),
+    path('Spot-SysCtrl/joinlink',             API.JoinLinkTab, name='JoinLinkTab'),
     #EVENT:        
     path('Spot-SysCtrl/exportReport',         API.ExportReport, name='ExportReport'),
     path('Spot-SysCtrl/GenerateCode',         API.GenerateCode, name='GenerateCode'),

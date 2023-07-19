@@ -52,7 +52,7 @@ body {
   margin: 20px;
   border: 5px solid green;
   float:left;/*Add float left*/
-  width: 40%;
+  width: 65%;
 }
 
 .right h2 {
@@ -61,7 +61,7 @@ body {
 
 /* left column (page content) */
 .left {
-  width: 50%;
+  width: 25%;
   /* flex: 70%; */
   /* padding: 15px; */
   /* border: 5px solid green; */
@@ -135,29 +135,6 @@ table, th, td {
 
   <div class="left" style="background-color:#ddd;">
     <div class="subleft" style="background-color:#ddd;">
-      <h2>Verification code</h2>
-      {%if user.is_superuser %}
-      <p>Generate <strong> verification code.</strong> Current valid code is <i><strong style="color: blue;">{{ valid_amount }}</strong></i>.</p>
-      <p style="font-size:12px"><i>	&#40;*&#41; Generate 10 code every single confirmation. Maximum amount of valid code is 50. </i></p>
-      <br><br>
-      <form action="GenerateCode" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <button type = "submit" id="gc-btn-id" class='gc-btn-cls' onclick="VCConfirmFunction()">Generate code</button>
-        {% if 'successfully' in status %}
-          <p class="status">Status : <strong style="color: green;">{{ status }}</strong></p>
-          <p class="dateime">Date/Time : {{ datetime }}</p>
-        {% elif status == 'Full slot on database.' %}
-          <p class="status">Status : <strong style="color: red;">{{ status }}</strong></p>
-          <p class="dateime">Date/Time : {{ datetime }}</p>
-        {% else %}
-        {% endif %}
-      </form>
-      {% else %}
-      <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
-      {% endif %}
-    </div>
-
-    <div class="subleft" style="background-color:#ddd;">
       <h2>Verification code management</h2>
       {%if user.is_superuser %}
       <p style="font-size:12px"><i>	&#40;*&#41; Manage verification code. </i></p>
@@ -198,8 +175,8 @@ table, th, td {
               <option value ="All">All</option>
           </select>
           <input type="text" id="Search" onkeyup="SearchFunction()" placeholder="Search for names.." title="Type in a name">
-          
       </form>
+      
       {% else %}
       <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
       {% endif %}
@@ -233,6 +210,8 @@ table, th, td {
       {% endfor %}
     </table>
   </div>
+
+
 
   <!-- JAVASCRIPT:: -->
   <!-- Filter: -->

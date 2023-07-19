@@ -33,6 +33,7 @@ class MasterAccountDB(models.Model):
     Nation   = models.CharField(max_length=20)
     MemNum   = models.IntegerField()
     Date     = models.CharField(max_length=200)
+    Remark   = models.CharField(max_length=200)
     
     #Method
     def __str__(self):

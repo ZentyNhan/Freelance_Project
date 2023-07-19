@@ -85,6 +85,7 @@ class ResponseConfig():
         '517' :	{'status':'Error'       ,'detail':{'admin':'ID out of range',                                         'customer':'None'}},
         '518' :	{'status':'Error'       ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
         '519' :	{'status':'Error'       ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
+        '520' :	{'status':'Error'       ,'detail':{'admin':'Permission denied',                                       'customer':'None'}},
         '530' :	{'status':'Success'     ,'detail':{'admin':'Deleted',                                                 'customer':'None'}},
         '531' :	{'status':'Success'     ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
         # Others:
