@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException,ElementNotInteractableException,ElementClickInterceptedException
 from selenium.webdriver.support import expected_conditions as EC
@@ -201,8 +202,9 @@ def joinSpotify(request):
                     NAT = 'Indian'
                     
                     #Instances:
-                    #Options:
-                    ops = webdriver.ChromeOptions()
+                    #Options and services:
+                    ops  = webdriver.ChromeOptions()
+                    serv = Service()
                     # ops.add_argument('headless')
                     # options = {
                     #     'proxy': {
@@ -211,9 +213,10 @@ def joinSpotify(request):
                     #         'no_proxy': 'localhost,127.0.0.1'
                     #     }
                     # }
-                    
-                    # DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=options)
-                    DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops)
+                    try:
+                        DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=ops)
+                    except:
+                        DRIVER         = webdriver.Chrome(service=serv, options=ops)
                     LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
                     USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
                     code           = '400'
@@ -251,7 +254,7 @@ def joinSpotify(request):
                     
                     ########## ANCHOR: REPORT AND DB HANDLING ##########
                     ##### "SUCCESS" TEST: #####
-                    code = '200'
+                    # code = '200'
                     ###########################
                     
                     ### Check error ret: ###
@@ -454,7 +457,6 @@ def GenerateCode(request):
             VC_ID          = []
             ret_dict       = {}
 
-            
             ### Functions ###  
             #Counting valid vercode:
             for data in rawdata:
@@ -615,15 +617,13 @@ def UploadData(request):
             import_data = dataset.load(excel_file.read(), format='xlsx')
             # Change "Dataset" to "List"
             for data_col in import_data:
-                if data_col[6] not in [None, 'None', 'Date']:
+                if data_col[5] not in [None, 'None', 'Date']:
                     data.append({'Username' : data_col[0], 
-                                'Password' : data_col[1], 
-                                'FamLink'  : data_col[2], 
-                                'Address'  : data_col[3], 
-                                'Nation'   : data_col[4], 
-                                'MemNum'   : data_col[5], 
-                                'Date'     : (data_col[6]).strftime(D_format),
-                                'Remark'   : data_col[7]})
+                                'FamLink'  : data_col[1], 
+                                'Address'  : data_col[2], 
+                                'Nation'   : data_col[3], 
+                                'MemNum'   : data_col[4], 
+                                'Date'     : (data_col[5]).strftime(D_format)})
             #Update on DB:
             for Master_acc in data:
                 length  = len(MasterAccountDB.objects.all().values())
@@ -631,13 +631,11 @@ def UploadData(request):
                 if Master_acc['Username'] not in ['Master Username', None]:
                     DB_upload(id,
                             Master_acc['Username'],  
-                            Master_acc['Password'],
                             Master_acc['FamLink'],
                             Master_acc['Address'],
                             lib.ResConfig.langcode[Master_acc['Nation']],
                             Master_acc['MemNum'],
-                            Master_acc['Date'],
-                            Master_acc['Remark'])
+                            Master_acc['Date'])
 
             #Return:
             ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{current_datetime()}'}

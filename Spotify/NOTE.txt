@@ -128,6 +128,16 @@ II.Workloads
 28. Hiện thông báo đã gen xong verification code, gen bao nhiêu, hoặc đã full rồi (Done)
 29. Khi KH đã join thành công, code sẽ đổi thành 'used' và admin không thể sửa status lại, co thể xóa (Done)
 30. account đã join, join nữa đc k? --> manual (Done)
+
+Front-end:
+31. Màn hình join trả KQ về pop-up, hiện loader trong lúc xử lý. (Đông)
+32. Dồn verifition code, upload, download về 1 màn hình "HOME". (Nhân, Đông)
+33. Bỏ nút edit, reload (Status hiện tại chỉ có used, valid). (Nhân, Đông)
+34. Chỉ có filter verifition code status. (Đông)
+35. Verification code table, bỏ cột ID, thêm action delete vào mỗi row. (Nhân, Đông)
+36. Thêm table link join. (Nhân, Đông)
+37. Screen login admin giống screen tham gia luôn (Nhân, Đông)
+39. Thêm insert 1 master account manual (Nhân)
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)

@@ -175,7 +175,7 @@ class Process(delay, logging):
     Profile_url  = f'https://www.spotify.com/us/account/profile/'
     TO_wait      = 30
     Element_dict = {
-        'Nation_Sel'              : '''/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/article[1]/section[1]/form[1]/div[1]/button[1]/span[1]''',
+        'Nation_Sel'              : '''/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[2]/article[1]/section[1]/form[1]/div[1]/button[1]/span[1]''',
         'join_invite'             : '''//header/a[1]/span[1]''',
         'join_address'            : '''//input[@id='address']''',
         'join_expired'            : '''//html[1]/body[1]/div[1]/main[1]/div[1]/section[1]/h1[1]''',
