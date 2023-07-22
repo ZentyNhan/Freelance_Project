@@ -131,10 +131,10 @@ II.Workloads
 
 Front-end:
 31. Màn hình join trả KQ về pop-up, hiện loader trong lúc xử lý. (Đông)
-32. Dồn verifition code, upload, download về 1 màn hình "HOME". (Nhân, Đông)
-33. Bỏ nút edit, reload (Status hiện tại chỉ có used, valid). (Nhân, Đông)
-34. Chỉ có filter verifition code status. (Đông)
-35. Verification code table, bỏ cột ID, thêm action delete vào mỗi row. (Nhân, Đông)
+32. Dồn verifition code, upload, download về 1 màn hình "HOME". (Nhân, Đông) --> Consider không thực hiện
+33. Bỏ nút edit, reload (Status hiện tại chỉ có used, valid). (Nhân, Đông) (Done)
+34. Chỉ có filter verifition code status. (Nhân,Đông) (Done)
+35. Verification code table, bỏ cột ID, thêm action delete vào mỗi row. (Nhân, Đông) (Done 50%)
 36. Thêm table link join. (Nhân, Đông)
 37. Screen login admin giống screen tham gia luôn (Nhân, Đông)
 39. Thêm insert 1 master account manual (Nhân)
