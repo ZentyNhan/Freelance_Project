@@ -124,7 +124,7 @@ II.Workloads
 25. Rotate proxy
 26. Nếu expired link, set available number của link đó về 0, không xài nữa, note là lỗi, yêu cầu lấy link mới (Done)
 
-27. Oops! Something went wrong, please try again or check out our help area --> Có thể là lỗi proxy
+27. Oops! Something went wrong, please try again or check out our help area                                                                                                                                                                                                                                      --> Có thể là lỗi proxy
 28. Hiện thông báo đã gen xong verification code, gen bao nhiêu, hoặc đã full rồi (Done)
 29. Khi KH đã join thành công, code sẽ đổi thành 'used' và admin không thể sửa status lại, co thể xóa (Done)
 30. account đã join, join nữa đc k? --> manual (Done)
@@ -138,6 +138,7 @@ Front-end:
 36. Thêm table link join. (Nhân, Đông)
 37. Screen login admin giống screen tham gia luôn (Nhân, Đông)
 39. Thêm insert 1 master account manual (Nhân)
+40. sửa lại format upload/download (Nhân) (Done)
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)

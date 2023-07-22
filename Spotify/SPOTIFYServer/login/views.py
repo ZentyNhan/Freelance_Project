@@ -76,10 +76,10 @@ def DB_Input(id_,User_,  PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_,
     UserInfo = MainDB(id_, User_, PassW_, MasterAcc_, FamLink_, Addr_, vercode_, isJoin_, Detail_,current_datetime())
     UserInfo.save()
     
-def DB_upload(id_,User_,PassW_,FamLink_,Addr_,Nation_,Memnum_, Date_, Remark_):
+def DB_upload(id_, User_, FamLink_, Addr_, Nation_, Memnum_, Date_):
     if Date_ in [None, 'None', '']:    
         Date_ = current_datetime()
-    MasterUserInfo = MasterAccountDB(id_, User_, PassW_, FamLink_, Addr_, Nation_, Memnum_ , Date_, Remark_)
+    MasterUserInfo = MasterAccountDB(id_, User_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
     MasterUserInfo.save()
     
 def DB_gencode(id_, Vercode_, Status_, Remark_):
@@ -190,7 +190,6 @@ def joinSpotify(request):
                     MemNum      = Master_infor[4] #Current member number.
                     Nation      = Master_infor[5]
                     
-                    print('Master_id: ',Master_id)
                     #String Handling:
                     dt_format  = "%d-%m-%Y_%H:%M:%S"
                     ls         = familyURL.split('/')
@@ -506,10 +505,14 @@ def GenerateCode(request):
 def ExportReport(request):   
     if request.method == 'POST':
         ### Input ###
-        mode = 'passed' ### REPORT ###
-        Sel_month  = request.POST.get('monthfilter_n')
-        DB_rawdata = MainDB.objects.all().values()
-        fil_data   = []
+        mode = 'Customer_format' ### REPORT ###
+        Sel_month         = request.POST.get('monthfilter_n')
+        DB_rawdata        = MainDB.objects.all().values()
+        fil_data          = []
+        succeed_MA_list   = []
+        succeed_Mem_list  = []
+        succeed_VC_list   = []
+        succeed_data_dict = {}
         ### Raw data handling ###
         for raw in DB_rawdata:
             if str(raw['Datetime'][3:5]) == str(Sel_month):
@@ -535,10 +538,10 @@ def ExportReport(request):
             'valign':   'vcenter',
             'fg_color': '#D7E4BC',
         })
-        worksheet.merge_range('A1:I2', 'Spotify Family Report', tittle_format)
-        #Header:
-        header_data = ['ID', 'Email/PhoneNumber', 'Master Account', 'Famimy link', 'Address', 'Verification Code','Joined Family', 'Detail', 'Date']
-        header_format = workbook.add_format({'bold': True,'border': 1, 'align': 'center','bg_color': '#5BC85B'})
+        worksheet.merge_range('A1:F2', 'Spotify Family Report', tittle_format)
+        #Header: Customer's requirement template
+        header_data = ['Email', 'Link invite', 'Address', 'Số account đã joined', 'Email account joined /\nVerification Code', 'Created date']
+        header_format = workbook.add_format({'text_wrap': True,'bold': True,'border': 1, 'align': 'center','bg_color': '#5BC85B'})
         for col_num, x_data in enumerate(header_data):
             worksheet.write(2, col_num, x_data, header_format)
         #Data in excel:
@@ -550,7 +553,54 @@ def ExportReport(request):
                                                 'align':'center',
                                                 'valign': 'vcenter', 
                                                 'fg_color': '#FFFF00',})
-            worksheet.merge_range('A4:I7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
+            worksheet.merge_range('A4:F7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
+        #Customter's requirement format:
+        elif mode == 'Customer_format':
+            data_format = workbook.add_format({'text_wrap': True, 'border': 1, 'align':'center'})
+            #Get Master accounts in succeed cases:
+            for data_1 in data:
+                if data_1['MasterAccout'] not in succeed_MA_list and \
+                    data_1['isJoined'] == True:
+                    succeed_MA_list.append(data_1['MasterAccout'])
+            
+            #Get export account family data:
+            for succeed in succeed_MA_list:
+                for data_2 in data:
+                    if succeed == data_2['MasterAccout'] and \
+                        data_2['isJoined'] == True:
+                            succeed_Mem_list.append(data_2['Username'])
+                            succeed_VC_list.append(data_2['VerCode'])
+                            LinkJoin = data_2['FamLink'] 
+                            Address  = data_2['Address'] 
+                succeed_data_dict[succeed] = {
+                    'MasterAccout' : succeed,
+                    'Linkjoin'     : LinkJoin,
+                    'Address'      : Address,
+                    'Vercode'      : succeed_VC_list.copy(),
+                    'Username'     : succeed_Mem_list.copy(),
+                }
+                succeed_VC_list.clear()
+                succeed_Mem_list.clear()
+            
+            l_length = len(succeed_MA_list)   
+            for row in range(3, l_length+3):
+                for column in range(len(header_data)):
+                    MA = succeed_MA_list[row-3]
+                    if   column == 0: worksheet.write(row, column, succeed_data_dict[MA]['MasterAccout']      , data_format)
+                    elif column == 1: worksheet.write(row, column, succeed_data_dict[MA]['Linkjoin']          , data_format)
+                    elif column == 2: worksheet.write(row, column, succeed_data_dict[MA]['Address']           , data_format)
+                    elif column == 3: worksheet.write(row, column, len(succeed_data_dict[MA]['Username'])     , data_format)
+                    elif column == 4: 
+                        string = ''
+                        l_length_succeed_Mem = len(succeed_data_dict[MA]['Username'])
+                        for ind in range(l_length_succeed_Mem):
+                            string += f''''- Email: {succeed_data_dict[MA]['Username'][ind]} (VCode: {succeed_data_dict[MA]['Vercode'][ind]})\n'''
+                        worksheet.write(row, column, string                                                   , data_format)
+                    elif column == 5: worksheet.write(row, column, current_date()                             , data_format)
+                    else:
+                        #For next release
+                        pass
+
         #All cases (Both passed and failed)        
         elif mode == 'all':  
             data_format = workbook.add_format({'border': 1, 'align':'center'})
@@ -609,6 +659,7 @@ def UploadData(request):
     if request.method == 'POST':
         try: 
             ### Input ###
+            nation  = request.POST.get('nationsel_n')
             dataset = Dataset()
             data    = []
             
@@ -617,13 +668,12 @@ def UploadData(request):
             import_data = dataset.load(excel_file.read(), format='xlsx')
             # Change "Dataset" to "List"
             for data_col in import_data:
-                if data_col[5] not in [None, 'None', 'Date']:
+                if data_col[4] not in [None, 'None', 'Date']:
                     data.append({'Username' : data_col[0], 
                                 'FamLink'  : data_col[1], 
                                 'Address'  : data_col[2], 
-                                'Nation'   : data_col[3], 
-                                'MemNum'   : data_col[4], 
-                                'Date'     : (data_col[5]).strftime(D_format)})
+                                'MemNum'   : data_col[3], 
+                                'Date'     : (data_col[4]).strftime(D_format)})
             #Update on DB:
             for Master_acc in data:
                 length  = len(MasterAccountDB.objects.all().values())
@@ -633,7 +683,7 @@ def UploadData(request):
                             Master_acc['Username'],  
                             Master_acc['FamLink'],
                             Master_acc['Address'],
-                            lib.ResConfig.langcode[Master_acc['Nation']],
+                            nation,
                             Master_acc['MemNum'],
                             Master_acc['Date'])
 

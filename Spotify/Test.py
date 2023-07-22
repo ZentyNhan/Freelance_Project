@@ -191,17 +191,36 @@ print(django.get_version())
 # print(os.getcwd())
 # log = logging(os.getcwd())
 
-WB = Workbook()
-WS = WB.active
-list = []
-def generateVC(size=8, chars=string.ascii_uppercase + string.digits):
-        return 'SF' + ''.join(random.choice(chars) for _ in range(size))
+# WB = Workbook()
+# WS = WB.active
+# list = []
+# def generateVC(size=8, chars=string.ascii_uppercase + string.digits):
+#         return 'SF' + ''.join(random.choice(chars) for _ in range(size))
 
-for i in range(26):
-    # str =  f'https://www.spotify.com/vn-vi/family/join/invite/{generateVC()}/'
-    str =  f'{generateVC()}'
-    list.append(str)
+# for i in range(26):
+#     # str =  f'https://www.spotify.com/vn-vi/family/join/invite/{generateVC()}/'
+#     str =  f'{generateVC()}'
+#     list.append(str)
     
-print(list)
+# print(list)
+
+# def ignore_repeated_values(list_of_values):
+#   """
+#   This function takes a list of values and returns a new list
+#   that contains only the unique values.
+#   """
+#   unique_values = []
+#   for value in list_of_values:
+#     if value not in unique_values:
+#       unique_values.append(value)
+#   return unique_values
+
+
+# if __name__ == "__main__":
+#   list_of_values = [1, 2, 3, 1, 2, 3, 4, 5, 6]
+#   unique_values = ignore_repeated_values(list_of_values)
+#   print(unique_values)
+
+
 
 
