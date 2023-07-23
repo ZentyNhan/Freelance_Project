@@ -719,7 +719,3 @@ def VerificationTab(request):
     VC_list = DB_VC_list()
     ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}  
     return render(request, 'Spotify_control_vercode.html',ret_dict)
-
-def JoinLinkTab(request): 
-    ### Input ###  
-    return render(request, 'Spotify_control_joinlink.html',ret_dict)
