@@ -1,199 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- Design by foolishdeveloper.com -->
-    <title>Spotify Family Gate</title> 
-    <link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
-    <!--Stylesheet-->
-    <style media="screen">
-        *,
-    *:before,
-    *:after{
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-    }
-    body{
-        background-color: #080710;
-    }
-    .background{
-        width: 430px;
-        height: 520px;
-        position: absolute;
-        transform: translate(-50%,-50%);
-        left: 50%;
-        top: 50%;
-    }
-    .background .shape{
-        height: 200px;
-        width: 200px;
-        position: absolute;
-        border-radius: 50%;
-    }
-    .shape:first-child{
-        background: linear-gradient(
-            #1845ad,
-            #23a2f6
-        );
-        left: -80px;
-        top: -80px;
-    }
-    .shape:last-child{
-        background: linear-gradient(
-            to right,
-            #ff512f,
-            #f09819
-        );
-        right: -30px;
-        bottom: -80px;
-    }
-    form{
-        height: 630px;
-        width: 400px;
-        background-color: rgba(255,255,255,0.13);
-        position: absolute;
-        transform: translate(-50%,-50%);
-        top: 50%;
-        left: 50%;
-        border-radius: 10px;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255,255,255,0.1);
-        box-shadow: 0 0 40px rgba(8,7,16,0.6);
-        padding: 50px 35px;
-        resize: vertical;
-    }
-    form *{
-        font-family: 'Poppins',sans-serif;
-        color: #ffffff;
-        letter-spacing: 0.5px;
-        outline: none;
-        border: none;
-    }
-    form h3{
-        font-size: 32px;
-        font-weight: 500;
-        line-height: 42px;
-        text-align: center;
-    }
-    form h4{
-        font-size: 20px;
-        font-weight: 500;
-        line-height: 36px;
-        text-align: center;
-    }
+{% extends "Layout.html" %} 
+{% load static %}
+{% block title %} Spotify Family Gate {% endblock %}
+{% block styles %} 
+<link rel="stylesheet" href="{% static "css/admin.css" %}" type="text/css" /> 
+{% endblock %} 
 
-    label{
-        display: block;
-        margin-top: 30px;
-        font-size: 16px;
-        font-weight: 500;
-    }
-    input{
-        display: block;
-        height: 50px;
-        width: 100%;
-        background-color: rgba(255,255,255,0.07);
-        border-radius: 3px;
-        padding: 0 10px;
-        margin-top: 8px;
-        font-size: 14px;
-        font-weight: 300;
-    }
-    ::placeholder{
-        color: #e5e5e5;
-    }
-    button{
-        margin-top: 50px;
-        width: 100%;
-        background-color: #ffffff;
-        color: #080710;
-        padding: 15px 0;
-        font-size: 18px;
-        font-weight: 600;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .social{
-    margin-top: 30px;
-    display: flex;
-    }
-    .social div{
-    background: red;
-    width: 150px;
-    border-radius: 3px;
-    padding: 5px 10px 10px 5px;
-    background-color: rgba(255,255,255,0.27);
-    color: #eaf0fb;
-    text-align: center;
-    }
-    .social div:hover{
-    background-color: rgba(255,255,255,0.47);
-    }
-    .social .fb{
-    margin-left: 25px;
-    }
-    .social i{
-    margin-right: 4px;
-    }
+{% block content %}
+<form method="post">
+  {% csrf_token %}
 
-    .box{
-        font-family: 'Poppins',sans-serif;
-        display: block;
-        background-color: lightgreen;
-        width: 500px;
-        height: 300px;
-        border: 5px solid green;
-        backdrop-filter: blur(5px);
-        padding: 30px;
-        margin: 30px;
-        margin-left: 1250px;
-    }
+  <h3 class="text-center text-white">Đăng Nhập</h3>
+  <div class="text-center mb-3">
+    <img src="/static/Spotify_icon.png" alt="Avatar" class="avatar" />
+  </div>
+  <h5 class='text-center mb-3 text-white'>Nhập thông tin tài khoản để tham gia Spotify Family</h5>
 
-    </style>
-</head>
-<body>
-    {%if status == 'Lỗi' %}
-    {%endif%}
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
+  <div class="container">
+
+    {% if status == 'Thành công' %}
+      <div class="alert alert-danger px-3 py-2" role="alert">
+        <div class="status"><strong>Kết quả</strong> : {{ status }}</div>
+        <div class="dateime"><strong>Thời gian</strong> : {{ time }}</div>
+      </div>
+    {% elif status == 'Thất bại' or status == 'Lỗi' %}
+      <div class="alert alert-danger px-3 py-2" role="alert">
+        <div class="status"><strong>Kết quả</strong> : {{ status }}</div>
+        <div class="reason"><strong>Chi tiết</strong> : {{ detail }}</div>
+        <div class="dateime"><strong>Thời gian</strong> : {{ time }}</div>
+      </div>
+    {% else %}
+    {% endif %}
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="Uname" class="text-white">Username</label>
+      <input type="text" id="Uname" class="form-control" name="Uname" required placeholder="Enter Username"/>
     </div>
-    <form method="post">
-        <h3>Đăng Nhập</h3>
-        <h4 class='brief'>Nhập thông tin tài khoản để tham gia Spotify Family</h4>
-        {% csrf_token %} 
-        <label for="Uname">Username</label>
-        <input type="text" placeholder="Enter Username" id="Uname" name="Uname">
+  
+    <div class="mb-3">
+      <label for="Pwd" class="text-white">Password</label>
+      <input type="password" id="Pwd" class="form-control" name="Pwd" required placeholder="Enter Password"/>
+    </div>
 
-        <label for="Pwd">Password</label>
-        <input type="password" placeholder="Enter Password" id="Pwd" name="Pwd">
+    <div class="mb-4">
+      <label for="Vercode" class="text-white">Verification code</label>
+      <input type="text" id="Vercode" class="form-control" name="Vercode" required placeholder="Enter code"/>
+    </div>
 
-        <label for="Vercode">Verification code</label>
-        <input type="text" placeholder="Enter code" id="Vercode" name="Vercode">
+    <button type="submit" class="btn btn-primary btn-block">
+      Tham Gia
+    </button>
+    
+  </div>
+</form>
+{% endblock %}
 
-        <button type="submit" id="subBut">Tham Gia</button>
-        <br></br>
-        {% if status == 'Thành công' %}
-            <p class="status"><strong>Kết quả</strong> : <strong style="color: green;">{{ status }}</strong></p>
-            <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
-        {% elif status == 'Thất bại' or status == 'Lỗi' %}
-            <p class="status"><strong>Kết quả</strong> : <strong style="color: red;">{{ status }}</strong></p>
-            <p class="reason"><strong>Chi tiết</strong> : {{ detail }}</p>
-            <p class="dateime"><strong>Thời gian</strong> : {{ time }}</p>
-        {% else %}
-        {% endif %}
-    </form>
+{% block scripts %} 
+<script>
+  $(document).ready(function() {
+    // Add loading indicator to submit button
+    $('button[type="submit"]').click(function() {
+      $(this).addClass('disabled');
+      $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>`);
+    });
 
-    <script>
-            function myFunction() {
-              document.getElementById("mySubmit").disabled = true; //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_submit_disabled2
-            }
-    </script>
+    // Logic for error alert
+    $('.alert').fadeIn();
+    $('input').focusin(function() {
+      $('.alert').fadeOut();
+    })
 
-
-
-</body>
-</html>
+    setTimeout(function () {
+      $('.alert').fadeOut();
+    }, 15000);
+  })
+  
+</script>
+{% endblock %} 
