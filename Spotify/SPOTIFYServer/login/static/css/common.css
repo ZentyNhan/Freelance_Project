@@ -5,3 +5,44 @@ label {
 .alert {
   font-size: 14px;
 }
+
+button:hover {
+  opacity: 0.8;
+}
+
+.navbar-toggler, .header-title, .nav-link.active {
+  color: #04AA6D !important;
+  font-weight: bold;
+}
+
+td {
+  padding: 8px 12px !important;
+}
+
+.page-list {
+  display: none !important;
+}
+
+.page-item.active .page-link {
+  background-color: #eee !important;
+  color: #4f4f4f !important;
+}
+
+.fixed-table-toolbar > .search {
+  display: none;
+}
+
+.fixed-table-toolbar > .bs-bars {
+  width: 100%;
+}
+
+.fixed-table-toolbar button, 
+.fixed-table-toolbar .form-control,
+.fixed-table-toolbar .form-select {
+  height: 36px;
+}
+
+.fixed-table-toolbar .form-label {
+  margin-bottom: -5px;
+  font-size: 12px;
+}
