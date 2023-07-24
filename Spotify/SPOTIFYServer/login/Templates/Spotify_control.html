@@ -71,7 +71,7 @@ body {
   margin: 20px;
   border: 5px solid green;
   float:left;/*Add float left*/
-  width: 40%;
+  width: 95%;
 }
 
 .right_2 h2 {
@@ -80,7 +80,7 @@ body {
 
 /* left_2 column (page content) */
 .left_2 {
-  width: 50%;
+  width: 25%;
   /* flex: 70%; */
   /* padding: 15px; */
   /* border: 5px solid green; */
@@ -222,75 +222,34 @@ table, th, td {
     {% endif %}
   </div>
 
-  <!-- Vercode -->
-  <div class="left_2" style="background-color:#ddd;">
-    <div class="subleft" style="background-color:#ddd;">
-      <h2>Verification code</h2>
-      {%if user.is_superuser %}
-      <p>Generate <strong> verification code.</strong> Current valid code is <i><strong style="color: blue;">{{ valid_amount }}</strong></i>.</p>
-      <p style="font-size:12px"><i>	&#40;*&#41; Generate 10 code every single confirmation. Maximum amount of valid code is 50. </i></p>
-      <br><br>
-      <form action="GenerateCode" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <button type = "submit" id="gc-btn-id" class='gc-btn-cls' onclick="VCConfirmFunction()">Generate code</button>
-        {% if 'successfully' in status %}
-          <p class="status">Status : <strong style="color: green;">{{ status }}</strong></p>
-          <p class="dateime">Date/Time : {{ datetime }}</p>
-        {% elif status == 'Full slot on database.' %}
-          <p class="status">Status : <strong style="color: red;">{{ status }}</strong></p>
-          <p class="dateime">Date/Time : {{ datetime }}</p>
-        {% else %}
-        {% endif %}
-      </form>
-      {% else %}
-      <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
-      {% endif %}
-    </div>
-
-    <div class="subleft" style="background-color:#ddd;">
-      <h2>Verification code management</h2>
-      {%if user.is_superuser %}
-      <p style="font-size:12px"><i>	&#40;*&#41; Manage verification code. </i></p>
-      <br><br>
-      <form action="UpdateCode" method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-          <label for="Filter">Filter: </label>
-          <select style="text-align: center;" id="VClistfilter_id" name = "VClistfilter_n" class = "VClistfilter_cls" onchange="SearchFunction()"> 
-              <option value ="all">All</option>
-              <option value ="valid">Valid</option>
-              <option value ="used">Used</option>
-          </select>
-          
-      </form>
-      {% else %}
-      <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
-      {% endif %}
-    </div>
-  </div>
 
   <div class="right_2" style="background-color:#ddd;">
-    <h2>Verification list</h2>
-    <p style="font-size:12px"><i>	&#40;*&#41; list of verification code. </i></p>
+    <h2>Spotify join link</h2>
     <table id="vcl-table-id">
       <tr>
-          <th width="20%">Verification code</th>
-          <th width="10%">Status</th>
-          <th width="60%">Remark</th>
-          <th width="8%">Action</th>
+          <th width="15%">Email</th>
+          <th width="28%">Link invite</th>
+          <th width="28%">Address</th>
+          <th width="5%">Joined account number</th>
+          <th width="19%">Joined account email /<br> Verification Code</th>
+          <th width="5%">Created Date</th>
+
       </tr>
-      {% for item in table %}
+      {% for key, value in data.items %}
       <tr> 
-          <td>{{ item.VerCode }}</td>
-          {%if item.Status == 'valid' %}
-            <td style="color: green;">{{ item.Status }}</td>
-          {% elif item.Status == 'used' %}
-            <td style="color: red;">{{ item.Status }}</td>
-          {% elif item.Status == 'disabled' %}
-            <td style="color: orange;">{{ item.Status }}</td>
-          {% else %}
-          {% endif %}
-          <td>{{ item.Remark }}</td>
-          <td><button name="dl-btn-n-{{item.id}}">Delete</button></td>
+          <td>{{ value.MasterAccout }}</td>
+          <td>{{ value.Linkjoin }}</td>
+          <td>{{ value.Address }}</td>
+          <td>{{ value.MemNum }}</td>
+          <td>
+            {% for key_Z, value_Z in value.Zip.items %}
+              {% for skey_Z, svalue_Z in value_Z.items %}
+                <div data-id="email-{{key_Z}}">- {{skey_Z}} &#40;{{svalue_Z}}&#41;</div>
+                <button data-id="btn-{{key_Z}}">Delete</button>
+              {% endfor %}
+            {% endfor %}
+        </td>
+          <td>{{ value.Date }}</td>
       </tr>
       {% endfor %}
     </table>

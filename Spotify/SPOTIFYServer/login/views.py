@@ -48,6 +48,10 @@ D_format  = "%d/%m/%Y"
 DTRes_format  = "%H:%M:%S - %d/%m/%Y "
 
 ########## ANCHOR: GLOBAL METHODS ##########
+@dispatch(dict)
+def ret_dict_met(dict_):
+    return {"data": dict_}
+
 @dispatch(str,str)
 def ret_dict_met(stt_, detl_):
     return {"status": stt_, "detail": detl_,"time" : current_datetime()}
@@ -88,19 +92,26 @@ def DB_gencode(id_, Vercode_, Status_, Remark_):
     
 def DB_get_master_info():
     master_info_list  = list(MasterAccountDB.objects.all().values())
+    isSlotAvaiable    = False
     if master_info_list != []:
+        datetime.datetime.strptime("1/1/9999", lib.ResConfig.D_format)
+        min_created_date = datetime.datetime.strptime("1/1/9999", lib.ResConfig.D_format)
         for master_info in master_info_list:
-            if master_info['MemNum'] != 0:
-                id_        = master_info['id']
-                MasterAcc_ = master_info['Username']
-                familyURL_ = master_info['FamLink']
-                Address_   = master_info['Address']
-                NemNum_    = master_info['MemNum']
-                Nation_    = master_info['Nation']
-                return [id_,MasterAcc_,familyURL_,Address_,NemNum_,Nation_]
+            if master_info['MemNum'] != 0 and datetime.datetime.strptime(master_info['Date'], lib.ResConfig.D_format) <= min_created_date:
+                isSlotAvaiable   = True
+                min_created_date = datetime.datetime.strptime(master_info['Date'], lib.ResConfig.D_format)
+                id_              = master_info['id']
+                MasterAcc_       = master_info['Username']
+                familyURL_       = master_info['FamLink']
+                Address_         = master_info['Address']
+                NemNum_          = master_info['MemNum']
+                Nation_          = master_info['Nation']       
+        if isSlotAvaiable:
+            return [id_,MasterAcc_,familyURL_,Address_,NemNum_,Nation_]
+        else:
+            return 'No available slot'
     else:
         return 'Database is null'
-    return 'No available slot'
 
 def DB_check_vercode_validation(vercode_):
     vercode_info_list  = list(VerificationCodeDB.objects.all().values())
@@ -449,7 +460,6 @@ def GenerateCode(request):
             #Amount:
             gen_amount     = lib.VerificationCode.vc_quantity
             max_amount     = lib.VerificationCode.vc_quantity_max
-            current_amount = len(rawdata)
             valid_amount   = 0
             #Others:
             VC_list        = DB_VC_list()
@@ -507,20 +517,21 @@ def ExportReport(request):
         ### Input ###
         mode = 'Customer_format' ### REPORT ###
         Sel_month         = request.POST.get('monthfilter_n')
-        DB_rawdata        = MainDB.objects.all().values()
+        DB_M_rawdata      = MainDB.objects.all().values()
+        DB_MA_rawdata     = MasterAccountDB.objects.all().values()
         fil_data          = []
         succeed_MA_list   = []
         succeed_Mem_list  = []
         succeed_VC_list   = []
         succeed_data_dict = {}
         ### Raw data handling ###
-        for raw in DB_rawdata:
+        for raw in DB_M_rawdata:
             if str(raw['Datetime'][3:5]) == str(Sel_month):
                 fil_data.append(raw)
         #length/data:  
         if Sel_month == 'All':  
-            length = len(DB_rawdata)
-            data   = DB_rawdata
+            length = len(DB_M_rawdata)
+            data   = DB_M_rawdata
         else:                   
             length = len(fil_data) 
             data   = fil_data
@@ -540,20 +551,22 @@ def ExportReport(request):
         })
         worksheet.merge_range('A1:F2', 'Spotify Family Report', tittle_format)
         #Header: Customer's requirement template
-        header_data = ['Email', 'Link invite', 'Address', 'Số account đã joined', 'Email account joined /\nVerification Code', 'Created date']
+        header_data = ['Email', 'Link invite', 'Address', 'Số account đã joined', 'Joined account email /\nVerification Code', 'Created date']
         header_format = workbook.add_format({'text_wrap': True,'bold': True,'border': 1, 'align': 'center','bg_color': '#5BC85B'})
-        for col_num, x_data in enumerate(header_data):
-            worksheet.write(2, col_num, x_data, header_format)
-        #Data in excel:
-        if data == []:
-            error_format = workbook.add_format({'bold': True, 
+        error_format = workbook.add_format({'bold': True, 
                                                 'border': 1, 
                                                 'font_color': 'red', 
                                                 'text_wrap': True,
                                                 'align':'center',
                                                 'valign': 'vcenter', 
                                                 'fg_color': '#FFFF00',})
-            worksheet.merge_range('A4:F7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month) ', error_format)
+        for col_num, x_data in enumerate(header_data):
+            worksheet.write(2, col_num, x_data, header_format)
+        #Data in excel:
+        if data == []:
+            worksheet.merge_range('A4:F7', 'Empty data. Please check again!\n(Maybe there is no user joined in this month)', error_format)
+        elif DB_MA_rawdata == []:
+            worksheet.merge_range('A4:F7', 'Master account database is empty. Please check again!\n(No Spotify master account on database)', error_format)
         #Customter's requirement format:
         elif mode == 'Customer_format':
             data_format = workbook.add_format({'text_wrap': True, 'border': 1, 'align':'center'})
@@ -572,12 +585,21 @@ def ExportReport(request):
                             succeed_VC_list.append(data_2['VerCode'])
                             LinkJoin = data_2['FamLink'] 
                             Address  = data_2['Address'] 
+                            #Get Created date:
+                            try:
+                                DB_MA_rawdata = MasterAccountDB.objects.get(Username=data_2['MasterAccout'])
+                                Created_Date = DB_MA_rawdata.Date
+                            except MasterAccountDB.MultipleObjectsReturned: 
+                                DB_MA_rawdata = MasterAccountDB.objects.filter(Username=data_2['MasterAccout']).first()
+                                Created_Date = DB_MA_rawdata.Date
                 succeed_data_dict[succeed] = {
                     'MasterAccout' : succeed,
                     'Linkjoin'     : LinkJoin,
                     'Address'      : Address,
+                    'MemNum'       : len(succeed_Mem_list),
                     'Vercode'      : succeed_VC_list.copy(),
                     'Username'     : succeed_Mem_list.copy(),
+                    'Date'         : Created_Date
                 }
                 succeed_VC_list.clear()
                 succeed_Mem_list.clear()
@@ -589,14 +611,14 @@ def ExportReport(request):
                     if   column == 0: worksheet.write(row, column, succeed_data_dict[MA]['MasterAccout']      , data_format)
                     elif column == 1: worksheet.write(row, column, succeed_data_dict[MA]['Linkjoin']          , data_format)
                     elif column == 2: worksheet.write(row, column, succeed_data_dict[MA]['Address']           , data_format)
-                    elif column == 3: worksheet.write(row, column, len(succeed_data_dict[MA]['Username'])     , data_format)
+                    elif column == 3: worksheet.write(row, column, succeed_data_dict[MA]['MemNum']            , data_format)
                     elif column == 4: 
                         string = ''
                         l_length_succeed_Mem = len(succeed_data_dict[MA]['Username'])
                         for ind in range(l_length_succeed_Mem):
                             string += f''''- Email: {succeed_data_dict[MA]['Username'][ind]} (VCode: {succeed_data_dict[MA]['Vercode'][ind]})\n'''
                         worksheet.write(row, column, string                                                   , data_format)
-                    elif column == 5: worksheet.write(row, column, current_date()                             , data_format)
+                    elif column == 5: worksheet.write(row, column, succeed_data_dict[MA]['Date']              , data_format)
                     else:
                         #For next release
                         pass
@@ -712,7 +734,77 @@ def get_login(request):
     return render(request, 'Spotify_login.html')
 
 def SysCtrlSpotifyTab(request):
-    return render(request, 'Spotify_control.html')
+    ### Input ###
+    DB_M_rawdata      = MainDB.objects.all().values()
+    DB_MA_rawdata     = MasterAccountDB.objects.all().values()
+    succeed_MA_list   = []
+    succeed_Mem_list  = []
+    succeed_ID_list   = []
+    succeed_VC_list   = []
+    succeed_data_dict = {}
+        
+    ### Excel handling ###
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet('Report')
+    
+    #Data in excel:
+    if DB_M_rawdata == []:
+        return render(request, 'Spotify_control.html')
+    elif DB_MA_rawdata == []:
+        code = '521'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+        return render(request, 'Spotify_control.html',ret_dict)
+    #Customter's requirement format:
+    else:
+        #Get Master accounts in succeed cases:
+        for data_1 in DB_M_rawdata:
+            if data_1['MasterAccout'] not in succeed_MA_list and \
+                data_1['isJoined'] == True:
+                succeed_MA_list.append(data_1['MasterAccout'])
+        
+        #Get export account family data:
+        for succeed in succeed_MA_list:
+            for data_2 in DB_M_rawdata:
+                if succeed == data_2['MasterAccout'] and \
+                    data_2['isJoined'] == True:
+                        succeed_ID_list.append(data_2['id'])
+                        succeed_Mem_list.append(data_2['Username'])
+                        succeed_VC_list.append(data_2['VerCode'])
+                        LinkJoin = data_2['FamLink'] 
+                        Address  = data_2['Address'] 
+                        #Get Created date:
+                        try:
+                            DB_MA_rawdata = MasterAccountDB.objects.get(Username=data_2['MasterAccout'])
+                            Created_Date = DB_MA_rawdata.Date
+                        except MasterAccountDB.MultipleObjectsReturned: 
+                            code = '522'
+                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                            return render(request, 'Spotify_control.html',ret_dict)
+                        except MasterAccountDB.DoesNotExist: 
+                            code = '523'
+                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                            return render(request, 'Spotify_control.html',ret_dict)
+            
+            Full_zip = {k: {v1:v2} for k, v1, v2 in zip(succeed_ID_list.copy(), succeed_Mem_list.copy(), succeed_VC_list.copy())}            
+            succeed_data_dict[succeed] = {
+                'MasterAccout' : succeed,
+                'Linkjoin'     : LinkJoin,
+                'Address'      : Address,
+                'MemNum'       : len(succeed_Mem_list),
+                'Zip'          : Full_zip,
+                'Date'         : Created_Date
+            }
+            succeed_VC_list.clear()
+            succeed_Mem_list.clear()
+            succeed_ID_list.clear()
+
+        print(succeed_data_dict)
+            
+        #Return:
+        ret_dict = ret_dict_met(succeed_data_dict)
+                
+    return render(request, 'Spotify_control.html',ret_dict)
 
 def VerificationTab(request): 
     ### Input ###  

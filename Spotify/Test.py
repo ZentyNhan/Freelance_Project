@@ -221,6 +221,21 @@ print(django.get_version())
 #   unique_values = ignore_repeated_values(list_of_values)
 #   print(unique_values)
 
+# from datetime import datetime as dt
+# a = dt.strptime("27/06/2023", "%d/%m/%Y")
+# b = dt.strptime("28/06/2023", "%d/%m/%Y")
+# if a < b:
+#     print('hihi')
+# else:
+#     print('haha')
+    
+    
+# a = ['1','2','3','4','5']
+# b = ['a','b','c','d','e']
+# c = ['z','x','c','v','b']
 
+# d = {k: {v1:v2} for k, v1, v2 in zip(a, b, c)}
 
+# print(type(d))
+# print (d)
 

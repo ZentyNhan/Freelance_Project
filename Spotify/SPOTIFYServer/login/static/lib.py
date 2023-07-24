@@ -86,6 +86,9 @@ class ResponseConfig():
         '518' :	{'status':'Error'       ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
         '519' :	{'status':'Error'       ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
         '520' :	{'status':'Error'       ,'detail':{'admin':'Permission denied',                                       'customer':'None'}},
+        '521' :	{'status':'Error'       ,'detail':{'admin':'Master account database is null',                         'customer':'None'}},
+        '522' :	{'status':'Error'       ,'detail':{'admin':'Master account is duplicated on database',                'customer':'None'}},
+        '523' :	{'status':'Error'       ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
         '530' :	{'status':'Success'     ,'detail':{'admin':'Deleted',                                                 'customer':'None'}},
         '531' :	{'status':'Success'     ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
         # Others:
