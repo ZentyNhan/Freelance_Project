@@ -244,7 +244,7 @@ table, th, td {
           <td>
             {% for key_Z, value_Z in value.Zip.items %}
               {% for skey_Z, svalue_Z in value_Z.items %}
-                <div data-id="email-{{key_Z}}">- {{skey_Z}} &#40;{{svalue_Z}}&#41;</div>
+                <div>- {{skey_Z}} &#40;{{svalue_Z}}&#41;</div>
                 <button data-id="btn-{{key_Z}}">Delete</button>
               {% endfor %}
             {% endfor %}
