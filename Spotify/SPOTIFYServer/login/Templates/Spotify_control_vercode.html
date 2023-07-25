@@ -1,254 +1,219 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Administrator Panel</title> 
-<link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-}
+{% extends "Components/Layout.html" %} 
+{% load static %}
+{% block title %} Administrator Panel {% endblock %}
+{% block styles %} 
+<link rel="stylesheet" href="{% static "css/control_vercode.css" %}" type="text/css" /> 
+{% endblock %} 
 
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-}
+{% block content %}
+{% include 'Components/Header.html' %}
 
-.topnav a {
-  float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.topnav a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.topnav a.active {
-  background-color: #04AA6D;
-  color: white;
-}
-
-.topnav a.split {
-  float: right;
-  background-color: #04AA6D;
-  color: white;
-}
-/* Create a column layout with Flexbox */
-.row {
-  display: flex;
-}
-
-/* right column (menu) */
-.right {
-  /* flex: 35%; */
-  padding: 15px;
-  margin: 20px;
-  border: 5px solid green;
-  float:left;/*Add float left*/
-  width: 40%;
-}
-
-.right h2 {
-  padding-right: 8px;
-}
-
-/* left column (page content) */
-.left {
-  width: 50%;
-  /* flex: 70%; */
-  /* padding: 15px; */
-  /* border: 5px solid green; */
-  margin: 20px;
-  float:left;
-}
-
-/* left column (page content) */
-.subleft {
-  width: 100%;
-  /* flex: 70%; */
-  padding: 15px;
-  border: 5px solid green;
-  /* margin: 20px; */
-  float:left;
-}
-
-/* Style the search box */
-#mySearch {
-  width: 100%;
-  font-size: 18px;
-  padding: 11px;
-  border: 1px solid #ddd;
-}
-
-/* Style the navigation menu inside the left column */
-#myMenu {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-#myMenu li a {
-  padding: 12px;
-  text-decoration: none;
-  color: black;
-  display: block
-}
-
-#myMenu li a:hover {
-  background-color: #eee;
-}
-
-table, th, td {
-  border:1px solid black;
-}
-.tdbreak {
-  word-break: break-all
-}
-
-/* Clear floats (clearfix hack) */
-.vcl-btn-group:after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-</style>
-</head>
-<body>
-  <!-- COMMON -->
-  <div class="topnav">
-    <a class="active" href="{% url 'ControlPanel' %}"><i class="fa fa-fw fa-home"></i> Spotify Join Link</a>
-    <a href="{% url 'VerificationTab' %}"><i class="fa fa-check-circle"></i> Verification Code</a>
-    <a href="{% url 'LogoutAdmin' %}" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
-  </div>
-  <!-- COMMON -->
-
-  <div class="left" style="background-color:#ddd;">
-    <div class="subleft" style="background-color:#ddd;">
-      <h2>Verification code</h2>
-      {%if user.is_superuser %}
-      <p>Generate <strong> verification code.</strong> Current valid code is <i><strong style="color: blue;">{{ valid_amount }}</strong></i>.</p>
-      <p style="font-size:12px"><i>	&#40;*&#41; Generate 10 code every single confirmation. Maximum amount of valid code is 50. </i></p>
-      <br><br>
-      <form action="GenerateCode" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <button type = "submit" id="gc-btn-id" class='gc-btn-cls' onclick="VCConfirmFunction()">Generate code</button>
-        {% if 'successfully' in status %}
-          <p class="status">Status : <strong style="color: green;">{{ status }}</strong></p>
-          <p class="dateime">Date/Time : {{ datetime }}</p>
-        {% elif status == 'Full slot on database.' %}
-          <p class="status">Status : <strong style="color: red;">{{ status }}</strong></p>
-          <p class="dateime">Date/Time : {{ datetime }}</p>
-        {% else %}
-        {% endif %}
-      </form>
-      {% else %}
-      <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
-      {% endif %}
-    </div>
-
-    <div class="subleft" style="background-color:#ddd;">
-      <h2>Verification code management</h2>
-      {%if user.is_superuser %}
-      <p style="font-size:12px"><i>	&#40;*&#41; Manage verification code. </i></p>
-      <br><br>
-      <form action="UpdateCode" method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-          <label for="Filter">Filter: </label>
-          <select style="text-align: center;" id="VClistfilter_id" name = "VClistfilter_n" class = "VClistfilter_cls" onchange="SearchFunction()"> 
-              <option value ="all">All</option>
-            <option value ="valid">valid</option>
-            <option value ="used">used</option>
-          </select>
-          
-      </form>
-      {% else %}
-      <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
-      {% endif %}
+<main class="p-3 px-lg-5">
+  <h3 class="mb-0">Verification Code</h3>
+  <div class="toolbar w-100">
+    <div class="row">
+      <div class="col-md-7 d-flex align-items-end">
+        <form id="genCodeForm" action="{% url 'GenerateCode' %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+        </form>
+        <button id="btnGenCode" class="btn btn-primary">Generate code</button>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-6 d-flex align-items-center">
+            <form class="w-100" action="UpdateCode" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <label for="VClistfilter_id" class="form-label">Status</label>
+              <select class="form-select me-2" aria-label="Filter status"
+                id="VClistfilter_id" name="VClistfilter_n">
+                <option value="All" selected>All</option>
+                <option value="Valid">Valid</option>
+                <option value="Used">Used</option>
+              </select>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <div>
+              <label for="search-input" class="form-label">Search</label>
+              <div class="search btn-group m-0 w-100">
+                <input id="search-input" class="form-control search-input" type="search" aria-label="Search" placeholder="Search" autocomplete="off">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="right" style="background-color:#ddd;">
-    <h2>Verification list</h2>
-    <p style="font-size:12px"><i>	&#40;*&#41; list of verification code. </i></p>
-    <table id="vcl-table-id">
-      <tr>
-          <th width="20%">Verification code</th>
-          <th width="10%">Status</th>
-          <th width="60%">Remark</th>
-          <th width="8%">Action</th>
-      </tr>
+  <div>
+    <table 
+      id="table-vercode"
+      data-toggle="table" 
+      class="table-light"
+      data-pagination="true"
+      data-search="true"
+      data-toolbar=".toolbar"
+      data-toolbar-align="left"
+      data-page-size="20"
+      data-fixed-columns="true"
+      data-fixed-right-number="2"
+      >
+      <thead>
+        <tr class="table-dark">
+          <th width="20%" data-field="code">Verification code</th>
+          <th width="67%">Remark</th>
+          <th width="8%" class="text-center" data-field="status">Status</th>
+          <th width="5%" class="text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody>
       {% for item in table %}
-      <tr> 
+        <tr> 
           <td>{{ item.VerCode }}</td>
-          {%if item.Status == 'valid' %}
-            <td style="color: green;">{{ item.Status }}</td>
-          {% elif item.Status == 'used' %}
-            <td style="color: red;">{{ item.Status }}</td>
-          {% elif item.Status == 'disabled' %}
-            <td style="color: orange;">{{ item.Status }}</td>
-          {% else %}
-          {% endif %}
           <td>{{ item.Remark }}</td>
-          <td><button data-id="{{item.id}}">Delete</button></td>
-      </tr>
+          <td cl>
+            <h5 class="mb-0 text-center">
+              {%if item.Status == 'valid' %}
+                <span class="badge rounded-pill badge-success">{{ item.Status | title }}</span>
+              {% elif item.Status == 'used' %}
+                <span class="badge rounded-pill badge-danger">{{ item.Status | title }}</span>
+              {% else %}
+              {% endif %}
+            </h5>
+          </td>
+          <td class="text-center">
+            <a class="text-danger vercode-delete" data-id="{{ item.id }}" data-vercode="{{ item.VerCode }}" href="#" role="button" 
+              data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </a>  
+          </td>
+        </tr>
       {% endfor %}
+      </tbody>
     </table>
   </div>
-
-  <!-- JAVASCRIPT:: -->
-  <!-- Filter: -->
-  <script>
-    function SearchFunction() {
-      var input, filter, table, tr, td, i, txtValue;
-      var select_value = 1;
-      input = document.getElementById("VClistfilter_id");
-      filter = input.value.toUpperCase();
-      table = document.getElementById("vcl-table-id");
-      tr = table.getElementsByTagName("tr");
-      for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[select_value];  
-        if (td) {
-          if (td.innerHTML.toUpperCase() === filter) {
-            tr[i].style.display = "";
-          } else {
-            tr[i].style.display = "none";
-          }
-        }       
-      }
-    }
-</script>
+  {% include 'Components/Modal.html' with id='confirmGenerateCode' title='Generate code confirmation' confirmText='Generate Code' only %}
+  {% include 'Components/Modal.html' with id='confirmDeleteCode' title='Delete verification code confirmation' closeText='Cancel' confirmText='Delete' confirmColor='danger' only %}
+  {% include 'Components/Toast.html' %}
+</main>
   
-  <!-- Confirm create ver code: -->
-  <script>
-    function VCConfirmFunction() {
-      let text = "Please confirm:!\nPress OK to create code.";
-      if (confirm(text) == true) {
-        text = "You pressed OK!";
-      } else {
-        text = "You canceled!";
-      }
-    }
-  </script>
+{% endblock %}
 
-  <!-- Confirm delete ver code: -->
-  <script>
-    function VCDeleteConfirmFunction() {
-      let text = "Please confirm:!\nPress OK to delete code.";
-      if (confirm(text) == true) {
-        text = "You pressed OK!";
-      } else {
-        text = "You canceled!";
-      }
-    }
-  </script>
+{% block scripts %} 
+<!-- JAVASCRIPT:: -->
+<!-- Filter: -->
+<script>
+  $(document).ready(function() {
 
-</body>
-</html>
+    // Add table filter by status
+    const $table = $('#table-vercode');
+    $('#VClistfilter_id').change(function() {
+      $table.bootstrapTable('filterBy', {
+        status: $(this).val(),
+      }, {
+        'filterAlgorithm': (row, filters) => {
+          $status = $($.parseHTML(row.status));
+          return filters.status === 'All' || $status.find('.badge').text() === filters.status
+        }
+      })
+    });
+
+    // Handle show genearte code confirm modal
+    $genCodeModal = $('#confirmGenerateCode');
+    $genCodeModal.find('button.confirm').click(function() {
+      $(this).addClass('disabled');
+      $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>`);
+      $("#genCodeForm").trigger( "submit" );
+    })
+    $('#btnGenCode').click(function() {
+      const message = `You are running on generate <strong>verification code</strong> process.</p>
+        <p>By confirm generate, 10 verification codes will be generated. The total maximum amount of valid code is 50.</p>
+        <p>Current valid code is <i><strong>{{ valid_amount }}</strong></i>. {% if valid_amount == 50 %}Cannot generate verification codes anymore.{% endif %}</p>`;
+      const validAmount = `{{ valid_amount }}`;
+      if (validAmount === '50') {
+        $genCodeModal.find('button.confirm').addClass('disabled');
+      }
+      $genCodeModal.find('.modal-body').html(message);
+      $genCodeModal.modal('show');
+    })
+
+    // Handle show toast messages gencodes
+    const genCodeStatus = `{{ status }}`;
+    if (genCodeStatus.includes('successfully')) {
+      const $toast = $('#toast-list .toast-success');
+      $toast.find('.toast-title').html('Generate code successfully');
+      $toast.find('.toast-body').html(genCodeStatus);
+      $toast.toast('show');
+    } else if (genCodeStatus) {
+      const $toast = $('#toast-list .toast-danger');
+      $toast.find('.toast-title').html('Generate code failed');
+      $toast.find('.toast-body').html(genCodeStatus);
+      $toast.toast('show');
+    }
+
+    // Setup delete vercode buttons 
+    $deleteCodeModal = $('#confirmDeleteCode');
+    let deleteCode, deleteId;
+    const setupDeleteCodeButtons = () => {
+      $('.vercode-delete').click(function() {
+        deleteId = $(this).data('id');
+        deleteCode = $(this).data('vercode');
+        const message = `Are you sure you want to delete verification code: ${deleteCode}`;
+        $deleteCodeModal.find('.modal-body').html(message);
+        $deleteCodeModal.modal('show');
+      })
+    }
+    const closeDeleteCodeModal = () => {
+      $deleteCodeModal.find('button.confirm').removeClass('disabled');
+      $deleteCodeModal.find('button.confirm').html('Delete');
+      $deleteCodeModal.modal('toggle');
+    }
+    setupDeleteCodeButtons();
+    $deleteCodeModal.find('button.confirm').click(function() {
+      $(this).addClass('disabled');
+      $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>`);
+      const data = new FormData();
+      data.append('id', deleteId);
+      // add form input from hidden input elsewhere on the page
+      data.append('csrfmiddlewaretoken', $('#genCodeForm input[name="csrfmiddlewaretoken"]').attr('value'));
+
+      const handleDeleteFailed = () => {
+        closeDeleteCodeModal();
+        const $toast = $('#toast-list .toast-danger');
+        $toast.find('.toast-title').html('Delete code failed');
+        $toast.find('.toast-body').html(`Fail to delete verification code: ${deleteCode}`);
+        $toast.toast('show');
+      }
+
+      fetch("/verification/delete", {
+          method: 'POST',
+          body: data,
+          credentials: 'same-origin',
+      }).then(response => {
+        if (response.ok) {
+          closeDeleteCodeModal();
+          const $toast = $('#toast-list .toast-success');
+          $toast.find('.toast-title').html('Delete code successfully');
+          $toast.find('.toast-body').html(`Successfully deleted verification code: ${deleteCode}`);
+          $toast.toast('show');
+          $table.bootstrapTable('remove', {
+            field: 'code',
+            values: [deleteCode]
+          });
+          setupDeleteCodeButtons();
+        } else {
+          handleDeleteFailed();
+        }
+      }).catch(error => {
+        handleDeleteFailed();
+      })
+    })
+  })
+
+</script>
+
+
+{% endblock %}

@@ -1,124 +1,72 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Administrator Login</title> 
-    <link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {
-    background-image: url('/static/Admin_Background_3.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;  
-    background-size: cover;
-}
-form{
-    height: 520px;
-    width: 400px;
-    background-color: rgba(255,255,255,0.13);
-    position: absolute;
-    transform: translate(-50%,-50%);
-    top: 50%;
-    left: 50%;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 40px rgba(8,7,16,0.6);
-    padding: 50px 35px;
-}
+{% extends "Components/Layout.html" %} 
+{% load static %}
+{% block title %} Administrator Login {% endblock %}
+{% block styles %} 
+<link rel="stylesheet" href="{% static "css/admin.css" %}" type="text/css" /> 
+{% endblock %} 
 
-input[type=text], input[type=password] {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #04AA6D;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-button:hover {
-  opacity: 0.8;
-}
-
-.cancelbtn {
-  width: auto;
-  padding: 10px 18px;
-  background-color: #f44336;
-}
-
-.imgcontainer {
-  text-align: center;
-  margin: 24px 0 12px 0;
-}
-
-img.avatar {
-  width: 15%;
-  border-radius: 20%;
-}
-
-.greeting {
-  text-align: center;
-  margin: 24px 0 12px 0;
-
-}
-
-span.psw {
-  float: right;
-  padding-top: 16px;
-}
-
-/* Change styles for span and cancel button on extra small screens */
-@media screen and (max-width: 300px) {
-  span.psw {
-     display: block;
-     float: none;
-  }
-  .cancelbtn {
-     width: 100%;
-  }
-}
-
-
-</style>
-</head>
-<body>
-
-
+{% block content %}
 <form method="post">
-  {% csrf_token %} 
-  <div class="greeting">
-    <h3 style="color:white;">Administrator System</h3>
-  </div>
-  <div class="imgcontainer">
-    <img src="/static/Spotify_icon.png" alt="Avatar" class="avatar">
+  {% csrf_token %}
+  <h3 class="text-center mb-3 text-white">Administrator System</h3>
+  <div class="text-center mb-3">
+    <img src="/static/Spotify_icon.png" alt="Avatar" class="avatar" />
   </div>
 
   <div class="container">
-    <label for="uname" style="color:white;"><b>Username</b></label>
-    <input type="text" placeholder="Enter Username" name="uname" required>
+    {%if status == 'Error: ' %}
+      <div id="error-alert" class="alert alert-danger px-3 py-2" role="alert">
+        <div><strong>{{ status }}</strong></div>
+        <div>
+          {{ detail }}
+        </div>
+      </div>
+    {%endif%}
 
-    <label for="psw" style="color:white;"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required>
-        
-    <button type="submit">Login</button>
-    <label>
-      <input type="checkbox" checked="checked" name="remember"> Remember me
-    </label>
-  </div>
+    <div class="mb-3">
+      <label for="uname" class="text-white">Username</label>
+      <input type="text" id="uname" class="form-control" name="uname" required placeholder="Enter Username" />
+    </div>
+  
+    <div class="mb-3">
+      <label for="psw" class="text-white">Password</label>
+      <input type="password" id="psw" class="form-control" name="psw" required placeholder="Enter Password"/>
+    </div>
 
-  <div class="container">
-        <p style="color:red;"><strong>{{ status }}</strong>{{ detail }}</p>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" value="" id="remember" name="remember" checked />
+      <label class="form-check-label text-white" for="remember"> Remember me </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">
+      Login
+    </button>
+    
   </div>
 </form>
+{% endblock %}
 
-</body>
-</html>
+{% block scripts %} 
+<script>
+  $(document).ready(function() {
+    // Add loading indicator to submit button
+    $('button[type="submit"]').click(function() {
+      $(this).addClass('disabled');
+      $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>`);
+    });
+
+    // Logic for error alert
+    $('#error-alert').fadeIn();
+    $('input').focusin(function() {
+      $('#error-alert').fadeOut();
+    })
+
+    setTimeout(function () {
+      $('#error-alert').fadeOut();
+    }, 15000);
+  })
+  
+</script>
+{% endblock %} 

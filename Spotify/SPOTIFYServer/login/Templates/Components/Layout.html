@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link href="{% static "vendor/mdb5/css/mdb.min.css" %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static "vendor/bootstrap-table/bootstrap-table.min.css" %}">
+  <link rel="stylesheet" href="{% static "vendor/bootstrap-table/extensions/fixed-columns/bootstrap-table-fixed-columns.css" %}">
+  <link href="{% static "css/common.css" %}" rel="stylesheet">
+  {% block styles %}{% endblock %}
+</head>
+<body>
+
+{% block content %}{% endblock %}
+<script type="text/javascript" src="{% static "vendor/jquery-3.7.0.min.js" %}"></script>
+<script src="{% static "vendor/bootstrap-table/bootstrap-table.min.js" %}"></script>
+<script src="{% static "vendor/bootstrap-table/extensions/fixed-columns/bootstrap-table-fixed-columns.js" %}"></script>
+<script type="text/javascript" src="{% static "vendor/mdb5/js/mdb.min.js" %}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
