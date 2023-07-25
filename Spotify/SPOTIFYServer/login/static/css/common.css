@@ -42,7 +42,22 @@ td {
   height: 36px;
 }
 
-.fixed-table-toolbar .form-label {
+.fixed-table-toolbar .form-label, .modal-body .form-label {
   margin-bottom: -5px;
   font-size: 12px;
 }
+
+th {
+  vertical-align: middle !important;
+}
+
+.modal-footer button {
+  width: 10rem !important;
+}
+
+tbody:hover td[rowspan],
+tr:hover td {
+  /* Durch Aufteilung in zwei Bodys geht es, dass die zusammengefügten Zellen markiert werden! */
+  background-color: rgba(0,0,0,0.025) !important;
+}
+

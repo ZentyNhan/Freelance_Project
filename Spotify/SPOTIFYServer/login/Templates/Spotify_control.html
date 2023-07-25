@@ -1,147 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Administrator Panel</title> 
-<link rel="shortcut icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-}
+{% extends "Components/Layout.html" %} 
+{% load static %}
+{% block title %} Administrator Panel {% endblock %}
 
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-}
-
-.topnav a {
-  float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.topnav a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.topnav a.active {
-  background-color: #04AA6D;
-  color: white;
-}
-
-.topnav a.split {
-  float: right;
-  background-color: #04AA6D;
-  color: white;
-}
-/* Create a column layout with Flexbox */
-.row {
-  display: flex;
-}
-
-/* Left column (menu) */
-.left {
-  flex: 35%;
-  padding: 15px 0;
-}
-
-.left h2 {
-  padding-left: 8px;
-}
-
-/* Right column (page content) */
-.right {
-  flex: 144%;
-  padding: 15px;
-  border: 5px solid green;
-  margin: 20px;
-}
-
-
-/* right_2 column (menu) */
-.right_2 {
-  /* flex: 35%; */
-  padding: 15px;
-  margin: 20px;
-  border: 5px solid green;
-  float:left;/*Add float left*/
-  width: 95%;
-}
-
-.right_2 h2 {
-  padding-right: 8px;
-}
-
-/* left_2 column (page content) */
-.left_2 {
-  width: 25%;
-  /* flex: 70%; */
-  /* padding: 15px; */
-  /* border: 5px solid green; */
-  margin: 20px;
-  float:left;
-}
-
-/* subleft column (page content) */
-.subleft {
-  width: 100%;
-  /* flex: 70%; */
-  padding: 15px;
-  border: 5px solid green;
-  /* margin: 20px; */
-  float:left;
-}
-
-table, th, td {
-  border:1px solid black;
-}
-.tdbreak {
-  word-break: break-all
-}
-
-/* Style the search box */
-#mySearch {
-  width: 100%;
-  font-size: 18px;
-  padding: 11px;
-  border: 1px solid #ddd;
-}
-
-/* Style the navigation menu inside the left column */
-#myMenu {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-#myMenu li a {
-  padding: 12px;
-  text-decoration: none;
-  color: black;
-  display: block
-}
-
-#myMenu li a:hover {
-  background-color: #eee;
-}
-
-</style>
-</head>
-<body>
-  <!-- COMMON -->
-  <div class="topnav">
-    <a class="active" href="{% url 'ControlPanel' %}"><i class="fa fa-fw fa-home"></i> Spotify Join Link</a>
-    <a href="{% url 'VerificationTab' %}"><i class="fa fa-check-circle"></i> Verification Code</a>
-    <a href="{% url 'LogoutAdmin' %}" class="split"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
-  </div>
-  <!-- COMMON -->
- <div class="right" style="background-color:#ddd;">
+{% block content %}
+{% include 'Components/Header.html' %}
+<main class="p-3 px-lg-5">
+ <!-- <div class="right" style="background-color:#ddd;">
     <h2>Upload Data</h2>
     {%if user.is_superuser %}
     <p>Import data <strong> &#91;Master accounts, Fammily join link, Nation, Member capacity...&#93;</strong> to database. It's stored for customer to join in system.</p>
@@ -220,91 +84,279 @@ table, th, td {
     {% else %}
     <p>Please login as <a href='http://127.0.0.1:8000/Spot-admin/'>Administrator</a> before running this function</p>
     {% endif %}
+  </div> -->
+  <h3 class="mb-0">Spotify join link</h3>
+  <div class="toolbar w-100">
+    <div class="row">
+      <div class="col-md-7 d-flex align-items-end">
+        <button id="btnImport" class="btn btn-primary me-3"><i class="fa-solid fa-file-import me-2"></i>Import</button>
+        <button id="btnExport" class="btn btn-primary"><i class="fa-solid fa-file-export me-2"></i>Export</button>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-6 d-flex align-items-center"></div>
+          <div class="col-md-6">
+            <div>
+              <label for="search-input" class="form-label">Search</label>
+              <div class="search btn-group m-0 w-100">
+                <input id="search-input" class="form-control search-input" type="search" aria-label="Search" placeholder="Search" autocomplete="off">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-
-  <div class="right_2" style="background-color:#ddd;">
-    <h2>Spotify join link</h2>
-    <table id="vcl-table-id">
-      <tr>
-          <th width="15%">Email</th>
+  <form id="tokenForm">{% csrf_token %}</form>
+  <div>
+    <table 
+      id="table-vercode"
+      data-toggle="table" 
+      class="table-light"
+      data-pagination="true"
+      data-search="true"
+      data-toolbar=".toolbar"
+      data-toolbar-align="left"
+      data-page-size="20"
+      data-fixed-columns="true"
+      data-fixed-right-number="1"
+      >
+      <thead>
+        <tr class="table-dark">
+          <th width="5%" data-field="id">Email</th>
           <th width="28%">Link invite</th>
           <th width="28%">Address</th>
-          <th width="5%">Joined account number</th>
-          <th width="19%">Joined account email /<br> Verification Code</th>
           <th width="5%">Created Date</th>
-
-      </tr>
-      {% for key, value in data.items %}
-      <tr> 
+          <th width="5%" data-field="accountNumber">Joined account number</th>
+          <th width="30%" data-field="accountDetails">Joined account email /<br> Verification Code</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for key, value in data.items %}
+        <tr id="row-{{value.MasterAccout}}"> 
           <td>{{ value.MasterAccout }}</td>
           <td>{{ value.Linkjoin }}</td>
           <td>{{ value.Address }}</td>
-          <td>{{ value.MemNum }}</td>
-          <td>
-            {% for key_Z, value_Z in value.Zip.items %}
-              {% for skey_Z, svalue_Z in value_Z.items %}
-                <div>- {{skey_Z}} &#40;{{svalue_Z}}&#41;</div>
-                <button data-id="btn-{{key_Z}}">Delete</button>
-              {% endfor %}
-            {% endfor %}
-        </td>
           <td>{{ value.Date }}</td>
-      </tr>
-      {% endfor %}
+          <td class="accountNumber">{{ value.MemNum }}</td>
+          <td class="accountDetails">
+            {% for key_Z, value_Z in value.Zip.items %}
+              {% if forloop.last %}<div class="row h-100 p-2" style="border-bottom: none;">{% else %}<div class="row h-100 p-2" style="border-bottom: solid 1px rgb(226, 226, 226);">{% endif %}
+              {% for skey_Z, svalue_Z in value_Z.items %}  
+                  <div class="col-md-10">
+                    <i class="fa-solid fa-envelope"></i> {{skey_Z}} &#40;{{svalue_Z}}&#41;
+                  </div>
+                  <div class="col-md-2 text-end">
+                    <a class="text-danger account-delete" data-id="{{ key_Z }}" data-name="{{skey_Z}} ({{svalue_Z}})" data-row-id="{{value.MasterAccout}}" href="#" role="button" 
+                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
+                      <i class="fa-solid fa-rectangle-xmark"></i>
+                    </a>  
+                  </div>
+                </div>
+              {% endfor %}
+              </div>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
+  {% include 'Components/Modal.html' with id='confirmImport' title='Import Spotify Join Link' confirmText='Import file' only %}
+  {% include 'Components/Modal.html' with id='confirmExport' title='Export Spotify Join Link' confirmText='Export data' only %}
+  {% include 'Components/Modal.html' with id='confirmDelete' title='Delete joined account confirmation' closeText='Cancel' confirmText='Delete' confirmColor='danger' only %}
+  {% include 'Components/Toast.html' %}
+  <div id="import-form-template" class="d-none">
+    <form action="{% url 'UploadData' %}" class="p-3 py-2" id="import-form" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-2">
+        <label for="nationsel_n" class="form-label">Nation</label>
+        <select class="form-select me-2 required-field" aria-label="Filter status"
+          id="nationsel_n" name="nationsel_n">
+          <option value ="IN">Indian</option>
+          <option value ="TR">Turkey</option>
+          <option value ="VN">Vietnam</option>
+          <option value ="US">USA</option>
+          <option value ="JP">Japan</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" for="uploadData-name">File import</label>
+        <input type="file" class="form-control form-control-md required-field" id="uploadData-name" name="uploadData-name" />
+      </div>
+    </form>
+  </div>
+  <div id="export-form-template" class="d-none">
+    <form action="{% url 'ExportReport' %}" class="p-3 py-2" id="export-form" method="post">
+      {% csrf_token %}
+      <div>Please choose month and year to export data:</div>
+      <div class="d-flex flex-row gap-3">
+        <div>
+          <label for="monthfilter_n" class="form-label">Month</label>
+          <select class="form-select me-2 required-field" aria-label="Filter status"
+            id="monthfilter_n" name="monthfilter_n">
+            <option value ="01">Jan</option>
+            <option value ="02">Feb</option>
+            <option value ="03">Mar</option>
+            <option value ="04">Apr</option>
+            <option value ="05">May</option>
+            <option value ="06">Jun</option>
+            <option value ="07">Jul</option>
+            <option value ="08">Aug</option>
+            <option value ="09">Sep</option>
+            <option value ="10">Oct</option>
+            <option value ="11">Nov</option>
+            <option value ="12">Sep</option>
+            <option value ="All" selected>All</option>
+          </select>
+        </div>
+        <div>
+          <label for="yearfilter_n" class="form-label">Year</label>
+          <select class="form-select me-2 required-field" aria-label="Filter status"
+            id="yearfilter_n" name="yearfilter_n">
+            <option value ="2023" selected>2023</option>
+            <option value ="2024">2024</option>
+            <option value ="2025">2025</option>
+            <option value ="2026">2026</option>
+            <option value ="2027">2027</option>
+            <option value ="2028">2028</option>
+            <option value ="2029">2029</option>
+            <option value ="2030">2030</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %} 
 
+{% block scripts %} 
   <script>
-    function myFunction() {
-      var input, filter, ul, li, a, i;
-      input = document.getElementById("mySearch");
-      filter = input.value.toUpperCase();
-      ul = document.getElementById("myMenu");
-      li = ul.getElementsByTagName("li");
-      for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-          li[i].style.display = "";
-        } else {
-          li[i].style.display = "none";
-        }
+    $(document).ready(function() {
+      // Handle show import confirm modal
+      const $importModal = $('#confirmImport');
+      const importFormValidation = () => {        
+        const $confirmButton = $importModal.find('button.confirm');
+        $confirmButton.removeClass('disabled');
+        $importModal.find('.required-field').each(function() {
+          if (!$(this).val()) {
+            $confirmButton.addClass('disabled');
+          }
+        })
       }
-    }
-  </script>
 
-  <script>
-      function SearchFunction() {
-        var input, filter, table, tr, td, i, txtValue;
-        var select_value = 1;
-        input = document.getElementById("VClistfilter_id");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("vcl-table-id");
-        tr = table.getElementsByTagName("tr");
-        for (i = 0; i < tr.length; i++) {
-          td = tr[i].getElementsByTagName("td")[select_value];  
-          if (td) {
-            if (td.innerHTML.toUpperCase() === filter) {
-              tr[i].style.display = "";
-            } else {
-              tr[i].style.display = "none";
-            }
-          }       
-        }
+      $importModal.find('button.confirm').click(function() {
+        $(this).addClass('disabled');
+        $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>`);
+        $("#import-form").trigger( "submit" );
+      })
+      $('#btnImport').click(function() {
+        $importModal.find('.modal-body').html($('#import-form-template').html());
+        $importModal.find('.required-field').change(importFormValidation);
+        $importModal.modal('show');
+        importFormValidation();
+      })
+
+      // Handle show toast messages import
+      const importStatus = `{{ status }}`;
+      const importFailedReason = `{{ reason }}`;
+      if (importStatus === 'Upload successfully') {
+        const $toast = $('#toast-list .toast-success');
+        $toast.find('.toast-title').html('Import successfully');
+        $toast.find('.toast-body').html('Import spotify join link successfully');
+        $toast.toast('show');
+      } else if (importStatus === 'Upload failed') {
+        const $toast = $('#toast-list .toast-danger');
+        $toast.find('.toast-title').html('Import failed');
+        $toast.find('.toast-body').html(importFailedReason);
+        $toast.toast('show');
       }
-  </script>
 
-    <!-- Confirm create ver code: -->
-  <script>
-      function VCConfirmFunction() {
-        let text = "Please confirm:!\nPress OK to create code.";
-        if (confirm(text) == true) {
-          text = "You pressed OK!";
-        } else {
-          text = "You canceled!";
-        }
+      // Handle show import confirm modal
+      const $exportModal = $('#confirmExport');
+      $exportModal.find('button.confirm').click(function() {
+        $(this).addClass('disabled');
+        $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>`);
+        $("#export-form").trigger( "submit" );
+        $exportModal.modal('toggle');
+      })
+      $('#btnExport').click(function() {
+        $exportModal.find('button.confirm').removeClass('disabled').html('Export data');
+        $exportModal.find('.modal-body').html($('#export-form-template').html());
+        $exportModal.modal('show');
+      })
+
+      // Setup delete vercode buttons 
+      const $deleteModal = $('#confirmDelete');
+      let deleteName, deleteId, deleteRowId;
+      const setupDeleteButtons = () => {
+        $('.account-delete').click(function() {
+          deleteId = $(this).data('id');
+          deleteName = $(this).data('name');
+          deleteRowId = $(this).data('row-id');
+          const message = `Are you sure you want to delete joined account: ${deleteName}`;
+          $deleteModal.find('.modal-body').html(message);
+          $deleteModal.modal('show');
+        })
       }
-  </script>
+      const handleUpdateRowData = () => {
+        $row = $(`#row-${deleteRowId}`);
+        const accountNumber = parseInt($row.find('.accountNumber').text());
+        const $accountDetails = $row.find('.accountDetails');
+        $row.find('.accountNumber').html(accountNumber - 1);
+        $accountDetails.children().filter(function(){
+          return $(this).find('.account-delete').data('id') == deleteId;
+        }).remove();
+      }
+      const closeDeleteModal = () => {
+        $deleteModal.find('button.confirm').removeClass('disabled');
+        $deleteModal.find('button.confirm').html('Delete');
+        $deleteModal.modal('toggle');
+      }
+      setupDeleteButtons();
+      $deleteModal.find('button.confirm').click(function() {
+        $(this).addClass('disabled');
+        $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>`);
+        const data = new FormData();
+        data.append('id', deleteId);
+        // add form input from hidden input elsewhere on the page
+        data.append('csrfmiddlewaretoken', $('#tokenForm input[name="csrfmiddlewaretoken"]').attr('value'));
 
-</body>
-</html>
+        const handleDeleteFailed = () => {
+          closeDeleteModal();
+          const $toast = $('#toast-list .toast-danger');
+          $toast.find('.toast-title').html('Delete joined account failed');
+          $toast.find('.toast-body').html(`Fail to delete joined account: ${deleteName}`);
+          $toast.toast('show');
+        }
+
+        fetch("/joinLink/delete", {
+            method: 'POST',
+            body: data,
+            credentials: 'same-origin',
+        }).then(response => {
+          if (response.ok) {
+            closeDeleteModal();
+            const $toast = $('#toast-list .toast-success');
+            $toast.find('.toast-title').html('Delete joined account successfully');
+            $toast.find('.toast-body').html(`Successfully deleted joined account: ${deleteName}`);
+            $toast.toast('show');
+            handleUpdateRowData();
+            setupDeleteButtons();
+          } else {
+            handleDeleteFailed();
+          }
+        }).catch(error => {
+          handleDeleteFailed();
+        })
+      })
+    });
+  </script>
+{% endblock %}
+
