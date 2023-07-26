@@ -39,6 +39,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from login.models import MainDB, MasterAccountDB, VerificationCodeDB
 from tablib import Dataset
+from django.http import JsonResponse
 
 ########## ANCHOR: GLOBAL ATTIRIBUTES ##########
 
@@ -60,12 +61,20 @@ def ret_dict_met(stt_, detl_):
 def ret_dict_met(stt_, detl_, table_):
     return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_}
 
+@dispatch(str,str,dict)
+def ret_dict_met(stt_, detl_, table_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_}
+
 @dispatch(str,str,list,int)
 def ret_dict_met(stt_, detl_, table_, valid_amount_):
     return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_,"valid_amount":valid_amount_}
 
 def DB_VC_list():
     rawdata = list(VerificationCodeDB.objects.all().values())
+    return rawdata   
+
+def DB_M_list():
+    rawdata = list(MainDB.objects.all().values())
     return rawdata   
 
 def DB_VC_Valid_amount():
@@ -112,6 +121,73 @@ def DB_get_master_info():
             return 'No available slot'
     else:
         return 'Database is null'
+    
+def DB_M_succeed_table():
+    ### Input ###
+    DB_M_rawdata      = MainDB.objects.all().values()
+    DB_MA_rawdata     = MasterAccountDB.objects.all().values()
+    succeed_MA_list   = []
+    succeed_Mem_list  = []
+    succeed_ID_list   = []
+    succeed_VC_list   = []
+    succeed_data_dict = {}
+        
+    #Data in excel:
+    if DB_M_rawdata == []:
+        return ''
+    elif DB_MA_rawdata == []:
+        code = '521'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+        return ret_dict
+    #Customter's requirement format:
+    else:
+        #Get Master accounts in succeed cases:
+        for data_1 in DB_M_rawdata:
+            if data_1['MasterAccout'] not in succeed_MA_list and \
+                data_1['isJoined'] == True:
+                succeed_MA_list.append(data_1['MasterAccout'])
+        
+        #Get export account family data:
+        for succeed in succeed_MA_list:
+            for data_2 in DB_M_rawdata:
+                if succeed == data_2['MasterAccout'] and \
+                    data_2['isJoined'] == True:
+                        succeed_ID_list.append(data_2['id'])
+                        succeed_Mem_list.append(data_2['Username'])
+                        succeed_VC_list.append(data_2['VerCode'])
+                        LinkJoin = data_2['FamLink'] 
+                        Address  = data_2['Address'] 
+                        #Get Created date:
+                        try:
+                            DB_MA_rawdata = MasterAccountDB.objects.get(Username=data_2['MasterAccout'])
+                            Created_Date = DB_MA_rawdata.Date
+                        except MasterAccountDB.MultipleObjectsReturned: 
+                            code = '522'
+                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                            return ret_dict
+                        except MasterAccountDB.DoesNotExist: 
+                            code = '523'
+                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                            return ret_dict
+            
+            Full_zip = {k: {v1:v2} for k, v1, v2 in zip(succeed_ID_list.copy(), succeed_Mem_list.copy(), succeed_VC_list.copy())}            
+            succeed_data_dict[succeed] = {
+                'MasterAccout' : succeed,
+                'Linkjoin'     : LinkJoin,
+                'Address'      : Address,
+                'MemNum'       : len(succeed_Mem_list),
+                'Zip'          : Full_zip,
+                'Date'         : Created_Date
+            }
+            succeed_VC_list.clear()
+            succeed_Mem_list.clear()
+            succeed_ID_list.clear()
+
+        #Return:
+        code = '532'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], succeed_data_dict)
+                
+    return ret_dict
 
 def DB_check_vercode_validation(vercode_):
     vercode_info_list  = list(VerificationCodeDB.objects.all().values())
@@ -124,7 +200,23 @@ def DB_check_vercode_validation(vercode_):
 def is_integer(n):
     if isinstance(n, int): return True
     else:                  return False
-
+    
+def id_gen(mode_, list_):
+    ID = []
+    data = list_
+    for i in data:
+        ID.append(i['id'])
+    if mode_ == 'new':
+        if ID == []: id = 0
+        else:        id = max(ID) + 1
+    elif mode_ == 'max':
+        if ID == []: id = 0
+        else:        id = max(ID)
+    else:
+        if ID == []: id = 0
+        else:        id = min(ID)
+    return id
+    
 def current_date():
     return datetime.datetime.now().strftime(D_format)        
 
@@ -174,8 +266,7 @@ def joinSpotify(request):
                 ########## ANCHOR: DO NOT CHANGE ##########
                 ### Check information from DB:
                 # id handling:
-                length       = len(MainDB.objects.all().values()) 
-                id           = length + 1 #Calculate ID from current length Users in DB
+                id = id_gen(mode_='new', list_=MainDB.objects.all().values()) #Calculate ID from current length Users in DB
                 # get master information:
                 Master_infor = DB_get_master_info()
                 if  Master_infor in ['Database is null']:
@@ -324,7 +415,77 @@ def joinSpotify(request):
         return render(request, 'Spotify_login.html')
     
 ### EVENTS ### 
-########## ANCHOR: UpdateCode ##########: Update / Delete / Edit
+########## ANCHOR: DeleteAccount ##########: Delete
+@login_required(login_url='/Spot-admin')
+def DeleteAccount(request):
+    try:
+        ### Input ###  
+        M_list   = DB_M_list()
+        #Get info from admin:
+        input_id = request.POST.get('id') #str
+        #Others:
+        A_ID     = []
+        
+        ### Functions ###
+        for i in M_list:
+            #Get VC id info:
+            A_ID.append(i['id'])
+        
+        if int(input_id) in A_ID:
+            #Delete object:
+            MainDB.objects.get(id=input_id).delete()
+            #Update objects order:
+            Update_A_list = DB_M_list()
+            code = '530'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_A_list, DB_VC_Valid_amount())
+            return JsonResponse(ret_dict, status=200)
+        else:
+            code = '686'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], M_list, DB_VC_Valid_amount())
+            return JsonResponse(ret_dict, status=404)
+            
+    except:
+        code = '999'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], M_list, DB_VC_Valid_amount())
+        return JsonResponse(ret_dict, status=404)
+
+    
+########## ANCHOR: DeleteCode ##########: Delete 
+@login_required(login_url='/Spot-admin')
+def DeleteCode(request):
+    try:
+        ### Input ###  
+        VC_list  = DB_VC_list()
+        #Get info from admin:
+        input_id = request.POST.get('id') #str
+        #Others:
+        VC_ID    = []
+
+        ### Functions ###
+        for i in VC_list:
+            #Get VC id info:
+            VC_ID.append(i['id'])
+        
+        if int(input_id) in VC_ID:
+            #Delete object:
+            VerificationCodeDB.objects.get(id=input_id).delete()
+            #Update objects order:
+            Update_VC_list = DB_VC_list()
+            code = '530'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            return JsonResponse(ret_dict, status=200)
+        else:
+            code = '686'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            return JsonResponse(ret_dict, status=404)
+            
+    except:
+        code = '999'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        return JsonResponse(ret_dict, status=404)
+
+#(***OBSOLETED***)      
+########## ANCHOR: UpdateCode ##########: Update / Delete / Edit 
 @login_required(login_url='/Spot-admin')
 def UpdateCode(request):
     try:
@@ -463,7 +624,6 @@ def GenerateCode(request):
             valid_amount   = 0
             #Others:
             VC_list        = DB_VC_list()
-            VC_ID          = []
             ret_dict       = {}
 
             ### Functions ###  
@@ -471,12 +631,9 @@ def GenerateCode(request):
             for data in rawdata:
                 if data['Status'] == 'valid':
                     valid_amount += 1
-                    #id list:
-                    VC_ID.append(data['id'])
 
             #Max ID:
-            if VC_ID == []: max_id = 0
-            else:           max_id = max(VC_ID)
+            max_id = id_gen(mode_='max', list_=VerificationCodeDB.objects.all().values())
 
             #Counting offset:
             offset = max_amount - valid_amount
@@ -517,6 +674,7 @@ def ExportReport(request):
         ### Input ###
         mode = 'Customer_format' ### REPORT ###
         Sel_month         = request.POST.get('monthfilter_n')
+        Sel_year          = request.POST.get('yearfilter_n')
         DB_M_rawdata      = MainDB.objects.all().values()
         DB_MA_rawdata     = MasterAccountDB.objects.all().values()
         fil_data          = []
@@ -526,8 +684,10 @@ def ExportReport(request):
         succeed_data_dict = {}
         ### Raw data handling ###
         for raw in DB_M_rawdata:
-            if str(raw['Datetime'][3:5]) == str(Sel_month):
+            if str(raw['Datetime'][3:5]) == str(Sel_month) and \
+               str(raw['Datetime'][6:10]) == str(Sel_year):
                 fil_data.append(raw)
+                
         #length/data:  
         if Sel_month == 'All':  
             length = len(DB_M_rawdata)
@@ -616,7 +776,7 @@ def ExportReport(request):
                         string = ''
                         l_length_succeed_Mem = len(succeed_data_dict[MA]['Username'])
                         for ind in range(l_length_succeed_Mem):
-                            string += f''''- Email: {succeed_data_dict[MA]['Username'][ind]} (VCode: {succeed_data_dict[MA]['Vercode'][ind]})\n'''
+                            string += f'''- Email: {succeed_data_dict[MA]['Username'][ind]} (VCode: {succeed_data_dict[MA]['Vercode'][ind]})\n'''
                         worksheet.write(row, column, string                                                   , data_format)
                     elif column == 5: worksheet.write(row, column, succeed_data_dict[MA]['Date']              , data_format)
                     else:
@@ -681,9 +841,11 @@ def UploadData(request):
     if request.method == 'POST':
         try: 
             ### Input ###
-            nation  = request.POST.get('nationsel_n')
-            dataset = Dataset()
-            data    = []
+            nation        = request.POST.get('nationsel_n')
+            dataset       = Dataset()
+            DB_MA_rawdata = MasterAccountDB.objects.all().values()
+            data          = []
+            MA_list       = []
             
             #Import excel:
             excel_file = request.FILES['uploadData-name']
@@ -696,11 +858,18 @@ def UploadData(request):
                                 'Address'  : data_col[2], 
                                 'MemNum'   : data_col[3], 
                                 'Date'     : (data_col[4]).strftime(D_format)})
+            #Master account list:
+            for i in DB_MA_rawdata:
+                MA_list.append(i['Username']
+                               )
             #Update on DB:
             for Master_acc in data:
-                length  = len(MasterAccountDB.objects.all().values())
-                id      = length + 1
-                if Master_acc['Username'] not in ['Master Username', None]:
+                id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
+                if Master_acc['Username'] in MA_list:
+                    code = '522'
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    return render(request, 'Spotify_control.html',ret_dict)
+                elif Master_acc['Username'] not in ['Master Username', None]:
                     DB_upload(id,
                             Master_acc['Username'],  
                             Master_acc['FamLink'],
@@ -734,76 +903,8 @@ def get_login(request):
     return render(request, 'Spotify_login.html')
 
 def SysCtrlSpotifyTab(request):
-    ### Input ###
-    DB_M_rawdata      = MainDB.objects.all().values()
-    DB_MA_rawdata     = MasterAccountDB.objects.all().values()
-    succeed_MA_list   = []
-    succeed_Mem_list  = []
-    succeed_ID_list   = []
-    succeed_VC_list   = []
-    succeed_data_dict = {}
-        
-    ### Excel handling ###
-    output = BytesIO()
-    workbook = xlsxwriter.Workbook(output)
-    worksheet = workbook.add_worksheet('Report')
-    
-    #Data in excel:
-    if DB_M_rawdata == []:
-        return render(request, 'Spotify_control.html')
-    elif DB_MA_rawdata == []:
-        code = '521'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
-        return render(request, 'Spotify_control.html',ret_dict)
-    #Customter's requirement format:
-    else:
-        #Get Master accounts in succeed cases:
-        for data_1 in DB_M_rawdata:
-            if data_1['MasterAccout'] not in succeed_MA_list and \
-                data_1['isJoined'] == True:
-                succeed_MA_list.append(data_1['MasterAccout'])
-        
-        #Get export account family data:
-        for succeed in succeed_MA_list:
-            for data_2 in DB_M_rawdata:
-                if succeed == data_2['MasterAccout'] and \
-                    data_2['isJoined'] == True:
-                        succeed_ID_list.append(data_2['id'])
-                        succeed_Mem_list.append(data_2['Username'])
-                        succeed_VC_list.append(data_2['VerCode'])
-                        LinkJoin = data_2['FamLink'] 
-                        Address  = data_2['Address'] 
-                        #Get Created date:
-                        try:
-                            DB_MA_rawdata = MasterAccountDB.objects.get(Username=data_2['MasterAccout'])
-                            Created_Date = DB_MA_rawdata.Date
-                        except MasterAccountDB.MultipleObjectsReturned: 
-                            code = '522'
-                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
-                            return render(request, 'Spotify_control.html',ret_dict)
-                        except MasterAccountDB.DoesNotExist: 
-                            code = '523'
-                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
-                            return render(request, 'Spotify_control.html',ret_dict)
-            
-            Full_zip = {k: {v1:v2} for k, v1, v2 in zip(succeed_ID_list.copy(), succeed_Mem_list.copy(), succeed_VC_list.copy())}            
-            succeed_data_dict[succeed] = {
-                'MasterAccout' : succeed,
-                'Linkjoin'     : LinkJoin,
-                'Address'      : Address,
-                'MemNum'       : len(succeed_Mem_list),
-                'Zip'          : Full_zip,
-                'Date'         : Created_Date
-            }
-            succeed_VC_list.clear()
-            succeed_Mem_list.clear()
-            succeed_ID_list.clear()
-
-        print(succeed_data_dict)
-            
-        #Return:
-        ret_dict = ret_dict_met(succeed_data_dict)
-                
+    ret_dict = DB_M_succeed_table()
+    # return JsonResponse(ret_dict, status=200)
     return render(request, 'Spotify_control.html',ret_dict)
 
 def VerificationTab(request): 
