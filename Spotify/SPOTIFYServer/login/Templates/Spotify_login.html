@@ -6,7 +6,7 @@
 {% endblock %} 
 
 {% block content %}
-<form method="post">
+<form method="post" id="login-form">
   {% csrf_token %}
 
   <h3 class="text-center text-white">Đăng Nhập</h3>
@@ -33,17 +33,17 @@
     {% csrf_token %}
     <div class="mb-3">
       <label for="Uname" class="text-white">Username</label>
-      <input type="text" id="Uname" class="form-control" name="Uname" required placeholder="Enter Username"/>
+      <input type="text" id="Uname" class="form-control required" name="Uname" required placeholder="Enter Username"/>
     </div>
   
     <div class="mb-3">
       <label for="Pwd" class="text-white">Password</label>
-      <input type="password" id="Pwd" class="form-control" name="Pwd" required placeholder="Enter Password"/>
+      <input type="password" id="Pwd" class="form-control required" name="Pwd" required placeholder="Enter Password"/>
     </div>
 
     <div class="mb-4">
       <label for="Vercode" class="text-white">Verification code</label>
-      <input type="text" id="Vercode" class="form-control" name="Vercode" required placeholder="Enter code"/>
+      <input type="text" id="Vercode" class="form-control required" name="Vercode" required placeholder="Enter code"/>
     </div>
 
     <button type="submit" class="btn btn-primary btn-block">
@@ -59,10 +59,19 @@
   $(document).ready(function() {
     // Add loading indicator to submit button
     $('button[type="submit"]').click(function() {
-      $(this).addClass('disabled');
-      $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>`);
+      let valid = true;
+      const btnThis = this;
+      $('#login-form input.required').each(function() {
+        if (!$(this).val()) {
+          valid = false;
+        }
+      })
+      if (valid) {
+        $(btnThis).addClass('disabled');
+        $(btnThis).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>`);
+      }
     });
 
     // Logic for error alert
