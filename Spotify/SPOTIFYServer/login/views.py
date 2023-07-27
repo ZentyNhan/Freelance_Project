@@ -43,10 +43,11 @@ from django.http import JsonResponse
 
 ########## ANCHOR: GLOBAL ATTIRIBUTES ##########
 
-ret_dict = {}
-DT_format = "%d/%m/%Y %H:%M:%S"
-D_format  = "%d/%m/%Y"
-DTRes_format  = "%H:%M:%S - %d/%m/%Y "
+Max_join_memnum = int(5)
+ret_dict        = {}
+DT_format       = "%d/%m/%Y %H:%M:%S"
+D_format        = "%d/%m/%Y"
+DTRes_format    = "%H:%M:%S - %d/%m/%Y "
 
 ########## ANCHOR: GLOBAL METHODS ##########
 @dispatch(dict)
@@ -148,34 +149,50 @@ def DB_M_succeed_table():
                 succeed_MA_list.append(data_1['MasterAccout'])
         
         #Get export account family data:
-        for succeed in succeed_MA_list:
-            for data_2 in DB_M_rawdata:
-                if succeed == data_2['MasterAccout'] and \
-                    data_2['isJoined'] == True:
-                        succeed_ID_list.append(data_2['id'])
-                        succeed_Mem_list.append(data_2['Username'])
-                        succeed_VC_list.append(data_2['VerCode'])
-                        LinkJoin = data_2['FamLink'] 
-                        Address  = data_2['Address'] 
-                        #Get Created date:
-                        try:
-                            DB_MA_rawdata = MasterAccountDB.objects.get(Username=data_2['MasterAccout'])
-                            Created_Date = DB_MA_rawdata.Date
-                        except MasterAccountDB.MultipleObjectsReturned: 
-                            code = '522'
-                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
-                            return ret_dict
-                        except MasterAccountDB.DoesNotExist: 
-                            code = '523'
-                            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
-                            return ret_dict
-            
-            Full_zip = {k: {v1:v2} for k, v1, v2 in zip(succeed_ID_list.copy(), succeed_Mem_list.copy(), succeed_VC_list.copy())}            
-            succeed_data_dict[succeed] = {
-                'MasterAccout' : succeed,
+        for MA in DB_MA_rawdata:
+            if MA['Username'] in succeed_MA_list:
+                for data_2 in DB_M_rawdata:
+                    if MA['Username']  == data_2['MasterAccout'] and \
+                        data_2['isJoined'] == True:
+                            succeed_ID_list.append(data_2['id'])
+                            succeed_Mem_list.append(data_2['Username'])
+                            succeed_VC_list.append(data_2['VerCode'])
+                            LinkJoin      = data_2['FamLink'] 
+                            Address       = data_2['Address'] 
+                            MasterAccount = MA['Username']
+                            Nation        = lib.ResConfig.langcode[MA['Nation']]
+                            #Get Created date:
+                            try:
+                                DB_MA_rawdata = MasterAccountDB.objects.get(Username=data_2['MasterAccout'])
+                                Created_Date = DB_MA_rawdata.Date
+                            except MasterAccountDB.MultipleObjectsReturned: 
+                                code = '522'
+                                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                                return ret_dict
+                            except MasterAccountDB.DoesNotExist: 
+                                code = '523'
+                                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                                return ret_dict
+                Full_zip      = {k: {v1:v2} for k, v1, v2 in zip(succeed_ID_list.copy(), succeed_Mem_list.copy(), succeed_VC_list.copy())}  
+                joined_memnum = len(succeed_Mem_list)          
+                
+            else:
+                MasterAccount = MA['Username']
+                LinkJoin      = MA['FamLink']
+                Address       = MA['Address']
+                Nation        = lib.ResConfig.langcode[MA['Nation']]
+                Created_Date  = MA['Date']
+                joined_memnum = 0
+                Full_zip      = 'null'
+
+                
+            #succeed_data_dict:
+            succeed_data_dict[MasterAccount] = {
+                'MasterAccount': MasterAccount,
                 'Linkjoin'     : LinkJoin,
                 'Address'      : Address,
-                'MemNum'       : len(succeed_Mem_list),
+                'Nation'       : Nation,
+                'MemNum'       : joined_memnum,
                 'Zip'          : Full_zip,
                 'Date'         : Created_Date
             }
@@ -247,6 +264,7 @@ def AdminSpotify(request):
     else:
         return render(request, 'Spotify_admin.html')
 
+########## ANCHOR: joinSpotify ########## 
 def joinSpotify(request):
     if request.method == 'POST':
         #Get info from customer:
@@ -355,7 +373,7 @@ def joinSpotify(request):
                     
                     ########## ANCHOR: REPORT AND DB HANDLING ##########
                     ##### "SUCCESS" TEST: #####
-                    # code = '200'
+                    code = '200'
                     ###########################
                     
                     ### Check error ret: ###
@@ -435,18 +453,14 @@ def DeleteAccount(request):
             #Delete object:
             MainDB.objects.get(id=input_id).delete()
             #Update objects order:
-            Update_A_list = DB_M_list()
-            code = '530'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_A_list, DB_VC_Valid_amount())
+            ret_dict = DB_M_succeed_table()
             return JsonResponse(ret_dict, status=200)
         else:
-            code = '686'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], M_list, DB_VC_Valid_amount())
+            ret_dict = DB_M_succeed_table()
             return JsonResponse(ret_dict, status=404)
             
     except:
-        code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], M_list, DB_VC_Valid_amount())
+        ret_dict = DB_M_succeed_table()
         return JsonResponse(ret_dict, status=404)
 
     
@@ -860,14 +874,15 @@ def UploadData(request):
                                 'Date'     : (data_col[4]).strftime(D_format)})
             #Master account list:
             for i in DB_MA_rawdata:
-                MA_list.append(i['Username']
-                               )
+                MA_list.append(i['Username'])
+                
             #Update on DB:
             for Master_acc in data:
                 id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
                 if Master_acc['Username'] in MA_list:
                     code = '522'
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
+                    print(DB_M_succeed_table())
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_M_succeed_table())
                     return render(request, 'Spotify_control.html',ret_dict)
                 elif Master_acc['Username'] not in ['Master Username', None]:
                     DB_upload(id,
@@ -882,7 +897,7 @@ def UploadData(request):
             ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{current_datetime()}'}
             return render(request, 'Spotify_control.html',ret_dict)
         except Exception as error:
-            ret_dict = {'status' : f'Upload failed' , 'reason' : error , 'datetime' : f'{current_datetime()}'}
+            ret_dict = {'status' : f'Upload failed' , 'detail' : error , 'time' : f'{current_datetime()}', 'table' : DB_M_succeed_table()}
             return render(request, 'Spotify_control.html',ret_dict)
     else:
         ret_dict = {'status' : '' , 'datetime': ''}

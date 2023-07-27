@@ -81,20 +81,20 @@ class ResponseConfig():
         '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
         '415' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Wrong verification code',                 'customer':'Verification code chưa đúng. Vui lòng thử lại hoặc liên hệ admin để mua code'}},
         # Admin::
-        '516' :	{'status':'Error'       ,'detail':{'admin':'ID empty',                                                'customer':'None'}},
-        '517' :	{'status':'Error'       ,'detail':{'admin':'ID out of range',                                         'customer':'None'}},
-        '518' :	{'status':'Error'       ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
-        '519' :	{'status':'Error'       ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
-        '520' :	{'status':'Error'       ,'detail':{'admin':'Permission denied',                                       'customer':'None'}},
-        '521' :	{'status':'Error'       ,'detail':{'admin':'Master account database is null',                         'customer':'None'}},
-        '522' :	{'status':'Error'       ,'detail':{'admin':'Master account is duplicated on database',                'customer':'None'}},
-        '523' :	{'status':'Error'       ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
-        '530' :	{'status':'Success'     ,'detail':{'admin':'Deleted',                                                 'customer':'None'}},
-        '531' :	{'status':'Success'     ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
-        '532' :	{'status':'Success'     ,'detail':{'admin':'Loaded',                                                  'customer':'None'}},
-        # Others:
-        '686' :	{'status':'Warning'     ,'detail':{'admin':'Warning: Others value',                                   'customer':'Warning: Others value'}},
-        '999' :	{'status':'Error'       ,'detail':{'admin':'Unknow Exception',                                        'customer':'Unknow Exception'}},
+        '516' :	{'status':'Error'         ,'detail':{'admin':'ID empty',                                                'customer':'None'}},
+        '517' :	{'status':'Error'         ,'detail':{'admin':'ID out of range',                                         'customer':'None'}},
+        '518' :	{'status':'Error'         ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
+        '519' :	{'status':'Error'         ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
+        '520' :	{'status':'Error'         ,'detail':{'admin':'Permission denied',                                       'customer':'None'}},
+        '521' :	{'status':'Error'         ,'detail':{'admin':'Master account database is null',                         'customer':'None'}},
+        '522' :	{'status':'Upload failed' ,'detail':{'admin':'Master account is duplicated on database',                'customer':'None'}},
+        '523' :	{'status':'Upload failed' ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
+        '530' :	{'status':'Success'       ,'detail':{'admin':'Deleted',                                                 'customer':'None'}},
+        '531' :	{'status':'Success'       ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
+        '532' :	{'status':'Success'       ,'detail':{'admin':'Loaded',                                                  'customer':'None'}},
+        # Others:  
+        '686' :	{'status':'Warning'       ,'detail':{'admin':'Warning: Others value',                                   'customer':'Warning: Others value'}},
+        '999' :	{'status':'Error'         ,'detail':{'admin':'Unknow Exception',                                        'customer':'Unknow Exception'}},
 
     }
     
@@ -108,11 +108,20 @@ class ResponseConfig():
     D_format = "%d/%m/%Y"
     
     langcode  = {
+        #forward:
         'Japan'                   : 'JP',
         'Turkey'                  : 'TR',
         'Vietnam'                 : 'VN',
         'USA'                     : 'US',
-        'India'                   : 'IN'
+        'India'                   : 'IN',
+        'China'                   : 'CN',
+        #reverse:
+        'JP'                      : 'Japan',
+        'TR'                      : 'Turkey',
+        'VN'                      : 'Vietnam',
+        'US'                      : 'USA',    
+        'IN'                      : 'India',
+        'CN'                      : 'China'  
     }
     
 class logging():

@@ -144,6 +144,9 @@ Front-end:
 41. Upload, nếu trùng k cho import (Nhân) (Done)
 42. handle ID = max + 1 (Nhân) (Done)
 43. Xử lý year export (Nhân) (Done)
+44. Edit lại link join page (Nhân, Đông) 
+45. Filter "Joined account number", Nation (Đông)
+46. Đổ active Country, tạo cột Nation , dropdown active nation  (Nhân, Đông) 
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)

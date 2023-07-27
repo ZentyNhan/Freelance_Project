@@ -44,6 +44,17 @@
           {% url 'VerificationTab' as VerificationTab %}
           <a class="nav-link {% if VerificationTab in request.get_full_path%}active{% endif %}" href="{% url 'VerificationTab' %}"><i class="fa fa-check-circle"></i> Verification Code</a>
         </li>
+        <li class="nav-item Active-nation">
+          <select class="form-select Active-nation" aria-label="Select active nation"
+                id="ActNationSel_id" name="ActNationSel_n">
+                <option value ="IN">Indian</option>
+                <option value ="TR">Turkey</option>
+                <option value ="VN">Vietnam</option>
+                <option value ="US">USA</option>
+                <option value ="JP">Japan</option>
+                <option value ="CN">China</option>
+              </select>
+        </li>
         <li class="nav-item d-block d-lg-none">
           <a class="nav-link" href="{% url 'LogoutAdmin' %}"><i class="fa-solid fa-right-from-bracket me-1"></i> Logout</a>
         </li>

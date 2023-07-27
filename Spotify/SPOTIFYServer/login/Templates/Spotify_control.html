@@ -126,17 +126,19 @@
           <th width="5%" data-field="id">Email</th>
           <th width="28%">Link invite</th>
           <th width="28%">Address</th>
+          <th width="7%">Nation</th>
           <th width="5%">Created Date</th>
-          <th width="5%" data-field="accountNumber">Joined account number</th>
-          <th width="30%" data-field="accountDetails">Joined account email /<br> Verification Code</th>
+          <th width="2%" data-field="accountNumber">Joined account number</th>
+          <th width="25%" data-field="accountDetails">Joined account email /<br> Verification Code</th>
         </tr>
       </thead>
       <tbody>
         {% for key, value in table.items %}
         <tr id="row-{{value.MasterAccout}}"> 
-          <td>{{ value.MasterAccout }}</td>
+          <td>{{ value.MasterAccount }}</td>
           <td>{{ value.Linkjoin }}</td>
           <td>{{ value.Address }}</td>
+          <td>{{ value.Nation }}</td>
           <td>{{ value.Date }}</td>
           <td class="accountNumber">{{ value.MemNum }}</td>
           <td class="accountDetails">
@@ -178,6 +180,7 @@
           <option value ="VN">Vietnam</option>
           <option value ="US">USA</option>
           <option value ="JP">Japan</option>
+          <option value ="CN">China</option>
         </select>
       </div>
       <div>
@@ -261,7 +264,7 @@
 
       // Handle show toast messages import
       const importStatus = `{{ status }}`;
-      const importFailedReason = `{{ reason }}`;
+      const importFailedReason = `{{ detail }}`;
       if (importStatus === 'Upload successfully') {
         const $toast = $('#toast-list .toast-success');
         $toast.find('.toast-title').html('Import successfully');
