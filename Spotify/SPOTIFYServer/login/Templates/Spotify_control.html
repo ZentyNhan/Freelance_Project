@@ -88,14 +88,43 @@
   <h3 class="mb-0">Spotify join link</h3>
   <div class="toolbar w-100">
     <div class="row">
-      <div class="col-md-7 d-flex align-items-end">
+      <div class="col-md-5 d-flex align-items-end">
         <button id="btnImport" class="btn btn-primary me-3"><i class="fa-solid fa-file-import me-2"></i>Import</button>
         <button id="btnExport" class="btn btn-primary"><i class="fa-solid fa-file-export me-2"></i>Export</button>
       </div>
-      <div class="col-md-5">
+      <div class="col-md-7">
         <div class="row">
-          <div class="col-md-6 d-flex align-items-center"></div>
-          <div class="col-md-6">
+          <div class="col-md-4 d-flex align-items-center">
+            <div class="w-100">
+              <label for="nation-filter" class="form-label">Nation</label>
+              <select class="form-select me-2" aria-label="Filter status"
+                id="nation-filter" name="nation-filter">
+                <option value="All" selected>All</option>
+                <option value ="India">India</option>
+                <option value ="Turkey">Turkey</option>
+                <option value ="Vietnam">Vietnam</option>
+                <option value ="USA">USA</option>
+                <option value ="Japan">Japan</option>
+                <option value ="China">China</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4 d-flex align-items-center">
+            <div class="w-100">
+              <label for="join-number-filter" class="form-label">Joined account number</label>
+              <select class="form-select me-2" aria-label="Filter status"
+                id="join-number-filter" name="join-number-filter">
+                <option value="All" selected>All</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
             <div>
               <label for="search-input" class="form-label">Search</label>
               <div class="search btn-group m-0 w-100">
@@ -110,7 +139,7 @@
   <form id="tokenForm">{% csrf_token %}</form>
   <div>
     <table 
-      id="table-vercode"
+      id="table-joinlink"
       data-toggle="table" 
       class="table-light"
       data-pagination="true"
@@ -119,22 +148,23 @@
       data-toolbar-align="left"
       data-page-size="20"
       data-fixed-columns="true"
-      data-fixed-right-number="1"
+      data-fixed-right-number="2"
       >
       <thead>
         <tr class="table-dark">
-          <th width="5%" data-field="id">Email</th>
-          <th width="28%">Link invite</th>
-          <th width="28%">Address</th>
-          <th width="7%">Nation</th>
+          <th width="5%">Email</th>
+          <th width="30%">Link invite</th>
+          <th width="20%">Address</th>
+          <th width="8%" data-field="nation">Nation</th>
           <th width="5%">Created Date</th>
           <th width="2%" data-field="accountNumber">Joined account number</th>
           <th width="25%" data-field="accountDetails">Joined account email /<br> Verification Code</th>
+          <th width="5%" class="text-center">Action</th>
         </tr>
       </thead>
       <tbody>
         {% for key, value in table.items %}
-        <tr id="row-{{value.MasterAccout}}"> 
+        <tr id="row-{{key}}"> 
           <td>{{ value.MasterAccount }}</td>
           <td>{{ value.Linkjoin }}</td>
           <td>{{ value.Address }}</td>
@@ -149,7 +179,7 @@
                     <i class="fa-solid fa-envelope"></i> {{skey_Z}} &#40;{{svalue_Z}}&#41;
                   </div>
                   <div class="col-md-2 text-end">
-                    <a class="text-danger account-delete" data-id="{{ key_Z }}" data-name="{{skey_Z}} ({{svalue_Z}})" data-row-id="{{value.MasterAccout}}" href="#" role="button" 
+                    <a class="text-danger account-delete" data-id="{{ key_Z }}" data-name="{{skey_Z}} ({{svalue_Z}})" data-row-id="{{key}}" href="#" role="button" 
                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
                       <i class="fa-solid fa-rectangle-xmark"></i>
                     </a>  
@@ -159,6 +189,12 @@
               </div>
             {% endfor %}
           </td>
+          <td class="text-center">
+            <a class="text-primary joinlink-edit" data-row-id="{{key}}" href="#" role="button" 
+              data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -167,7 +203,7 @@
   {% include 'Components/Modal.html' with id='confirmImport' title='Import Spotify Join Link' confirmText='Import file' only %}
   {% include 'Components/Modal.html' with id='confirmExport' title='Export Spotify Join Link' confirmText='Export data' only %}
   {% include 'Components/Modal.html' with id='confirmDelete' title='Delete joined account confirmation' closeText='Cancel' confirmText='Delete' confirmColor='danger' only %}
-  {% include 'Components/Toast.html' %}
+  {% include 'Components/Modal.html' with id='editJoinLink' title='Edit Spotify Join Link' confirmText='Save' closeText='Cancel' only %}
   <div id="import-form-template" class="d-none">
     <form action="{% url 'UploadData' %}" class="p-3 py-2" id="import-form" method="post" enctype="multipart/form-data">
       {% csrf_token %}
@@ -186,6 +222,42 @@
       <div>
         <label class="form-label" for="uploadData-name">File import</label>
         <input type="file" class="form-control form-control-md required-field" id="uploadData-name" name="uploadData-name" />
+      </div>
+    </form>
+  </div>
+  <div id="edit-form-template" class="d-none">
+    <form action="{% url 'EditData' %}" class="p-3 py-2 edit-form needs-validation" novalidate method="post" enctype="multipart/form-data">
+      <!-- {
+        csrfmiddlewaretoken: 'Token...',
+        id: rowId,
+        email: 'email@example',
+        inviteLink: 'http://example.com',
+        address: 'address'
+      } -->
+      {% csrf_token %}
+      <input type="hidden" name="id" class="id">
+      <div class="mb-4">
+        <label for="email" >Email</label>
+        <input type="text" id="email" class="form-control required" name="email" required placeholder="Enter email"/>
+        <div class="invalid-feedback">
+          Email is required
+        </div>
+      </div>
+    
+      <div class="mb-4">
+        <label for="inviteLink" >Invite link</label>
+        <input type="text" id="inviteLink" class="form-control required" name="inviteLink" required placeholder="Enter invite link"/>
+        <div class="invalid-feedback">
+          Invite link is required
+        </div>
+      </div>
+  
+      <div class="mb-4">
+        <label for="address" >Address</label>
+        <input type="text" id="address" class="form-control required" name="address" required placeholder="Enter address"/>
+        <div class="invalid-feedback">
+          Address is required
+        </div>
       </div>
     </form>
   </div>
@@ -235,7 +307,50 @@
 
 {% block scripts %} 
   <script>
+    $.fn.isValid = function(){
+      return this[0].checkValidity()
+    }
     $(document).ready(function() {
+      // Add table filter by status
+      const $table = $('#table-joinlink');
+      const handleFilter = () => {
+        $table.bootstrapTable('filterBy', {
+          nation: $('#nation-filter').val(),
+          accountNumber: $('#join-number-filter').val(),
+        }, {
+          'filterAlgorithm': (row, filters) => {
+            $nation = $($.parseHTML(row.nation));
+            $accountNumber = $($.parseHTML(row.accountNumber));
+            console.log('debug', $nation, $accountNumber, filters);
+            return (filters.nation === 'All' || $nation.text() === filters.nation) 
+              && (filters.accountNumber === 'All' || $accountNumber.text() === filters.accountNumber);
+          }
+        })
+      }
+      $('#nation-filter').change(handleFilter);
+      $('#join-number-filter').change(handleFilter);
+
+      // Handle show edit join link modal
+      const $editModal = $('#editJoinLink');
+      $editModal.find('button.confirm').click(function() {
+        $form = $editModal.find('.edit-form');
+        if ($form.isValid()) {
+          $(this).addClass('disabled');
+          $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>`);
+          $editModal.find('.edit-form').submit();
+        }
+        $form.addClass('was-validated');
+      });
+      $('.joinlink-edit').click(function() {
+        const rowId = $(this).data('row-id');
+        const $template = $('#edit-form-template');
+        $template.find('input.id').val(rowId);
+        $editModal.find('.modal-body').html($template.html());
+        $editModal.modal('show');
+      })
+
       // Handle show import confirm modal
       const $importModal = $('#confirmImport');
       const importFormValidation = () => {        
@@ -263,17 +378,28 @@
       })
 
       // Handle show toast messages import
-      const importStatus = `{{ status }}`;
-      const importFailedReason = `{{ detail }}`;
-      if (importStatus === 'Upload successfully') {
+      const submitStatus = `{{ status }}`;
+      const submitDetail = `{{ detail }}`;
+      if (submitStatus === 'Upload successfully') {
         const $toast = $('#toast-list .toast-success');
         $toast.find('.toast-title').html('Import successfully');
         $toast.find('.toast-body').html('Import spotify join link successfully');
         $toast.toast('show');
-      } else if (importStatus === 'Upload failed') {
+      } else if (submitStatus === 'Upload failed') {
         const $toast = $('#toast-list .toast-danger');
         $toast.find('.toast-title').html('Import failed');
-        $toast.find('.toast-body').html(importFailedReason);
+        $toast.find('.toast-body').html(submitDetail);
+        $toast.toast('show');
+      }
+      if (submitStatus === 'Edit successfully') {
+        const $toast = $('#toast-list .toast-success');
+        $toast.find('.toast-title').html('Edit successfully');
+        $toast.find('.toast-body').html('Edit spotify join link successfully');
+        $toast.toast('show');
+      } else if (submitStatus === 'Edit failed') {
+        const $toast = $('#toast-list .toast-danger');
+        $toast.find('.toast-title').html('Import failed');
+        $toast.find('.toast-body').html(submitDetail);
         $toast.toast('show');
       }
 
@@ -293,7 +419,7 @@
         $exportModal.modal('show');
       })
 
-      // Setup delete vercode buttons 
+      // Setup delete join account buttons 
       const $deleteModal = $('#confirmDelete');
       let deleteName, deleteId, deleteRowId;
       const setupDeleteButtons = () => {

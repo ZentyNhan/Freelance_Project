@@ -93,7 +93,6 @@
   </div>
   {% include 'Components/Modal.html' with id='confirmGenerateCode' title='Generate code confirmation' confirmText='Generate Code' only %}
   {% include 'Components/Modal.html' with id='confirmDeleteCode' title='Delete verification code confirmation' closeText='Cancel' confirmText='Delete' confirmColor='danger' only %}
-  {% include 'Components/Toast.html' %}
 </main>
   
 {% endblock %}
@@ -103,6 +102,7 @@
 <!-- Filter: -->
 <script>
   $(document).ready(function() {
+    let validAmount = parseInt(`{{ valid_amount }}`);
 
     // Add table filter by status
     const $table = $('#table-vercode');
@@ -129,9 +129,8 @@
     $('#btnGenCode').click(function() {
       const message = `You are running on generate <strong>verification code</strong> process.</p>
         <p>By confirm generate, 10 verification codes will be generated. The total maximum amount of valid code is 50.</p>
-        <p>Current valid code is <i><strong>{{ valid_amount }}</strong></i>. {% if valid_amount == 50 %}Cannot generate verification codes anymore.{% endif %}</p>`;
-      const validAmount = `{{ valid_amount }}`;
-      if (validAmount === '50') {
+        <p>Current valid code is <i><strong>${validAmount}</strong></i>. ${ validAmount === 50 ? 'Cannot generate verification codes anymore.' : ''}</p>`;
+      if (validAmount === 50) {
         $genCodeModal.find('button.confirm').addClass('disabled');
       }
       $genCodeModal.find('.modal-body').html(message);
@@ -180,6 +179,14 @@
       // add form input from hidden input elsewhere on the page
       data.append('csrfmiddlewaretoken', $('#genCodeForm input[name="csrfmiddlewaretoken"]').attr('value'));
 
+      const handleUpdateTableData = (resData) => {
+        $table.bootstrapTable('remove', {
+          field: 'code',
+          values: [deleteCode]
+        });
+        validAmount = resData.valid_amount;
+      }
+
       const handleDeleteFailed = () => {
         closeDeleteCodeModal();
         const $toast = $('#toast-list .toast-danger');
@@ -192,17 +199,15 @@
           method: 'POST',
           body: data,
           credentials: 'same-origin',
-      }).then(response => {
+      }).then(async response => {
         if (response.ok) {
+          const resData = await response.json();
           closeDeleteCodeModal();
           const $toast = $('#toast-list .toast-success');
           $toast.find('.toast-title').html('Delete code successfully');
           $toast.find('.toast-body').html(`Successfully deleted verification code: ${deleteCode}`);
           $toast.toast('show');
-          $table.bootstrapTable('remove', {
-            field: 'code',
-            values: [deleteCode]
-          });
+          handleUpdateTableData(resData);
           setupDeleteCodeButtons();
         } else {
           handleDeleteFailed();

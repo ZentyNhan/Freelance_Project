@@ -61,3 +61,15 @@ tr:hover td {
   background-color: rgba(0,0,0,0.025) !important;
 }
 
+#nation-form {
+  min-width: 7rem;
+}
+
+#nation-form .loading {
+  width: 1rem;
+  height: 1rem;
+}
+
+#nation-form select {
+  max-height: 2.2rem;
+}

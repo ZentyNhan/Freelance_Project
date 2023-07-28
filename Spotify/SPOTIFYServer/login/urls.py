@@ -13,6 +13,7 @@ urlpatterns = [
     path('Spot-SysCtrl/verification/GenerateCode',  API.GenerateCode, name='GenerateCode'),
     path('Spot-SysCtrl/UpdateCode',                 API.UpdateCode, name='UpdateCode'),
     path('Spot-SysCtrl/joinLink/uploadData',        API.UploadData, name='UploadData'),
+    path('Spot-SysCtrl/joinLink/editData',          API.UploadData, name='EditData'),
     path('LogoutAdmin',                             API.LogoutAdmin, name='LogoutAdmin'),
     #EVENT FETCH:        
     path('verification/delete',                     API.DeleteCode),
