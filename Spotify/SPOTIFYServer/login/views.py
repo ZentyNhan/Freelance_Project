@@ -37,7 +37,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from login.models import MainDB, MasterAccountDB, VerificationCodeDB
+from login.models import MainDB, MasterAccountDB, VerificationCodeDB, StoredDB
 from tablib import Dataset
 from django.http import JsonResponse
 
@@ -66,9 +66,17 @@ def ret_dict_met(stt_, detl_, table_):
 def ret_dict_met(stt_, detl_, table_):
     return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_}
 
-@dispatch(str,str,list,int)
-def ret_dict_met(stt_, detl_, table_, valid_amount_):
-    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_,"valid_amount":valid_amount_}
+@dispatch(str,str,str,list)
+def ret_dict_met(stt_, detl_, actnation_, table_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"ActiveNation" : actnation_,"table" : table_}
+
+@dispatch(str,str,str,dict)
+def ret_dict_met(stt_, detl_, actnation_, table_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"ActiveNation" : actnation_,"table" : table_}
+
+@dispatch(str,str,str,list,int) #Vercode
+def ret_dict_met(stt_, detl_, actnation_, table_, valid_amount_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(),"ActiveNation" : actnation_,"table":table_,"valid_amount":valid_amount_}
 
 def DB_VC_list():
     rawdata = list(VerificationCodeDB.objects.all().values())
@@ -101,13 +109,17 @@ def DB_gencode(id_, Vercode_, Status_, Remark_):
     VerificationCode.save()
     
 def DB_get_master_info():
-    master_info_list  = list(MasterAccountDB.objects.all().values())
+    DB_MA_rawdata  = list(MasterAccountDB.objects.all().values())
+    DB_AN_rawdata     = StoredDB.objects.all().values()
+    
     isSlotAvaiable    = False
-    if master_info_list != []:
+    if DB_MA_rawdata != []:
         datetime.datetime.strptime("1/1/9999", lib.ResConfig.D_format)
         min_created_date = datetime.datetime.strptime("1/1/9999", lib.ResConfig.D_format)
-        for master_info in master_info_list:
-            if master_info['MemNum'] != 0 and datetime.datetime.strptime(master_info['Date'], lib.ResConfig.D_format) <= min_created_date:
+        for master_info in DB_MA_rawdata:
+            if master_info['MemNum'] != 0 and \
+               master_info['Nation'] == DB_AN_rawdata[0]['ActiveNation'] and \
+               datetime.datetime.strptime(master_info['Date'], lib.ResConfig.D_format) <= min_created_date :
                 isSlotAvaiable   = True
                 min_created_date = datetime.datetime.strptime(master_info['Date'], lib.ResConfig.D_format)
                 id_              = master_info['id']
@@ -194,7 +206,7 @@ def DB_M_succeed_table():
                 'Nation'       : Nation,
                 'MemNum'       : joined_memnum,
                 'Zip'          : Full_zip,
-                'Date'         : Created_Date
+                'Date'         : Created_Date,
             }
             succeed_VC_list.clear()
             succeed_Mem_list.clear()
@@ -202,7 +214,7 @@ def DB_M_succeed_table():
 
         #Return:
         code = '532'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], succeed_data_dict)
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), succeed_data_dict)
                 
     return ret_dict
 
@@ -233,6 +245,10 @@ def id_gen(mode_, list_):
         if ID == []: id = 0
         else:        id = min(ID)
     return id
+
+def DB_ActiveNation():
+    DB_AN_rawdata = StoredDB.objects.all().values()
+    return str(DB_AN_rawdata[0]['ActiveNation'])
     
 def current_date():
     return datetime.datetime.now().strftime(D_format)        
@@ -373,7 +389,7 @@ def joinSpotify(request):
                     
                     ########## ANCHOR: REPORT AND DB HANDLING ##########
                     ##### "SUCCESS" TEST: #####
-                    code = '200'
+                    # code = '200'
                     ###########################
                     
                     ### Check error ret: ###
@@ -462,6 +478,25 @@ def DeleteAccount(request):
     except:
         ret_dict = DB_M_succeed_table()
         return JsonResponse(ret_dict, status=404)
+    
+########## ANCHOR: ChangeNation ##########: Change
+@login_required(login_url='/Spot-admin')
+def ChangeNation(request):
+    try:
+        ### Input ###  
+        act_nation = request.POST.get('ActNationSel_n')
+        Update = StoredDB.objects.get(id = 1)
+        
+        #Update Active Nation:
+        Update.ActiveNation = act_nation
+        Update.save()
+        
+        ret_dict = DB_M_succeed_table()
+        return JsonResponse(ret_dict, status=200)
+            
+    except:
+        ret_dict = DB_M_succeed_table()
+        return JsonResponse(ret_dict, status=404)
 
     
 ########## ANCHOR: DeleteCode ##########: Delete 
@@ -539,13 +574,13 @@ def UpdateCode(request):
 
         #Update list:
         if 'ul-btn-n' in request.POST: 
-            ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}
+            ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}
 
         #Delete list:
         elif 'dl-btn-n' in request.POST: 
             if input_id == '':
                 code = '516'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
             elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
                 #Delete object:
                 for id_i in VC_ID_RANGE:
@@ -553,26 +588,26 @@ def UpdateCode(request):
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '530'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
             elif int(input_id) not in VC_ID:
                 code = '517'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
             elif int(input_id) in VC_ID:
                 #Delete object:
                 VerificationCodeDB.objects.get(id=input_id).delete()
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '530'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
             else:
                 code = '686'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
                 
         #Edit list:
         elif 'el-btn-n' in request.POST and isUsedCode == False: 
             if input_id == '':
                 code = '516'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
             elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
                 #Edit object:
                 for id_i in VC_ID_RANGE:
@@ -583,10 +618,10 @@ def UpdateCode(request):
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '531'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
             elif int(input_id) not in VC_ID:
                 code = '517'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
             elif int(input_id) in VC_ID:
                 #Edit object:
                 Update_VC_Object = VerificationCodeDB.objects.get(id=input_id)
@@ -596,17 +631,17 @@ def UpdateCode(request):
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '531'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
             else:
                 code = '686'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
         #Used code:
         elif isUsedCode == True:
             code = '520'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
         else:
             code = '686'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
 
         #Return:
         return render(request, 'Spotify_control_vercode.html',ret_dict)
@@ -615,12 +650,12 @@ def UpdateCode(request):
     # Value Error:
     except ValueError:
         code = '518'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     # Others:
     except Exception as e:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     
 
@@ -660,7 +695,7 @@ def GenerateCode(request):
                     vercode = lib.VerificationCode.generateVC()
                     DB_gencode(id, vercode, 'valid', f'Generated on {current_datetime()}')
                 VC_update_list = DB_VC_list()
-                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_update_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_update_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
             elif (valid_amount < max_amount) and offset < 10:
                 for i in range(1, offset + 1):
                     #id:
@@ -668,16 +703,16 @@ def GenerateCode(request):
                     vercode = lib.VerificationCode.generateVC()
                     DB_gencode(id, vercode, 'valid', f'Generated on {current_datetime()}')
                 VC_update_list = DB_VC_list()
-                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_update_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_update_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
             else:
-                ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+                ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
         # Return:
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     
     # Others:
     except Exception as e:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     
     
@@ -711,8 +746,8 @@ def ExportReport(request):
             data   = fil_data
             
         ### Excel handling ###
-        output = BytesIO()
-        workbook = xlsxwriter.Workbook(output)
+        output    = BytesIO()
+        workbook  = xlsxwriter.Workbook(output)
         worksheet = workbook.add_worksheet('Report')
         #Tittle:
         tittle_format = workbook.add_format({
@@ -850,6 +885,13 @@ def ExportReport(request):
 
 
 @login_required(login_url='/Spot-admin')
+########## ANCHOR: EditData ##########
+def EditData(request):   
+    def UploadData(request):   
+        if request.method == 'POST':
+            return render(request, 'Spotify_control.html',ret_dict)
+
+@login_required(login_url='/Spot-admin')
 ########## ANCHOR: UploadData ##########
 def UploadData(request):   
     if request.method == 'POST':
@@ -881,8 +923,7 @@ def UploadData(request):
                 id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
                 if Master_acc['Username'] in MA_list:
                     code = '522'
-                    print(DB_M_succeed_table())
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_M_succeed_table())
+                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), DB_M_succeed_table())
                     return render(request, 'Spotify_control.html',ret_dict)
                 elif Master_acc['Username'] not in ['Master Username', None]:
                     DB_upload(id,
@@ -894,10 +935,11 @@ def UploadData(request):
                             Master_acc['Date'])
 
             #Return:
-            ret_dict = {'status' : 'Upload successfully' , 'datetime' : f'{current_datetime()}'}
+            code = '524'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), DB_M_succeed_table())
             return render(request, 'Spotify_control.html',ret_dict)
         except Exception as error:
-            ret_dict = {'status' : f'Upload failed' , 'detail' : error , 'time' : f'{current_datetime()}', 'table' : DB_M_succeed_table()}
+            ret_dict = {'status' : f'Upload failed' , 'detail' : error , 'time' : f'{current_datetime()}', 'ActiveNation': DB_ActiveNation(),'table' : DB_M_succeed_table()}
             return render(request, 'Spotify_control.html',ret_dict)
     else:
         ret_dict = {'status' : '' , 'datetime': ''}
@@ -925,5 +967,5 @@ def SysCtrlSpotifyTab(request):
 def VerificationTab(request): 
     ### Input ###  
     VC_list = DB_VC_list()
-    ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}  
+    ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}  
     return render(request, 'Spotify_control_vercode.html',ret_dict)

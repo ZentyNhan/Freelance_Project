@@ -20,7 +20,7 @@ class MainDB(models.Model):
     Detail       = models.CharField(max_length=200)
     Datetime     = models.CharField(max_length=200)
     
-    #Method
+    #Methods:
     def __str__(self):
         return self.Username
     
@@ -33,7 +33,7 @@ class MasterAccountDB(models.Model):
     MemNum   = models.IntegerField()
     Date     = models.CharField(max_length=200)
     
-    #Method
+    #Methods:
     def __str__(self):
         return self.Username
     
@@ -43,7 +43,7 @@ class VerificationCodeDB(models.Model):
     Status  = models.CharField(max_length=20)
     Remark  = models.CharField(max_length=200)
     
-    #Method
+    #Methods:
     def __str__(self):
         return self.VerCode
     
@@ -56,9 +56,17 @@ class ListAccountFamilyDB(models.Model):
     JoinedAcc     = models.CharField(max_length=2000)
     Date          = models.CharField(max_length=50)
     
-    #Method
+    #Methods:
     def __str__(self):
         return self.MasterAccount
+    
+class StoredDB(models.Model):
+    #Attributes:
+    ActiveNation = models.CharField(max_length=20)
+    
+    #Methods:
+    def __str__(self):
+        return self.ActiveNation
     
     
     
