@@ -152,6 +152,12 @@ Front-end:
 49. Đổ data cho model edit (Đông) (Done)
 50. Validate Email + link join (Đông) (Done)
 51. offer a Hải thêm tính năng xóa Master account khi account không login đc nữa
+52. proxy management page (render)
+    + Import list proxy (Nhân)
+    + Active nation chuyển qua proxy management page (Đông)
+    + Đổ Active nation vào page Spotify_control_proxy (Nhân)
+53. Xóa Export + Join filter  (Đông)
+54. chuyển active nation không có sẵn thì popup báo lỗi
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)

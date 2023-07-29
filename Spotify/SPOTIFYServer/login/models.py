@@ -56,11 +56,12 @@ class StoredDB(models.Model):
         return self.ActiveNation
     
 class ProxyManamentDB(models.Model):
-    Protocol   = models.CharField(max_length=20)
-    IP         = models.CharField(max_length=50)
-    Proxy_User = models.CharField(max_length=50)
-    Proxy_PW   = models.CharField(max_length=50)
-    Nation     = models.CharField(max_length=20)
+    Protocol      = models.CharField(max_length=20)
+    IP            = models.CharField(max_length=50)
+    Proxy_User    = models.CharField(max_length=50)
+    Proxy_PW      = models.CharField(max_length=50)
+    Nation        = models.CharField(max_length=20)
+    ActivetedDate = models.CharField(max_length=20)
     
     def __str__(self):
         return self.IP

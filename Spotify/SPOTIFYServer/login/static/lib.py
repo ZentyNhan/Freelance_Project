@@ -92,6 +92,8 @@ class ResponseConfig():
         '524' :	{'status':'Upload successfully' ,'detail':{'admin':'Uploaded successfully',                                   'customer':'None'}},
         '525' :	{'status':'Edit failed'         ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
         '526' :	{'status':'Edit successfully'   ,'detail':{'admin':'Editted successfully',                                    'customer':'None'}},
+        '527' :	{'status':'Upload failed'       ,'detail':{'admin':'Proxy IP is duplicated on database',                      'customer':'None'}},
+        '528' :	{'status':'Upload failed'       ,'detail':{'admin':'Proxy IP is not existed on database',                     'customer':'None'}},
         '529' :	{'status':'Delete failed'       ,'detail':{'admin':'Deleted failed',                                          'customer':'None'}},
         '530' :	{'status':'Delete successfully' ,'detail':{'admin':'Deleted successfully',                                    'customer':'None'}},
         '531' :	{'status':'Success'             ,'detail':{'admin':'Editted',                                                 'customer':'None'}},

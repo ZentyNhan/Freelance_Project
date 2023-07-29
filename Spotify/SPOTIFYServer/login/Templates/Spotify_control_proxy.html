@@ -165,12 +165,12 @@
       <tbody>
         {% for key, value in table.items %}
         <tr id="row-{{key}}"> 
-          <td>{{ value.MasterAccount }}</td>
-          <td>{{ value.Linkjoin }}</td>
-          <td>{{ value.Address }}</td>
+          <td>{{ value.Protocol }}</td>
+          <td>{{ value.IP }}</td>
+          <td>{{ value.Proxy_User }}</td>
+          <td>{{ value.Proxy_PW }}</td>
           <td>{{ value.Nation }}</td>
-          <td>{{ value.Nation }}</td>
-          <td>{{ value.Date }}</td>
+          <td>{{ value.ActivetedDate }}</td>
         </tr>
         {% endfor %}
       </tbody>

@@ -37,7 +37,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from login.models import MainDB, MasterAccountDB, VerificationCodeDB, StoredDB
+from login.models import MainDB, MasterAccountDB, VerificationCodeDB, StoredDB, ProxyManamentDB
 from tablib import Dataset
 from django.http import JsonResponse
 
@@ -66,12 +66,16 @@ def ret_dict_met(stt_, detl_, table_):
 def ret_dict_met(stt_, detl_, table_):
     return {"status": stt_, "detail": detl_,"time" : current_datetime(),"table":table_}
 
+@dispatch(str,str,list,int) #Vercode
+def ret_dict_met(stt_, detl_, table_, valid_amount_):
+    return {"status": stt_, "detail": detl_,"time" : current_datetime(), "table":table_,"valid_amount":valid_amount_}
+
 @dispatch(str,str,str,list)
 def ret_dict_met(stt_, detl_, actnation_, table_):
     return {"status": stt_, "detail": detl_,"time" : current_datetime(),"ActiveNation" : actnation_,"table" : table_}
 
 @dispatch(str,str,str,dict)
-def ret_dict_met(stt_, detl_, actnation_, table_):
+def ret_dict_met(stt_, detl_, actnation_, table_): #Proxy
     return {"status": stt_, "detail": detl_,"time" : current_datetime(),"ActiveNation" : actnation_,"table" : table_}
 
 @dispatch(str,str,str,list,int) #Vercode
@@ -103,6 +107,12 @@ def DB_upload(id_, User_, FamLink_, Addr_, Nation_, Memnum_, Date_):
         Date_ = current_datetime()
     MasterUserInfo = MasterAccountDB(id_, User_, FamLink_, Addr_, Nation_, Memnum_ , Date_)
     MasterUserInfo.save()
+    
+def DB_Proxy_upload(id_, Protocol_, IP_, ProxyUser_, ProxyPW_, Nation_, ActDate_):
+    if ActDate_ in [None, 'None', '']:    
+        ActDate_ = current_date()
+    ProxyInfo = ProxyManamentDB(id_, Protocol_, IP_, ProxyUser_, ProxyPW_, Nation_, ActDate_)
+    ProxyInfo.save()
     
 def DB_gencode(id_, Vercode_, Status_, Remark_):
     VerificationCode = VerificationCodeDB(id_, Vercode_, Status_, Remark_)
@@ -144,10 +154,13 @@ def DB_M_succeed_table(code_):
     succeed_ID_list   = []
     succeed_VC_list   = []
     succeed_data_dict = {}
+    
+    #code handlling:
+    code_ = '532' if code_ == '' else code_
         
     #Data in excel:
     if DB_M_rawdata == []:
-        return ''
+        return {}
     elif DB_MA_rawdata == []:
         code = '521'
         ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'])
@@ -213,9 +226,45 @@ def DB_M_succeed_table(code_):
             succeed_Mem_list.clear()
             succeed_ID_list.clear()
 
-        #Return:
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code_]['status'], lib.ResConfig.ResponseCode[code_]['detail']['admin'], DB_ActiveNation(), succeed_data_dict)
-                
+        #ret_dict:
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code_]['status'], lib.ResConfig.ResponseCode[code_]['detail']['admin'], succeed_data_dict)
+    #Return:         
+    return ret_dict
+
+def DB_Proxy_table(code_):
+    ### Input ###
+    DB_Proxy_rawdata = ProxyManamentDB.objects.all().values()
+    proxy_dict       = {}
+    
+    #code handlling:
+    code_ = '532' if code_ == '' else code_
+        
+    #Data in excel:
+    if DB_Proxy_rawdata == []:
+        return {}
+    else:
+        #Load proxy data:
+        for proxy in DB_Proxy_rawdata:
+            ID             = proxy['id']
+            PROTOCOL       = proxy['Protocol']
+            IP             = proxy['IP']
+            PROXY_USER     = proxy['Proxy_User']
+            PROXY_PW       = proxy['Proxy_PW']
+            NATION         = proxy['Nation']
+            ACTIVATED_DATE = proxy['Nation']
+        
+            #proxy_data_dict:
+            proxy_dict[ID] = {
+                'Protocol'      : PROTOCOL,
+                'IP'            : IP,
+                'Proxy_User'    : PROXY_USER,
+                'Proxy_PW'      : PROXY_PW,
+                'Nation'        : NATION,
+                'ActivetedDate' : ACTIVATED_DATE,
+            }
+        #ret_dict:
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code_]['status'], lib.ResConfig.ResponseCode[code_]['detail']['admin'], DB_ActiveNation(), proxy_dict)
+    #Return:         
     return ret_dict
 
 def DB_check_vercode_validation(vercode_):
@@ -297,7 +346,7 @@ def joinSpotify(request):
             return render(request, 'Spotify_login.html',ret_dict)
         else:
             try: 
-                ########## ANCHOR: DO NOT CHANGE ##########
+                ########## DO NOT CHANGE ##########
                 ### Check information from DB:
                 # id handling:
                 id = id_gen(mode_='new', list_=MainDB.objects.all().values()) #Calculate ID from current length Users in DB
@@ -339,8 +388,8 @@ def joinSpotify(request):
                     #Instances:
                     #Options and services:
                     ops  = webdriver.ChromeOptions()
+                    ops.add_argument('headless')
                     serv = Service()
-                    # ops.add_argument('headless')
                     # options = {
                     #     'proxy': {
                     #         'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
@@ -351,7 +400,7 @@ def joinSpotify(request):
                     try:
                         DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=ops)
                     except:
-                        DRIVER         = webdriver.Chrome(service=serv, options=ops)
+                        DRIVER         = webdriver.Chrome(service=serv, options=ops, seleniumwire_options=ops)
                     LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
                     USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
                     code           = '400'
@@ -387,7 +436,7 @@ def joinSpotify(request):
                     #Close driver:
                     DRIVER.close()
                     
-                    ########## ANCHOR: REPORT AND DB HANDLING ##########
+                    ########## REPORT AND DB HANDLING ##########
                     ##### "SUCCESS" TEST: #####
                     # code = '200'
                     ###########################
@@ -430,7 +479,7 @@ def joinSpotify(request):
                     else:             
                         DB_Input(id, Username, Password, MasterAcc, familyURL, Address, Vercode, False, lib.ResConfig.ResponseCode[code]['detail']['admin'])
                 
-            ########## ANCHOR: EXCEPTIONS ##########
+            ########## EXCEPTIONS ##########
             #Timeout:
             except TimeoutException as error:
                 code = '408'
@@ -448,7 +497,7 @@ def joinSpotify(request):
         #Return: 
         return render(request, 'Spotify_login.html')
     
-### EVENTS ### 
+### ANCHOR: EVENTS ### 
 ########## ANCHOR: DeleteAccount ##########: Delete
 @login_required(login_url='/Spot-admin')
 def DeleteAccount(request):
@@ -504,16 +553,16 @@ def DeleteCode(request):
             #Update objects order:
             Update_VC_list = DB_VC_list()
             code = '530'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
             return JsonResponse(ret_dict, status=200)
         else:
             code = '686'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
             return JsonResponse(ret_dict, status=404)
             
     except:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         return JsonResponse(ret_dict, status=404)
     
 ########## ANCHOR: ChangeNation ##########: Change
@@ -536,7 +585,7 @@ def ChangeNation(request):
         ret_dict = DB_M_succeed_table(code)
         return JsonResponse(ret_dict, status=404)
 
-#(***OBSOLETED***)#      
+#(***OBSOLETED***)
 ########## ANCHOR: UpdateCode ##########: Update / Delete / Edit 
 @login_required(login_url='/Spot-admin')
 def UpdateCode(request):
@@ -577,13 +626,13 @@ def UpdateCode(request):
 
         #Update list:
         if 'ul-btn-n' in request.POST: 
-            ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}
+            ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}
 
         #Delete list:
         elif 'dl-btn-n' in request.POST: 
             if input_id == '':
                 code = '516'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
             elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
                 #Delete object:
                 for id_i in VC_ID_RANGE:
@@ -591,26 +640,26 @@ def UpdateCode(request):
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '530'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
             elif int(input_id) not in VC_ID:
                 code = '517'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
             elif int(input_id) in VC_ID:
                 #Delete object:
                 VerificationCodeDB.objects.get(id=input_id).delete()
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '530'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
             else:
                 code = '686'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
                 
         #Edit list:
         elif 'el-btn-n' in request.POST and isUsedCode == False: 
             if input_id == '':
                 code = '516'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
             elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
                 #Edit object:
                 for id_i in VC_ID_RANGE:
@@ -621,10 +670,10 @@ def UpdateCode(request):
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '531'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
             elif int(input_id) not in VC_ID:
                 code = '517'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
             elif int(input_id) in VC_ID:
                 #Edit object:
                 Update_VC_Object = VerificationCodeDB.objects.get(id=input_id)
@@ -634,17 +683,17 @@ def UpdateCode(request):
                 #Update objects order:
                 Update_VC_list = DB_VC_list()
                 code = '531'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
             else:
                 code = '686'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         #Used code:
         elif isUsedCode == True:
             code = '520'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         else:
             code = '686'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
 
         #Return:
         return render(request, 'Spotify_control_vercode.html',ret_dict)
@@ -653,12 +702,12 @@ def UpdateCode(request):
     # Value Error:
     except ValueError:
         code = '518'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     # Others:
     except Exception as e:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     
 
@@ -698,7 +747,7 @@ def GenerateCode(request):
                     vercode = lib.VerificationCode.generateVC()
                     DB_gencode(id, vercode, 'valid', f'Generated on {current_datetime()}')
                 VC_update_list = DB_VC_list()
-                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_update_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+                ret_dict = {'status' : f'Generated {gen_amount} code successfully.' , 'table': VC_update_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
             elif (valid_amount < max_amount) and offset < 10:
                 for i in range(1, offset + 1):
                     #id:
@@ -706,16 +755,16 @@ def GenerateCode(request):
                     vercode = lib.VerificationCode.generateVC()
                     DB_gencode(id, vercode, 'valid', f'Generated on {current_datetime()}')
                 VC_update_list = DB_VC_list()
-                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_update_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+                ret_dict = {'status' : f'Generated {offset} code successfully.' , 'table': VC_update_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
             else:
-                ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
+                ret_dict = {'status' : 'Full slot on database.' , 'table': VC_list, 'valid_amount' : DB_VC_Valid_amount(), 'datetime': current_datetime()}
         # Return:
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     
     # Others:
     except Exception as e:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
         return render(request, 'Spotify_control_vercode.html',ret_dict)
     
     
@@ -940,8 +989,9 @@ def EditData(request):
             
     except:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
-        return JsonResponse(ret_dict, status=404)
+        ret_dict = DB_M_succeed_table(code)
+        return render(request, 'Spotify_control.html',ret_dict)
+
 
 @login_required(login_url='/Spot-admin')
 ########## ANCHOR: UploadData ##########
@@ -955,9 +1005,11 @@ def UploadData(request):
             data          = []
             MA_list       = []
             
+            print(nation)
             #Import excel:
-            excel_file = request.FILES['uploadProxy-name']
+            excel_file = request.FILES['uploadData-name']
             import_data = dataset.load(excel_file.read(), format='xlsx')
+            print(import_data)
             # Change "Dataset" to "List"
             for data_col in import_data:
                 if data_col[4] not in [None, 'None', 'Date']:
@@ -966,6 +1018,8 @@ def UploadData(request):
                                 'Address'  : data_col[2], 
                                 'MemNum'   : data_col[3], 
                                 'Date'     : (data_col[4]).strftime(D_format)})
+                    print('hihi')
+                    
             #Master account list:
             for i in DB_MA_rawdata:
                 MA_list.append(i['Username'])
@@ -1000,60 +1054,62 @@ def UploadData(request):
         return render(request, 'Spotify_control.html',ret_dict)
     
 @login_required(login_url='/Spot-admin')
-########## ANCHOR: UploadData ##########
+########## ANCHOR: UploadProxy ##########
 def UploadProxy(request):   
     if request.method == 'POST':
-        try: 
+        # try: 
             ### Input ###
-            nation        = request.POST.get('nationsel_n')
-            dataset       = Dataset()
-            DB_MA_rawdata = MasterAccountDB.objects.all().values()
-            data          = []
-            MA_list       = []
+            dataset          = Dataset()
+            DB_Proxy_rawdata = ProxyManamentDB.objects.all().values()
+            data             = []
+            IP_list          = []
             
             #Import excel:
-            excel_file = request.FILES['uploadProxy-name']
-            import_data = dataset.load(excel_file.read(), format='xlsx')
+            excel_file   = request.FILES['uploadProxy-name']
+            import_proxy = dataset.load(excel_file.read(), format='xlsx')
+            
+            
             # Change "Dataset" to "List"
-            for data_col in import_data:
-                if data_col[4] not in [None, 'None', 'Date']:
-                    data.append({'Username' : data_col[0], 
-                                'FamLink'  : data_col[1], 
-                                'Address'  : data_col[2], 
-                                'MemNum'   : data_col[3], 
-                                'Date'     : (data_col[4]).strftime(D_format)})
+            for data_col in import_proxy:
+                if data_col[5] not in [None, 'None', 'Activated Date']:
+                    data.append({'Protocol'      : data_col[0], 
+                                 'IP'            : data_col[1], 
+                                 'Proxy_User'    : data_col[2], 
+                                 'Proxy_PW'      : data_col[3], 
+                                 'Nation'        : data_col[4], 
+                                 'ActivatedDate' : (data_col[5]).strftime(D_format)})
             #Master account list:
-            for i in DB_MA_rawdata:
-                MA_list.append(i['Username'])
-                
+            for i in DB_Proxy_rawdata:
+                IP_list.append(i['IP'])
             #Update on DB:
-            for Master_acc in data:
-                id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
-                if Master_acc['Username'] in MA_list:
-                    code = '522'
-                    ret_dict = DB_M_succeed_table(code)
-                    return render(request, 'Spotify_control.html',ret_dict)
-                elif Master_acc['Username'] not in ['Master Username', None]:
-                    DB_upload(id,
-                            Master_acc['Username'],  
-                            Master_acc['FamLink'],
-                            Master_acc['Address'],
-                            nation,
-                            Master_acc['MemNum'],
-                            Master_acc['Date'])
+            for proxy in data:
+                print(proxy)
+                id = id_gen(mode_= 'new', list_= ProxyManamentDB.objects.all().values())
+                if proxy['IP'] in IP_list:
+                    code = '527'
+                    ret_dict = DB_Proxy_table(code)
+                    return render(request, 'Spotify_control_proxy.html',ret_dict)
+                elif proxy['IP'] not in ['IP & Port', None]:
+                    DB_Proxy_upload(id,
+                            proxy['Protocol'],  
+                            proxy['IP'],
+                            proxy['Proxy_User'],
+                            proxy['Proxy_PW'],
+                            proxy['Nation'],
+                            proxy['ActivatedDate'])
 
             #Return:
             code = '524'
-            ret_dict = DB_M_succeed_table(code)
-            return render(request, 'Spotify_control.html',ret_dict)
-        except Exception as error:
-            code = '999'
-            ret_dict = DB_M_succeed_table(code)
-            return render(request, 'Spotify_control.html',ret_dict)
+            ret_dict = DB_Proxy_table(code)
+            return render(request, 'Spotify_control_proxy.html',ret_dict)
+        # except Exception as error:
+        #     code = '999'
+        #     ret_dict = DB_Proxy_table(code)
+        #     return render(request, 'Spotify_control_proxy.html',ret_dict)
     else:
         code = '532'
-        ret_dict = DB_M_succeed_table(code)
-        return render(request, 'Spotify_control.html',ret_dict)
+        ret_dict = DB_Proxy_table(code)
+        return render(request, 'Spotify_control_proxy.html',ret_dict)
 
 def LogoutAdmin(request):   
     logout(request)
@@ -1072,17 +1128,16 @@ def get_login(request):
 def SysCtrlSpotifyTab(request):
     code = '532'
     ret_dict = DB_M_succeed_table(code)
-    # return JsonResponse(ret_dict, status=200)
     return render(request, 'Spotify_control.html',ret_dict)
 
 def VerificationTab(request): 
     ### Input ###  
     VC_list = DB_VC_list()
-    ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}  
+    ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}  
     return render(request, 'Spotify_control_vercode.html',ret_dict)
 
 def ProxyManageTab(request): 
-    ### Input ###  
-    VC_list = DB_VC_list()
-    ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}  
+    ### Input ### 
+    code = '532'
+    ret_dict = DB_Proxy_table(code)
     return render(request, 'Spotify_control_proxy.html',ret_dict)
