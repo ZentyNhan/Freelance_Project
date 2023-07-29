@@ -251,7 +251,7 @@ def DB_Proxy_table(code_):
             PROXY_USER     = proxy['Proxy_User']
             PROXY_PW       = proxy['Proxy_PW']
             NATION         = proxy['Nation']
-            ACTIVATED_DATE = proxy['Nation']
+            ACTIVATED_DATE = proxy['ActivetedDate']
         
             #proxy_data_dict:
             proxy_dict[ID] = {
@@ -570,19 +570,29 @@ def DeleteCode(request):
 def ChangeNation(request):
     try:
         ### Input ###  
-        act_nation = request.POST.get('ActNationSel_n')
-        Update = StoredDB.objects.get(id = 1)
+        DB_act_nation = StoredDB.objects.get(id = 1)
+        Proxy_list    = ProxyManamentDB.objects.all().values()
+        Proxy_nation  = []
+        act_nation    = request.POST.get('ActNationSel_n')
         
         #Update Active Nation:
-        Update.ActiveNation = act_nation
-        Update.save()
-        code     = '532' 
-        ret_dict = DB_M_succeed_table(code)
-        return JsonResponse(ret_dict, status=200)
+        for proxy in Proxy_list:
+            Proxy_nation.append(lib.ResConfig.langcode[proxy['Nation']])
+        #Check if any Proxy that able access chosen Active Nation:
+        if act_nation in Proxy_nation:
+            DB_act_nation.ActiveNation = act_nation
+            DB_act_nation.save()
+            code     = '532' 
+            ret_dict = DB_Proxy_table(code)
+            return JsonResponse(ret_dict, status=200)
+        else:
+            code     = '533' 
+            ret_dict = DB_Proxy_table(code)
+            return JsonResponse(ret_dict, status=404)
             
     except:
         code     = '999' 
-        ret_dict = DB_M_succeed_table(code)
+        ret_dict = DB_Proxy_table(code)
         return JsonResponse(ret_dict, status=404)
 
 #(***OBSOLETED***)
