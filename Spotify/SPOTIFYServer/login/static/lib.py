@@ -89,8 +89,11 @@ class ResponseConfig():
         '521' :	{'status':'Error'               ,'detail':{'admin':'Master account database is null',                         'customer':'None'}},
         '522' :	{'status':'Upload failed'       ,'detail':{'admin':'Master account is duplicated on database',                'customer':'None'}},
         '523' :	{'status':'Upload failed'       ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
-        '524' :	{'status':'Upload successfully' ,'detail':{'admin':'Upload successfully',                                     'customer':'None'}},
-        '530' :	{'status':'Success'             ,'detail':{'admin':'Deleted',                                                 'customer':'None'}},
+        '524' :	{'status':'Upload successfully' ,'detail':{'admin':'Uploaded successfully',                                   'customer':'None'}},
+        '525' :	{'status':'Edit failed'         ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
+        '526' :	{'status':'Edit successfully'   ,'detail':{'admin':'Editted successfully',                                    'customer':'None'}},
+        '529' :	{'status':'Delete failed'       ,'detail':{'admin':'Deleted failed',                                          'customer':'None'}},
+        '530' :	{'status':'Delete successfully' ,'detail':{'admin':'Deleted successfully',                                    'customer':'None'}},
         '531' :	{'status':'Success'             ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
         '532' :	{'status':'Success'             ,'detail':{'admin':'Loaded',                                                  'customer':'None'}},
         # Others:        

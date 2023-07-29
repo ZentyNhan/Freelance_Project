@@ -135,7 +135,7 @@ def DB_get_master_info():
     else:
         return 'Database is null'
     
-def DB_M_succeed_table():
+def DB_M_succeed_table(code_):
     ### Input ###
     DB_M_rawdata      = MainDB.objects.all().values()
     DB_MA_rawdata     = MasterAccountDB.objects.all().values()
@@ -162,6 +162,7 @@ def DB_M_succeed_table():
         
         #Get export account family data:
         for MA in DB_MA_rawdata:
+            id = MA['id']
             if MA['Username'] in succeed_MA_list:
                 for data_2 in DB_M_rawdata:
                     if MA['Username']  == data_2['MasterAccout'] and \
@@ -199,7 +200,7 @@ def DB_M_succeed_table():
 
                 
             #succeed_data_dict:
-            succeed_data_dict[MasterAccount] = {
+            succeed_data_dict[id] = {
                 'MasterAccount': MasterAccount,
                 'Linkjoin'     : LinkJoin,
                 'Address'      : Address,
@@ -213,8 +214,7 @@ def DB_M_succeed_table():
             succeed_ID_list.clear()
 
         #Return:
-        code = '532'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), succeed_data_dict)
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code_]['status'], lib.ResConfig.ResponseCode[code_]['detail']['admin'], DB_ActiveNation(), succeed_data_dict)
                 
     return ret_dict
 
@@ -469,35 +469,18 @@ def DeleteAccount(request):
             #Delete object:
             MainDB.objects.get(id=input_id).delete()
             #Update objects order:
-            ret_dict = DB_M_succeed_table()
+            code     = '530' 
+            ret_dict = DB_M_succeed_table(code)
             return JsonResponse(ret_dict, status=200)
         else:
-            ret_dict = DB_M_succeed_table()
+            code     = '529'
+            ret_dict = DB_M_succeed_table(code)
             return JsonResponse(ret_dict, status=404)
             
     except:
-        ret_dict = DB_M_succeed_table()
+        code     = '999'
+        ret_dict = DB_M_succeed_table(code)
         return JsonResponse(ret_dict, status=404)
-    
-########## ANCHOR: ChangeNation ##########: Change
-@login_required(login_url='/Spot-admin')
-def ChangeNation(request):
-    try:
-        ### Input ###  
-        act_nation = request.POST.get('ActNationSel_n')
-        Update = StoredDB.objects.get(id = 1)
-        
-        #Update Active Nation:
-        Update.ActiveNation = act_nation
-        Update.save()
-        
-        ret_dict = DB_M_succeed_table()
-        return JsonResponse(ret_dict, status=200)
-            
-    except:
-        ret_dict = DB_M_succeed_table()
-        return JsonResponse(ret_dict, status=404)
-
     
 ########## ANCHOR: DeleteCode ##########: Delete 
 @login_required(login_url='/Spot-admin')
@@ -521,19 +504,39 @@ def DeleteCode(request):
             #Update objects order:
             Update_VC_list = DB_VC_list()
             code = '530'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), Update_VC_list, DB_VC_Valid_amount())
             return JsonResponse(ret_dict, status=200)
         else:
             code = '686'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
             return JsonResponse(ret_dict, status=404)
             
     except:
         code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+        return JsonResponse(ret_dict, status=404)
+    
+########## ANCHOR: ChangeNation ##########: Change
+@login_required(login_url='/Spot-admin')
+def ChangeNation(request):
+    try:
+        ### Input ###  
+        act_nation = request.POST.get('ActNationSel_n')
+        Update = StoredDB.objects.get(id = 1)
+        
+        #Update Active Nation:
+        Update.ActiveNation = act_nation
+        Update.save()
+        code     = '532' 
+        ret_dict = DB_M_succeed_table(code)
+        return JsonResponse(ret_dict, status=200)
+            
+    except:
+        code     = '999' 
+        ret_dict = DB_M_succeed_table(code)
         return JsonResponse(ret_dict, status=404)
 
-#(***OBSOLETED***)      
+#(***OBSOLETED***)#      
 ########## ANCHOR: UpdateCode ##########: Update / Delete / Edit 
 @login_required(login_url='/Spot-admin')
 def UpdateCode(request):
@@ -887,9 +890,58 @@ def ExportReport(request):
 @login_required(login_url='/Spot-admin')
 ########## ANCHOR: EditData ##########
 def EditData(request):   
-    def UploadData(request):   
+    try:
         if request.method == 'POST':
-            return render(request, 'Spotify_control.html',ret_dict)
+            ### Input ###
+            DB_M_rawdata       = MainDB.objects.all().values()
+            DB_MA_rawdata      = MasterAccountDB.objects.all().values()
+            #Edit info:
+            MA_id              = request.POST.get('id')
+            editted_email      = request.POST.get('email')
+            editted_inviteLink = request.POST.get('inviteLink')
+            editted_address    = request.POST.get('address')
+            current_email      = ''
+            #Others:
+            isMAavailable      = False
+            
+            ### Methods ###
+            #Edit MA info in MasterAccountDB:
+            for MA in DB_MA_rawdata:
+                if int(MA_id) == MA['id']:
+                    isMAavailable   = True
+                    #Current data:
+                    current_email      = MA['Username']
+                    #Edit data:
+                    Update = MasterAccountDB.objects.get(id = MA_id)
+                    Update.Username = editted_email
+                    Update.FamLink  = editted_inviteLink
+                    Update.Address  = editted_address
+                    Update.save()
+                    
+                
+            #Edit Account info in MainDB:
+            if isMAavailable:
+                for Account in DB_M_rawdata:
+                    if Account['MasterAccout'] == current_email:
+                        Update = MainDB.objects.get(id = Account['id'])
+                        Update.MasterAccout = editted_email
+                        Update.FamLink      = editted_inviteLink
+                        Update.Address      = editted_address
+                        Update.save()
+                        
+                code = '526'
+                ret_dict = DB_M_succeed_table(code)
+                return render(request, 'Spotify_control.html',ret_dict)
+                    
+            else:
+                code = '525'
+                ret_dict = DB_M_succeed_table(code)
+                return render(request, 'Spotify_control.html',ret_dict)
+            
+    except:
+        code = '999'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), VC_list, DB_VC_Valid_amount())
+        return JsonResponse(ret_dict, status=404)
 
 @login_required(login_url='/Spot-admin')
 ########## ANCHOR: UploadData ##########
@@ -923,7 +975,7 @@ def UploadData(request):
                 id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
                 if Master_acc['Username'] in MA_list:
                     code = '522'
-                    ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), DB_M_succeed_table())
+                    ret_dict = DB_M_succeed_table(code)
                     return render(request, 'Spotify_control.html',ret_dict)
                 elif Master_acc['Username'] not in ['Master Username', None]:
                     DB_upload(id,
@@ -936,13 +988,15 @@ def UploadData(request):
 
             #Return:
             code = '524'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], DB_ActiveNation(), DB_M_succeed_table())
+            ret_dict = DB_M_succeed_table(code)
             return render(request, 'Spotify_control.html',ret_dict)
         except Exception as error:
-            ret_dict = {'status' : f'Upload failed' , 'detail' : error , 'time' : f'{current_datetime()}', 'ActiveNation': DB_ActiveNation(),'table' : DB_M_succeed_table()}
+            code = '999'
+            ret_dict = DB_M_succeed_table(code)
             return render(request, 'Spotify_control.html',ret_dict)
     else:
-        ret_dict = {'status' : '' , 'datetime': ''}
+        code = '532'
+        ret_dict = DB_M_succeed_table(code)
         return render(request, 'Spotify_control.html',ret_dict)
 
 def LogoutAdmin(request):   
@@ -960,7 +1014,8 @@ def get_login(request):
     return render(request, 'Spotify_login.html')
 
 def SysCtrlSpotifyTab(request):
-    ret_dict = DB_M_succeed_table()
+    code = '532'
+    ret_dict = DB_M_succeed_table(code)
     # return JsonResponse(ret_dict, status=200)
     return render(request, 'Spotify_control.html',ret_dict)
 

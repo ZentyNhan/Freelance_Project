@@ -135,7 +135,7 @@ Front-end:
 33. Bỏ nút edit, reload (Status hiện tại chỉ có used, valid). (Nhân, Đông) (Done)
 34. Chỉ có filter verifition code status. (Nhân,Đông) (Done)
 35. Verification code table, bỏ cột ID, thêm action delete vào mỗi row. (Nhân, Đông) (Done)
-36. Thêm table link join. (Nhân, Đông) (30%)
+36. Thêm table link join. (Nhân, Đông) (Done)
         + Sửa Created date, lấy từ MasterAccountDB (Done)
 37. Screen login admin giống screen tham gia luôn (Nhân, Đông) (Done)
 38. lấy join link theo ngày (Done)
@@ -144,13 +144,14 @@ Front-end:
 41. Upload, nếu trùng k cho import (Nhân) (Done)
 42. handle ID = max + 1 (Nhân) (Done)
 43. Xử lý year export (Nhân) (Done)
-44. Edit lại link join page (Nhân) (Render)
+44. Edit lại link join page (Nhân) (Render) (Done)
 45. Filter "Joined account number", Nation (Đông) (Done)
-46. Đổ active Country, tạo cột Nation , dropdown active nation  (Nhân) (call API -> Status), đổ "ActiveNation"
-47. Vercode sau khi chuyển trang không delete đc code. (Đông)
-48. Sau khi delete user khỏi master "babinhiithx4@kikyushop.com" , không load lại table (Đông)
-49. Đổ data cho model edit (Đông)
-50. Validate Email + link join (Đông)
+46. Đổ active Country, tạo cột Nation , dropdown active nation  (Nhân) (call API -> Status), đổ "ActiveNation"  (Done)
+47. Vercode sau khi chuyển trang không delete đc code. (Đông) (Done)
+48. Sau khi delete user khỏi master "babinhiithx4@kikyushop.com" , không load lại table (Đông) (Done)
+49. Đổ data cho model edit (Đông) (Done)
+50. Validate Email + link join (Đông) (Done)
+51. offer a Hải thêm tính năng xóa Master account khi account không login đc nữa
 ==========================================================================================================
 
 đưa stage ra terminal cho khách hàng xem (Done)
@@ -162,7 +163,7 @@ Used by User "lee@cloud-air.com" on 19/07/2023 09:14:58
 ==========================================================================================================
 UI Feedback:
 + Nhập thiếu field nào là nó quay liên tục ở nút 'Tham Gia', không cho click lại (Done)
-+ Nhờ Đông thêm ERROR trùng tên account master hoặc k có account master trên database
++ Nhờ Đông thêm ERROR trùng tên account master hoặc k có account master trên database (Done)
 + Sau khi delete vercode, account, current không update mặc dù gửi json
 + Màu của trạng thái thành công
 + import k thành công, chưa có thông báo
