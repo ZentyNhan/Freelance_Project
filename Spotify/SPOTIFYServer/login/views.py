@@ -956,7 +956,63 @@ def UploadData(request):
             MA_list       = []
             
             #Import excel:
-            excel_file = request.FILES['uploadData-name']
+            excel_file = request.FILES['uploadProxy-name']
+            import_data = dataset.load(excel_file.read(), format='xlsx')
+            # Change "Dataset" to "List"
+            for data_col in import_data:
+                if data_col[4] not in [None, 'None', 'Date']:
+                    data.append({'Username' : data_col[0], 
+                                'FamLink'  : data_col[1], 
+                                'Address'  : data_col[2], 
+                                'MemNum'   : data_col[3], 
+                                'Date'     : (data_col[4]).strftime(D_format)})
+            #Master account list:
+            for i in DB_MA_rawdata:
+                MA_list.append(i['Username'])
+                
+            #Update on DB:
+            for Master_acc in data:
+                id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
+                if Master_acc['Username'] in MA_list:
+                    code = '522'
+                    ret_dict = DB_M_succeed_table(code)
+                    return render(request, 'Spotify_control.html',ret_dict)
+                elif Master_acc['Username'] not in ['Master Username', None]:
+                    DB_upload(id,
+                            Master_acc['Username'],  
+                            Master_acc['FamLink'],
+                            Master_acc['Address'],
+                            nation,
+                            Master_acc['MemNum'],
+                            Master_acc['Date'])
+
+            #Return:
+            code = '524'
+            ret_dict = DB_M_succeed_table(code)
+            return render(request, 'Spotify_control.html',ret_dict)
+        except Exception as error:
+            code = '999'
+            ret_dict = DB_M_succeed_table(code)
+            return render(request, 'Spotify_control.html',ret_dict)
+    else:
+        code = '532'
+        ret_dict = DB_M_succeed_table(code)
+        return render(request, 'Spotify_control.html',ret_dict)
+    
+@login_required(login_url='/Spot-admin')
+########## ANCHOR: UploadData ##########
+def UploadProxy(request):   
+    if request.method == 'POST':
+        try: 
+            ### Input ###
+            nation        = request.POST.get('nationsel_n')
+            dataset       = Dataset()
+            DB_MA_rawdata = MasterAccountDB.objects.all().values()
+            data          = []
+            MA_list       = []
+            
+            #Import excel:
+            excel_file = request.FILES['uploadProxy-name']
             import_data = dataset.load(excel_file.read(), format='xlsx')
             # Change "Dataset" to "List"
             for data_col in import_data:
@@ -1024,3 +1080,9 @@ def VerificationTab(request):
     VC_list = DB_VC_list()
     ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}  
     return render(request, 'Spotify_control_vercode.html',ret_dict)
+
+def ProxyManageTab(request): 
+    ### Input ###  
+    VC_list = DB_VC_list()
+    ret_dict = {'table' : VC_list, 'ActiveNation': DB_ActiveNation(), 'valid_amount' : DB_VC_Valid_amount()}  
+    return render(request, 'Spotify_control_proxy.html',ret_dict)

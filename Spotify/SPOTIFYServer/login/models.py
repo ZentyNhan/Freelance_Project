@@ -47,19 +47,6 @@ class VerificationCodeDB(models.Model):
     def __str__(self):
         return self.VerCode
     
-class ListAccountFamilyDB(models.Model):
-    #Attributes:
-    MasterAccount = models.CharField(max_length=20)
-    FamLink       = models.CharField(max_length=200)
-    Address       = models.CharField(max_length=200)
-    JoinedNum     = models.IntegerField()
-    JoinedAcc     = models.CharField(max_length=2000)
-    Date          = models.CharField(max_length=50)
-    
-    #Methods:
-    def __str__(self):
-        return self.MasterAccount
-    
 class StoredDB(models.Model):
     #Attributes:
     ActiveNation = models.CharField(max_length=20)
@@ -68,6 +55,15 @@ class StoredDB(models.Model):
     def __str__(self):
         return self.ActiveNation
     
+class ProxyManamentDB(models.Model):
+    Protocol   = models.CharField(max_length=20)
+    IP         = models.CharField(max_length=50)
+    Proxy_User = models.CharField(max_length=50)
+    Proxy_PW   = models.CharField(max_length=50)
+    Nation     = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.IP
     
     
     

@@ -19,6 +19,8 @@
         {% if ControlPanel in request.get_full_path %}<i class="fa-solid fa-link"></i> Spotify Join Link{% endif %}
         {% url 'VerificationTab' as VerificationTab %}
         {% if VerificationTab in request.get_full_path %}<i class="fa fa-check-circle"></i> Verification Code{% endif %}
+        {% url 'ProxyManageTab' as ProxyManageTab %}
+        {% if ProxyManageTab in request.get_full_path %}<i class="fa fa-check-circle"></i> Proxy Management{% endif %}
       </span>
     </button>
 
@@ -43,6 +45,10 @@
         <li class="nav-item">
           {% url 'VerificationTab' as VerificationTab %}
           <a class="nav-link {% if VerificationTab in request.get_full_path%}active{% endif %}" href="{% url 'VerificationTab' %}"><i class="fa fa-check-circle"></i> Verification Code</a>
+        </li>
+        <li class="nav-item">
+          {% url 'ProxyManageTab' as ProxyManageTab %}
+          <a class="nav-link {% if ProxyManageTab in request.get_full_path%}active{% endif %}" href="{% url 'ProxyManageTab' %}"><i class="fa fa-check-circle"></i> Proxy Management</a>
         </li>
         <li class="nav-item d-block d-lg-none">
           <a class="nav-link" href="{% url 'LogoutAdmin' %}"><i class="fa-solid fa-right-from-bracket me-1"></i> Logout</a>
