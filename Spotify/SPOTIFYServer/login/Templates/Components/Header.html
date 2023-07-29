@@ -63,12 +63,12 @@
         {% csrf_token %}
         <select class="form-select active-nation" aria-label="Select active nation"
           id="ActNationSel_id" name="ActNationSel_n">
-          <option value ="IN">Indian</option>
-          <option value ="TR">Turkey</option>
-          <option value ="VN">Vietnam</option>
-          <option value ="US">USA</option>
-          <option value ="JP">Japan</option>
-          <option value ="CN">China</option>
+          <option value ="IN" {% if ActiveNation == 'IN' %}selected{% endif %}>Indian</option>
+          <option value ="TR" {% if ActiveNation == 'TR' %}selected{% endif %}>Turkey</option>
+          <option value ="VN" {% if ActiveNation == 'VN' %}selected{% endif %}>Vietnam</option>
+          <option value ="US" {% if ActiveNation == 'US' %}selected{% endif %}>USA</option>
+          <option value ="JP" {% if ActiveNation == 'JP' %}selected{% endif %}>Japan</option>
+          <option value ="CN" {% if ActiveNation == 'CN' %}selected{% endif %}>China</option>
         </select>
       </form>
       <a class="btn btn-primary btn-block d-none d-lg-block" href="{% url 'LogoutAdmin' %}" role="button">

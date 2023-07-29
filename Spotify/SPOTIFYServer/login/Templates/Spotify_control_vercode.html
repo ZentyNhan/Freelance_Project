@@ -81,7 +81,7 @@
             </h5>
           </td>
           <td class="text-center">
-            <a class="text-danger vercode-delete" data-id="{{ item.id }}" data-vercode="{{ item.VerCode }}" href="#" role="button" 
+            <a class="text-danger vercode-delete" data-id="{{ item.id }}" data-vercode="{{ item.VerCode }}" href="" role="button" 
               data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
               <i class="fa-solid fa-trash"></i>
             </a>  
@@ -155,7 +155,8 @@
     const $deleteCodeModal = $('#confirmDeleteCode');
     let deleteCode, deleteId;
     const setupDeleteCodeButtons = () => {
-      $('.vercode-delete').click(function() {
+      $('.vercode-delete').click(function(event) {
+        event.preventDefault();
         deleteId = $(this).data('id');
         deleteCode = $(this).data('vercode');
         const message = `Are you sure you want to delete verification code: ${deleteCode}`;
@@ -163,6 +164,9 @@
         $deleteCodeModal.modal('show');
       })
     }
+    $table.on('all.bs.table', function () {
+      setupDeleteCodeButtons();
+    })
     const closeDeleteCodeModal = () => {
       $deleteCodeModal.find('button.confirm').removeClass('disabled');
       $deleteCodeModal.find('button.confirm').html('Delete');

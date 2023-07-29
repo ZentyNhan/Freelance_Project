@@ -73,3 +73,7 @@ tr:hover td {
 #nation-form select {
   max-height: 2.2rem;
 }
+
+td.accountDetails .row:last-child {
+  border-bottom: none !important; 
+}

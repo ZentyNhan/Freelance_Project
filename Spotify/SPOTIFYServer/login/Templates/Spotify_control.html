@@ -173,13 +173,13 @@
           <td class="accountNumber">{{ value.MemNum }}</td>
           <td class="accountDetails">
             {% for key_Z, value_Z in value.Zip.items %}
-              {% if forloop.last %}<div class="row h-100 p-2" style="border-bottom: none;">{% else %}<div class="row h-100 p-2" style="border-bottom: solid 1px rgb(226, 226, 226);">{% endif %}
+              <div class="row h-100 p-2" style="border-bottom: solid 1px rgb(226, 226, 226);">
               {% for skey_Z, svalue_Z in value_Z.items %}  
                   <div class="col-md-10">
                     <i class="fa-solid fa-envelope"></i> {{skey_Z}} &#40;{{svalue_Z}}&#41;
                   </div>
                   <div class="col-md-2 text-end">
-                    <a class="text-danger account-delete" data-id="{{ key_Z }}" data-name="{{skey_Z}} ({{svalue_Z}})" data-row-id="{{key}}" href="#" role="button" 
+                    <a class="text-danger account-delete" data-id="{{ key_Z }}" data-name="{{skey_Z}} ({{svalue_Z}})" data-row-id="{{key}}" href="" role="button" 
                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
                       <i class="fa-solid fa-rectangle-xmark"></i>
                     </a>  
@@ -190,7 +190,8 @@
             {% endfor %}
           </td>
           <td class="text-center">
-            <a class="text-primary joinlink-edit" data-row-id="{{key}}" href="#" role="button" 
+            <a class="text-primary joinlink-edit" href="" role="button" data-row-id="{{key}}"
+              data-email="{{ value.MasterAccount }}" data-inviteLink="{{ value.Linkjoin }}" data-address="{{ value.Address }}"
               data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
               <i class="fa-solid fa-pen-to-square"></i>
             </a>
@@ -236,28 +237,24 @@
       } -->
       {% csrf_token %}
       <input type="hidden" name="id" class="id">
-      <div class="mb-4">
+      <div class="mb-4 email">
         <label for="email" >Email</label>
-        <input type="text" id="email" class="form-control required" name="email" required placeholder="Enter email"/>
-        <div class="invalid-feedback">
-          Email is required
-        </div>
+        <input type="email" id="email" class="form-control required email" name="email" required placeholder="email@example.com"/>
+        <div class="invalid-feedback"></div>
       </div>
     
-      <div class="mb-4">
+      <div class="mb-4 inviteLink">
         <label for="inviteLink" >Invite link</label>
-        <input type="text" id="inviteLink" class="form-control required" name="inviteLink" required placeholder="Enter invite link"/>
-        <div class="invalid-feedback">
-          Invite link is required
-        </div>
+        <input type="url" id="inviteLink" class="form-control required inviteLink" 
+          pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+[\.]spotify\.com(:[0-9]{1,5})?(\/.+)$"
+          name="inviteLink" required placeholder="https://www.spotify.com/..."/>
+        <div class="invalid-feedback"></div>
       </div>
   
-      <div class="mb-4">
+      <div class="mb-4 address">
         <label for="address" >Address</label>
-        <input type="text" id="address" class="form-control required" name="address" required placeholder="Enter address"/>
-        <div class="invalid-feedback">
-          Address is required
-        </div>
+        <input type="text" id="address" class="form-control required address" name="address" required placeholder="Enter address"/>
+        <div class="invalid-feedback"></div>
       </div>
     </form>
   </div>
@@ -340,16 +337,25 @@
               <span class="visually-hidden">Loading...</span>
             </div>`);
           $editModal.find('.edit-form').submit();
+        } else {
+          if (!$form.find('input.email').val()) {
+            $form.find('div.email .invalid-feedback').html('Email is required');
+          } else {
+            $form.find('div.email .invalid-feedback').html('Email format is invalid');
+          }
+
+          if (!$form.find('input.inviteLink').val()) {
+            $form.find('div.inviteLink .invalid-feedback').html('Invite link is required');
+          } else {
+            $form.find('div.inviteLink .invalid-feedback').html('Invite link must start with https://www.spotify.com/...');
+          }
+
+          if (!$form.find('input.address').val()) {
+            $form.find('div.address .invalid-feedback').html('Address is required');
+          }
         }
         $form.addClass('was-validated');
       });
-      $('.joinlink-edit').click(function() {
-        const rowId = $(this).data('row-id');
-        const $template = $('#edit-form-template');
-        $template.find('input.id').val(rowId);
-        $editModal.find('.modal-body').html($template.html());
-        $editModal.modal('show');
-      })
 
       // Handle show import confirm modal
       const $importModal = $('#confirmImport');
@@ -423,7 +429,8 @@
       const $deleteModal = $('#confirmDelete');
       let deleteName, deleteId, deleteRowId;
       const setupDeleteButtons = () => {
-        $('.account-delete').click(function() {
+        $('.account-delete').click(function(event) {
+          event.preventDefault();
           deleteId = $(this).data('id');
           deleteName = $(this).data('name');
           deleteRowId = $(this).data('row-id');
@@ -431,9 +438,24 @@
           $deleteModal.find('.modal-body').html(message);
           $deleteModal.modal('show');
         })
+        $('.joinlink-edit').click(function(event) {
+          event.preventDefault();
+          const rowId = $(this).data('row-id');
+          const $template = $('#edit-form-template');
+          $template.find('input.id').val(rowId);
+          $editModal.find('.modal-body').html($template.html());
+          $editModal.find('input.email').val($(this).data('email'));
+          $editModal.find('input.inviteLink').val($(this).data('invitelink'));
+          $editModal.find('input.address').val($(this).data('address'));
+          $editModal.modal('show');
+        })
       }
+      $table.on('all.bs.table', function () {
+        setupDeleteButtons();
+      })
       const handleUpdateRowData = () => {
-        $row = $(`#row-${deleteRowId}`);
+        $row = $(`#row-${deleteRowId.replaceAll('.','\\.').replaceAll('@', '\\@')}`);
+        console.log('debug', $row);
         const accountNumber = parseInt($row.find('.accountNumber').text());
         const $accountDetails = $row.find('.accountDetails');
         $row.find('.accountNumber').html(accountNumber - 1);
