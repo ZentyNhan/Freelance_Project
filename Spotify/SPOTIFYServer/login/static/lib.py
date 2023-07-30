@@ -66,51 +66,51 @@ class ResponseConfig():
     #Attributes:
     ResponseCode = {
         #Customer:
-        '200' :	{'status':'Thành công'  ,'detail':{'admin':'Joined Spotify Family Successfully',                      'customer':'Chúc mừng. Đã tham gia Spotify Family thành công'}},
-        '400' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when joining Premium',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '401' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when accessing Spotify', 'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Failed
-        '402' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when switching nation',  'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '403' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link expired',                          'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #Admin: Join Link expired 
-        '404' :	{'status':'Thất bại'    ,'detail':{'admin':'Reserved',                                                'customer':'Reserved'}},
-        '405' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join link error',                            'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '406' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
-        '408' : {'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: Request Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
-        '409' :	{'status':'Thất bại'    ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '410' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from other country',     'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '411' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '412' :	{'status':'Thất bại'    ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
-        '415' :	{'status':'Thất bại'    ,'detail':{'admin':'CUSTOMER ERROR: Wrong verification code',                 'customer':'Verification code chưa đúng. Vui lòng thử lại hoặc liên hệ admin để mua code'}},
+        '200' :	{'status':'Thành công'                     ,'detail':{'admin':'Joined Spotify Family Successfully',                      'customer':'Chúc mừng. Đã tham gia Spotify Family thành công'}},
+        '400' :	{'status':'Thất bại'                       ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when joining Premium',   'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '401' :	{'status':'Thất bại'                       ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when accessing Spotify', 'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Failed
+        '402' :	{'status':'Thất bại'                       ,'detail':{'admin':'SYSTEM ERROR: A failure occurred when switching nation',  'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '403' :	{'status':'Thất bại'                       ,'detail':{'admin':'ADMIN ERROR: Join link expired',                          'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #Admin: Join Link expired 
+        '404' :	{'status':'Thất bại'                       ,'detail':{'admin':'Reserved',                                                'customer':'Reserved'}},
+        '405' :	{'status':'Thất bại'                       ,'detail':{'admin':'ADMIN ERROR: Join link error',                            'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '406' :	{'status':'Thất bại'                       ,'detail':{'admin':'CUSTOMER ERROR: Incorrect username or password',          'customer':'Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại tài khoản'}}, #Customer
+        '408' : {'status':'Thất bại'                       ,'detail':{'admin':'SYSTEM ERROR: Request Timeout',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}}, #System: Timeout
+        '409' :	{'status':'Thất bại'                       ,'detail':{'admin':'SYSTEM ERROR: A failure occurred in main branch',         'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '410' :	{'status':'Thất bại'                       ,'detail':{'admin':'ADMIN ERROR: Join Premium Family from other country',     'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '411' :	{'status':'Thất bại'                       ,'detail':{'admin':'ADMIN ERROR: Database is null',                           'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '412' :	{'status':'Thất bại'                       ,'detail':{'admin':'ADMIN ERROR: No available slot in database',              'customer':'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ admin'}},
+        '415' :	{'status':'Thất bại'                       ,'detail':{'admin':'CUSTOMER ERROR: Wrong verification code',                 'customer':'Verification code chưa đúng. Vui lòng thử lại hoặc liên hệ admin để mua code'}},
         # Admin::
-        '516' :	{'status':'Error'                  ,'detail':{'admin':'ID empty',                                                'customer':'None'}},
-        '517' :	{'status':'Error'                  ,'detail':{'admin':'ID out of range',                                         'customer':'None'}},
-        '518' :	{'status':'Error'                  ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
-        '519' :	{'status':'Error'                  ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
-        '520' :	{'status':'Error'                  ,'detail':{'admin':'Permission denied',                                       'customer':'None'}},
-        '521' :	{'status':'Error'                  ,'detail':{'admin':'Master account database is null',                         'customer':'None'}},
-        '522' :	{'status':'Upload failed'          ,'detail':{'admin':'Master account is duplicated on database',                'customer':'None'}},
-        '523' :	{'status':'Upload failed'          ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
-        '524' :	{'status':'Upload successfully'    ,'detail':{'admin':'Uploaded successfully',                                   'customer':'None'}},
-        '525' :	{'status':'Edit failed'            ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
-        '526' :	{'status':'Edit successfully'      ,'detail':{'admin':'Editted successfully',                                    'customer':'None'}},
-        '527' :	{'status':'Add proxy successfully' ,'detail':{'admin':'Proxy IP is duplicated on database',                      'customer':'None'}},
-        '528' :	{'status':'Upload failed'          ,'detail':{'admin':'Proxy IP is not existed on database',                     'customer':'None'}},
-        '529' :	{'status':'Delete failed'          ,'detail':{'admin':'Deleted failed',                                          'customer':'None'}},
-        '530' :	{'status':'Delete successfully'    ,'detail':{'admin':'Deleted successfully',                                    'customer':'None'}},
-        '531' :	{'status':'Success'                ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
-        '532' :	{'status':'Success'                ,'detail':{'admin':'Loaded',                                                  'customer':'None'}},
-        '533' :	{'status':'Change failed'          ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
-        '534' :	{'status':'Edit failed'            ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
+        '516' :	{'status':'Error'                          ,'detail':{'admin':'ID empty',                                                'customer':'None'}},
+        '517' :	{'status':'Error'                          ,'detail':{'admin':'ID out of range',                                         'customer':'None'}},
+        '518' :	{'status':'Error'                          ,'detail':{'admin':'ID type error',                                           'customer':'None'}},
+        '519' :	{'status':'Error'                          ,'detail':{'admin':'Edit value empty',                                        'customer':'None'}},
+        '520' :	{'status':'Error'                          ,'detail':{'admin':'Permission denied',                                       'customer':'None'}},
+        '521' :	{'status':'Error'                          ,'detail':{'admin':'Master account database is null',                         'customer':'None'}},
+        '523' :	{'status':'Upload failed'                  ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
+        '525' :	{'status':'Edit failed'                    ,'detail':{'admin':'Master account is not existed on database',               'customer':'None'}},
+        '528' :	{'status':'Upload failed'                  ,'detail':{'admin':'Proxy IP is not existed on database',                     'customer':'None'}},
+        '529' :	{'status':'Delete failed'                  ,'detail':{'admin':'Deleted failed',                                          'customer':'None'}},
+        '530' :	{'status':'Delete successfully'            ,'detail':{'admin':'Deleted successfully',                                    'customer':'None'}},
+        '531' :	{'status':'Success'                        ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
+        '532' :	{'status':'Success'                        ,'detail':{'admin':'Loaded',                                                  'customer':'None'}},
+        '533' :	{'status':'Change failed'                  ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
+        '534' :	{'status':'Edit failed'                    ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
         # Admin 2:
         # Proxy:
-        '601' :	{'status':'Upload proxy successfully'      ,'detail':{'admin':'Uploaded successfully',                               'customer':'None'}},
-        '602' :	{'status':'Upload proxy failed'            ,'detail':{'admin':'This nation proxy IP is existed on database',         'customer':'None'}},
-        '603' :	{'status':'Add proxy successfully'         ,'detail':{'admin':'Added successfully',                                  'customer':'None'}},
-        '604' :	{'status':'Add proxy failed'               ,'detail':{'admin':'This nation proxy IP is existed on database',         'customer':'None'}},
-        '605' :	{'status':'Edit proxy successfully'        ,'detail':{'admin':'Editted successfully',                                'customer':'None'}},
-        '606' :	{'status':'Edit proxy failed'              ,'detail':{'admin':'This nation proxy IP is not existed on database',     'customer':'None'}},
+        '601' :	{'status':'Upload proxy successfully'      ,'detail':{'admin':'Uploaded successfully',                                   'customer':'None'}},
+        '602' :	{'status':'Upload proxy failed'            ,'detail':{'admin':'Some nation proxy IP is existed on database',             'customer':'None'}},
+        '603' :	{'status':'Add proxy successfully'         ,'detail':{'admin':'Added successfully',                                      'customer':'None'}},
+        '604' :	{'status':'Add proxy failed'               ,'detail':{'admin':'This nation proxy IP is existed on database',             'customer':'None'}},
+        '605' :	{'status':'Edit proxy successfully'        ,'detail':{'admin':'Editted successfully',                                    'customer':'None'}},
+        '606' :	{'status':'Edit proxy failed'              ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
+        '607' :	{'status':'Upload successfully'            ,'detail':{'admin':'Uploaded successfully',                                   'customer':'None'}},
+        '608' :	{'status':'Upload failed'                  ,'detail':{'admin':'Some master account is existed on database',              'customer':'None'}},
+        '609' :	{'status':'Edit successfully'              ,'detail':{'admin':'Editted successfully',                                    'customer':'None'}},
+        '610' :	{'status':'Edit failed'                    ,'detail':{'admin':'This master account is not existed on database',          'customer':'None'}},
         # Others:           
-        '686' :	{'status':'Warning'                ,'detail':{'admin':'Warning: Others value',                                   'customer':'Warning: Others value'}},
-        '999' :	{'status':'Failed'                 ,'detail':{'admin':'Unknow Exception',                                        'customer':'Unknow Exception'}},
+        '686' :	{'status':'Warning'                        ,'detail':{'admin':'Warning: Others value',                                   'customer':'Warning: Others value'}},
+        '999' :	{'status':'Failed'                         ,'detail':{'admin':'Unknow Exception',                                        'customer':'Unknow Exception'}},
 
     }
     

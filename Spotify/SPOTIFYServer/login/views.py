@@ -20,6 +20,7 @@ from time import sleep
 from datetime import datetime
 from datetime import date
 import time
+import random
 import pickle
 import datetime
 # from selenium import webdriver
@@ -278,6 +279,18 @@ def DB_check_vercode_validation(vercode_):
             return 'Valid'
     return 'Invalid'
 
+def DB_get_proper_proxy(Actnation_):
+    DB_Proxy_rawdata  = ProxyManamentDB.objects.all().values()
+    Proxy_proper_list = []
+    for PROXY in DB_Proxy_rawdata:
+        if langcode[PROXY['Nation']] == Actnation_:
+            Proxy_proper_list.append(PROXY)
+    PROPER_PROXY = random.choice(Proxy_proper_list)
+    #Return:         
+    return PROPER_PROXY
+    
+            
+
 def is_integer(n):
     if isinstance(n, int): return True
     else:                  return False
@@ -384,26 +397,26 @@ def joinSpotify(request):
                     Ind        = ls.index('invite') + 1
                     Premium_ID = ls[Ind]
                     
-                    #proxy:
-                    IND = 0
-                    NAT = 'Indian'
-                    
                     #Instances:
+                    #Proxy handling:
+                    PROXY = DB_get_proper_proxy(Nation)
+                    
                     #Options and services:
-                    ops  = webdriver.ChromeOptions()
-                    ops.add_argument('headless')
+                    ops_Chrome = webdriver.ChromeOptions()
+                    # ops.add_argument('headless')
                     serv = Service()
-                    # options = {
-                    #     'proxy': {
-                    #         'http':  '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
-                    #         'https': '{0}://{1}:{2}@{3}'.format(lib.proxy.info[NAT][IND]['protocol'], lib.proxy.info[NAT][IND]['User'], lib.proxy.info[NAT][IND]['PW'], lib.proxy.info[NAT][IND]['IP']),
-                    #         'no_proxy': 'localhost,127.0.0.1'
-                    #     }
-                    # }
+                    ops_SeleniumWire = {
+                        'proxy': {
+                            'http':  '{0}://{1}:{2}@{3}'.format(PROXY['Protocol'], PROXY['Proxy_User'], PROXY['Proxy_PW'], PROXY['IP']),
+                            'https': '{0}://{1}:{2}@{3}'.format(PROXY['Protocol'], PROXY['Proxy_User'], PROXY['Proxy_PW'], PROXY['IP']),
+                            'no_proxy': 'localhost,127.0.0.1'
+                        }
+                    }
+                    
                     try:
-                        DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops, seleniumwire_options=ops)
+                        DRIVER         = webdriver.Chrome(ChromeDriverManager().install(),options= ops_Chrome, seleniumwire_options=ops_SeleniumWire)
                     except:
-                        DRIVER         = webdriver.Chrome(service=serv, options=ops, seleniumwire_options=ops)
+                        DRIVER         = webdriver.Chrome(service=serv, options=ops_Chrome, seleniumwire_options=ops_SeleniumWire)
                     LOGGING        = lib.logging(Username, familyURL, MasterAcc, Nation, os.getcwd())
                     USER           = lib.Process(Username, Password, familyURL, Address, Nation, LOGGING)
                     code           = '400'
@@ -992,13 +1005,13 @@ def EditData(request):
                         Update.save()
                         
                 #Return:
-                code = '526'
+                code = '609'
                 ret_dict = DB_M_succeed_table(code)
                 return render(request, 'Spotify_control.html',ret_dict)
                     
             else:
                 #Return:
-                code = '525'
+                code = '610'
                 ret_dict = DB_M_succeed_table(code)
                 return render(request, 'Spotify_control.html',ret_dict)
             
@@ -1094,7 +1107,7 @@ def UploadData(request):
             for Master_acc in data:
                 id  = id_gen(mode_= 'new', list_= MasterAccountDB.objects.all().values())
                 if Master_acc['Username'] in MA_list:
-                    code = '522'
+                    code = '608'
                     ret_dict = DB_M_succeed_table(code)
                     return render(request, 'Spotify_control.html',ret_dict)
                 elif Master_acc['Username'] not in ['Master Username', None]:
@@ -1107,7 +1120,7 @@ def UploadData(request):
                             Master_acc['Date'])
 
             #Return:
-            code = '524'
+            code = '607'
             ret_dict = DB_M_succeed_table(code)
             return render(request, 'Spotify_control.html',ret_dict)
         except Exception as error:

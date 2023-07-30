@@ -47,7 +47,7 @@ import pyodbc
 #DJANGO:
 import django
 
-print(django.get_version())
+# print(django.get_version())
 
 # DRIVER_NAME = 'ODBC Driver 17 for SQL Server'
 # SERVER_NAME = 'DESKTOP-RCFES7K\SQLEXPRESS'
@@ -239,3 +239,32 @@ print(django.get_version())
 # print(type(d))
 # print (d)
 
+# a = [1,2,3,4,5,6]
+
+# print(next((num for num in a if num == 1),None))
+
+# initializing list
+test_list = [1, 4, 5, 2, 7]
+ 
+# printing original list
+print("Original list is : " + str(test_list))
+ 
+# using random.choice() to
+# get a random number
+random_num = random.choice(test_list)
+ 
+# printing random number
+print("Random selected number is : " + str(random_num))
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
