@@ -988,11 +988,13 @@ def EditData(request):
                         Update.Address      = editted_address
                         Update.save()
                         
+                #Return:
                 code = '526'
                 ret_dict = DB_M_succeed_table(code)
                 return render(request, 'Spotify_control.html',ret_dict)
                     
             else:
+                #Return:
                 code = '525'
                 ret_dict = DB_M_succeed_table(code)
                 return render(request, 'Spotify_control.html',ret_dict)
@@ -1009,48 +1011,38 @@ def EditProxy(request):
         if request.method == 'POST':
             ### Input ###
             DB_Proxy_rawdata       = ProxyManamentDB.objects.all().values()
-            #Edit info:
-            MA_id              = request.POST.get('id')
-            editted_email      = request.POST.get('email')
-            editted_inviteLink = request.POST.get('inviteLink')
-            editted_address    = request.POST.get('address')
-            current_email      = ''
-            #Others:
-            isMAavailable      = False
+            #Proxy info:
+            PROXY_ID               = request.POST.get('id')
+            EDITTED_PROTOCOL       = request.POST.get('Protocol_n')
+            EDITTED_IP             = request.POST.get('IP_n')
+            EDITTED_PROXY_USER     = request.POST.get('ProxyUser_n')
+            EDITTED_PROXY_PW       = request.POST.get('Proxypw_n')
+            EDITTED_NATION         = request.POST.get('Nation_n')
+            EDITTED_ACTIVATED_DATE = request.POST.get('ActivatedDate_n')
             
             ### Methods ###
-            #Edit MA info in MasterAccountDB:
-            for MA in DB_Proxy_rawdata:
-                if int(MA_id) == MA['id']:
-                    isMAavailable   = True
-                    #Current data:
-                    current_email      = MA['Username']
+            #Edit PROXY info in ProxyManamentDB:
+            for PROXY in DB_Proxy_rawdata:
+                if int(PROXY_ID) == PROXY['id']:
                     #Edit data:
-                    Update = MasterAccountDB.objects.get(id = MA_id)
-                    Update.Username = editted_email
-                    Update.FamLink  = editted_inviteLink
-                    Update.Address  = editted_address
+                    Update = ProxyManamentDB.objects.get(id = PROXY_ID)
+                    Update.Protocol      = EDITTED_PROTOCOL      
+                    Update.IP            = EDITTED_IP            
+                    Update.Proxy_User    = EDITTED_PROXY_USER    
+                    Update.Proxy_PW      = EDITTED_PROXY_PW      
+                    Update.Nation        = EDITTED_NATION        
+                    Update.ActivetedDate = EDITTED_ACTIVATED_DATE
                     Update.save()
+                    #Return:
+                    code = '526'
+                    ret_dict = DB_M_succeed_table(code)
+                    return render(request, 'Spotify_control.html',ret_dict)
                     
-                
-            #Edit Account info in MainDB:
-            if isMAavailable:
-                for Account in DB_Proxy_rawdata:
-                    if Account['MasterAccout'] == current_email:
-                        Update = MainDB.objects.get(id = Account['id'])
-                        Update.MasterAccout = editted_email
-                        Update.FamLink      = editted_inviteLink
-                        Update.Address      = editted_address
-                        Update.save()
-                        
-                code = '526'
-                ret_dict = DB_M_succeed_table(code)
-                return render(request, 'Spotify_control.html',ret_dict)
-                    
-            else:
-                code = '525'
-                ret_dict = DB_M_succeed_table(code)
-                return render(request, 'Spotify_control.html',ret_dict)
+                else:
+                    #Return:
+                    code = '534'
+                    ret_dict = DB_M_succeed_table(code)
+                    return render(request, 'Spotify_control.html',ret_dict)
             
     except:
         code = '999'
@@ -1074,7 +1066,6 @@ def UploadData(request):
             #Import excel:
             excel_file = request.FILES['uploadData-name']
             import_data = dataset.load(excel_file.read(), format='xlsx')
-            print(import_data)
             # Change "Dataset" to "List"
             for data_col in import_data:
                 if data_col[4] not in [None, 'None', 'Date']:
