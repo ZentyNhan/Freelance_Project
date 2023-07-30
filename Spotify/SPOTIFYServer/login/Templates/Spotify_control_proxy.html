@@ -162,7 +162,7 @@
           <th width="8%">Proxy Password</th>
           <th width="2%" data-field="nation">Nation</th>
           <th width="5%">Activated Date</th>
-
+          <th width="5%" class="text-center">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -174,6 +174,18 @@
           <td>{{ value.Proxy_PW }}</td>
           <td>{{ value.Nation }}</td>
           <td>{{ value.ActivetedDate }}</td>
+          <td class="text-center">
+            <a class="text-primary proxy-edit" href="" role="button" data-row-id="{{key}}"
+              data-protocol="{{ value.Protocol }}" 
+              data-ip="{{ value.IP }}"
+              data-proxyUser="{{ value.Proxy_User }}"
+              data-proxyPw="{{ value.Proxy_PW }}"
+              data-nationCode="{{ value.Nation }}"
+              data-activatedDate="{{ value.ActivetedDate }}"
+              data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -194,12 +206,13 @@
     <form action="{% url 'AddProxy' %}" class="p-3 py-2" id="add-proxy-form" method="post" enctype="multipart/form-data">
       <!--       
       csrfmiddlewaretoken
+      id: optional - only when edit
       protocol
       ip
       proxyUser
       proxyPw
-      nation
-      activatedDate
+      nation: nationCode: IN, JP,...
+      activatedDate: 2023-07-05
       -->
       {% csrf_token %}
       <div class="mb-4 protocol">
@@ -305,6 +318,7 @@
           $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>`);
+          // console.log('debug', $form.serializeArray());
           $form.submit();
         } else {
           if (!$form.find('input.protocol').val()) {
@@ -349,6 +363,17 @@
         $toast.find('.toast-body').html(submitDetail);
         $toast.toast('show');
       }
+      if (submitStatus === 'Edit proxy successfully') {
+        const $toast = $('#toast-list .toast-success');
+        $toast.find('.toast-title').html('Edit proxy successfully');
+        $toast.find('.toast-body').html('Edit proxy successfully');
+        $toast.toast('show');
+      } else if (submitStatus === 'Edit proxy failed') {
+        const $toast = $('#toast-list .toast-danger');
+        $toast.find('.toast-title').html('Edit proxy failed');
+        $toast.find('.toast-body').html(submitDetail);
+        $toast.toast('show');
+      }
 
       // Handle show import confirm modal
       const $exportModal = $('#confirmExport');
@@ -367,87 +392,27 @@
       })
 
       // Setup delete join account buttons 
-      const $deleteModal = $('#confirmDelete');
-      let deleteName, deleteId, deleteRowId;
-      const setupDeleteButtons = () => {
-        $('.account-delete').click(function(event) {
-          event.preventDefault();
-          deleteId = $(this).data('id');
-          deleteName = $(this).data('name');
-          deleteRowId = $(this).data('row-id');
-          const message = `Are you sure you want to delete joined account: ${deleteName}`;
-          $deleteModal.find('.modal-body').html(message);
-          $deleteModal.modal('show');
-        })
-        $('.joinlink-edit').click(function(event) {
+      const setupEditButtons = () => {
+        $('.proxy-edit').click(function(event) {
           event.preventDefault();
           const rowId = $(this).data('row-id');
-          const $template = $('#edit-form-template');
-          $template.find('input.id').val(rowId);
-          $editModal.find('.modal-body').html($template.html());
-          $editModal.find('input.email').val($(this).data('email'));
-          $editModal.find('input.inviteLink').val($(this).data('invitelink'));
-          $editModal.find('input.address').val($(this).data('address'));
-          $editModal.modal('show');
+          const $template = $('#add-proxy-template');
+          $addNewModel.find('.modal-body').html($template.html());
+          $addNewModel.find('form').prepend(`<input type="hidden" name="id" value="${rowId}" />`);
+          $addNewModel.find('form').attr('action', `{% url 'EditProxy' %}`);
+          $addNewModel.find('input.protocol').val($(this).data('protocol'));
+          $addNewModel.find('input.ip').val($(this).data('ip'));
+          $addNewModel.find('input.proxyUser').val($(this).data('proxyuser'));
+          $addNewModel.find('input.proxyPw').val($(this).data('proxypw'));
+          $addNewModel.find('input.nation').val($(this).data('nationcode'));
+          $addNewModel.find('input.activatedDate').val($(this).data('activateddate').split("/").reverse().join("-"));
+          $addNewModel.modal('show');
         })
       }
       $table.on('all.bs.table', function () {
-        setupDeleteButtons();
-      })
-      const handleUpdateRowData = () => {
-        $row = $(`#row-${deleteRowId.replaceAll('.','\\.').replaceAll('@', '\\@')}`);
-        console.log('debug', $row);
-        const accountNumber = parseInt($row.find('.accountNumber').text());
-        const $accountDetails = $row.find('.accountDetails');
-        $row.find('.accountNumber').html(accountNumber - 1);
-        $accountDetails.children().filter(function(){
-          return $(this).find('.account-delete').data('id') == deleteId;
-        }).remove();
-      }
-      const closeDeleteModal = () => {
-        $deleteModal.find('button.confirm').removeClass('disabled');
-        $deleteModal.find('button.confirm').html('Delete');
-        $deleteModal.modal('toggle');
-      }
-      setupDeleteButtons();
-      $deleteModal.find('button.confirm').click(function() {
-        $(this).addClass('disabled');
-        $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>`);
-        const data = new FormData();
-        data.append('id', deleteId);
-        // add form input from hidden input elsewhere on the page
-        data.append('csrfmiddlewaretoken', $('#tokenForm input[name="csrfmiddlewaretoken"]').attr('value'));
-
-        const handleDeleteFailed = () => {
-          closeDeleteModal();
-          const $toast = $('#toast-list .toast-danger');
-          $toast.find('.toast-title').html('Delete joined account failed');
-          $toast.find('.toast-body').html(`Fail to delete joined account: ${deleteName}`);
-          $toast.toast('show');
-        }
-
-        fetch("/joinLink/delete", {
-            method: 'POST',
-            body: data,
-            credentials: 'same-origin',
-        }).then(response => {
-          if (response.ok) {
-            closeDeleteModal();
-            const $toast = $('#toast-list .toast-success');
-            $toast.find('.toast-title').html('Delete joined account successfully');
-            $toast.find('.toast-body').html(`Successfully deleted joined account: ${deleteName}`);
-            $toast.toast('show');
-            handleUpdateRowData();
-            setupDeleteButtons();
-          } else {
-            handleDeleteFailed();
-          }
-        }).catch(error => {
-          handleDeleteFailed();
-        })
-      })
+        setupEditButtons();
+      });
+      setupEditButtons();
     });
   </script>
 {% endblock %}
