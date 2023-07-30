@@ -99,6 +99,7 @@ class ResponseConfig():
         '531' :	{'status':'Success'             ,'detail':{'admin':'Editted',                                                 'customer':'None'}},
         '532' :	{'status':'Success'             ,'detail':{'admin':'Loaded',                                                  'customer':'None'}},
         '533' :	{'status':'Change failed'       ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
+        '534' :	{'status':'Edit failed'         ,'detail':{'admin':'This nation proxy IP is not existed on database',         'customer':'None'}},
         # Others:        
         '686' :	{'status':'Warning'             ,'detail':{'admin':'Warning: Others value',                                   'customer':'Warning: Others value'}},
         '999' :	{'status':'Error'               ,'detail':{'admin':'Unknow Exception',                                        'customer':'Unknow Exception'}},
