@@ -180,7 +180,7 @@
               data-ip="{{ value.IP }}"
               data-proxyUser="{{ value.Proxy_User }}"
               data-proxyPw="{{ value.Proxy_PW }}"
-              data-nationCode="{{ value.Nation }}"
+              data-nationCode="{{ value.NationCode }}"
               data-activatedDate="{{ value.ActivetedDate }}"
               data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
               <i class="fa-solid fa-pen-to-square"></i>
@@ -392,7 +392,7 @@
           $editProxyModel.find('input.ip').val($(this).data('ip'));
           $editProxyModel.find('input.proxyUser').val($(this).data('proxyuser'));
           $editProxyModel.find('input.proxyPw').val($(this).data('proxypw'));
-          $editProxyModel.find('input.nation').val($(this).data('nationcode'));
+          $editProxyModel.find('select.nation').val($(this).data('nationcode'));
           $editProxyModel.find('input.activatedDate').val($(this).data('activateddate').split("/").reverse().join("-"));
           $editProxyModel.modal('show');
         })

@@ -48,6 +48,7 @@ ret_dict        = {}
 DT_format       = "%d/%m/%Y %H:%M:%S"
 D_format        = "%d/%m/%Y"
 DTRes_format    = "%H:%M:%S - %d/%m/%Y "
+langcode        = lib.ResConfig.langcode
 
 ########## ANCHOR: GLOBAL METHODS ##########
 @dispatch(dict)
@@ -251,6 +252,7 @@ def DB_Proxy_table(code_):
             PROXY_USER     = proxy['Proxy_User']
             PROXY_PW       = proxy['Proxy_PW']
             NATION         = proxy['Nation']
+            NATION_CODE    = langcode[proxy['Nation']]
             ACTIVATED_DATE = proxy['ActivetedDate']
         
             #proxy_data_dict:
@@ -260,6 +262,7 @@ def DB_Proxy_table(code_):
                 'Proxy_User'    : PROXY_USER,
                 'Proxy_PW'      : PROXY_PW,
                 'Nation'        : NATION,
+                'NationCode'    : NATION_CODE,
                 'ActivetedDate' : ACTIVATED_DATE,
             }
         #ret_dict:
@@ -1013,18 +1016,25 @@ def EditProxy(request):
             DB_Proxy_rawdata       = ProxyManamentDB.objects.all().values()
             #Proxy info:
             PROXY_ID               = request.POST.get('id')
-            EDITTED_PROTOCOL       = request.POST.get('Protocol_n')
-            EDITTED_IP             = request.POST.get('IP_n')
-            EDITTED_PROXY_USER     = request.POST.get('ProxyUser_n')
-            EDITTED_PROXY_PW       = request.POST.get('Proxypw_n')
-            EDITTED_NATION         = request.POST.get('Nation_n')
-            EDITTED_ACTIVATED_DATE = request.POST.get('ActivatedDate_n')
+            EDITTED_PROTOCOL       = request.POST.get('protocol')
+            EDITTED_IP             = request.POST.get('ip')
+            EDITTED_PROXY_USER     = request.POST.get('proxyUser')
+            EDITTED_PROXY_PW       = request.POST.get('proxyPw')
+            EDITTED_NATION         = langcode[request.POST.get('nation')]
+            EDITTED_ACTIVATED_DATE = request.POST.get('activatedDate')
+            #Others:
+            isProxyavailable       = False
             
             ### Methods ###
+            #Date handling:
+            temp = str(EDITTED_ACTIVATED_DATE).split('-')
+            EDITTED_ACTIVATED_DATE = f'{temp[2]}/{temp[1]}/{temp[0]}'
+            
             #Edit PROXY info in ProxyManamentDB:
             for PROXY in DB_Proxy_rawdata:
                 if int(PROXY_ID) == PROXY['id']:
                     #Edit data:
+                    isProxyavailable     = True
                     Update = ProxyManamentDB.objects.get(id = PROXY_ID)
                     Update.Protocol      = EDITTED_PROTOCOL      
                     Update.IP            = EDITTED_IP            
@@ -1033,21 +1043,22 @@ def EditProxy(request):
                     Update.Nation        = EDITTED_NATION        
                     Update.ActivetedDate = EDITTED_ACTIVATED_DATE
                     Update.save()
-                    #Return:
-                    code = '526'
-                    ret_dict = DB_M_succeed_table(code)
-                    return render(request, 'Spotify_control.html',ret_dict)
                     
-                else:
-                    #Return:
-                    code = '534'
-                    ret_dict = DB_M_succeed_table(code)
-                    return render(request, 'Spotify_control.html',ret_dict)
+            if isProxyavailable:
+                #Return:
+                code = '605'
+                ret_dict = DB_Proxy_table(code)
+                return render(request, 'Spotify_control_proxy.html',ret_dict)
+            else:
+                #Return:
+                code = '606'
+                ret_dict = DB_Proxy_table(code)
+                return render(request, 'Spotify_control_proxy.html',ret_dict)
             
     except:
         code = '999'
-        ret_dict = DB_M_succeed_table(code)
-        return render(request, 'Spotify_control.html',ret_dict)
+        ret_dict = DB_Proxy_table(code)
+        return render(request, 'Spotify_control_proxy.html',ret_dict)
 
 
 @login_required(login_url='/Spot-admin')
@@ -1074,7 +1085,6 @@ def UploadData(request):
                                 'Address'  : data_col[2], 
                                 'MemNum'   : data_col[3], 
                                 'Date'     : (data_col[4]).strftime(D_format)})
-                    print('hihi')
                     
             #Master account list:
             for i in DB_MA_rawdata:
@@ -1141,7 +1151,7 @@ def UploadProxy(request):
             for proxy in data:
                 id = id_gen(mode_= 'new', list_= ProxyManamentDB.objects.all().values())
                 if proxy['IP'] in IP_list:
-                    code = '527'
+                    code = '602'
                     ret_dict = DB_Proxy_table(code)
                     return render(request, 'Spotify_control_proxy.html',ret_dict)
                 elif proxy['IP'] not in ['IP & Port', None]:
@@ -1154,7 +1164,7 @@ def UploadProxy(request):
                             proxy['ActivatedDate'])
 
             #Return:
-            code = '524'
+            code = '601'
             ret_dict = DB_Proxy_table(code)
             return render(request, 'Spotify_control_proxy.html',ret_dict)
         except Exception as error:
@@ -1175,21 +1185,26 @@ def AddProxy(request):
             DB_Proxy_rawdata = ProxyManamentDB.objects.all().values()
             IP_list          = []
             #Proxy info:
-            PROTOCOL       = request.POST.get('Protocol_n')
-            IP             = request.POST.get('IP_n')
-            PROXY_USER     = request.POST.get('ProxyUser_n')
-            PROXY_PW       = request.POST.get('Proxypw_n')
-            NATION         = request.POST.get('Nation_n')
-            ACTIVATED_DATE = request.POST.get('ActivatedDate_n')
+            PROTOCOL       = request.POST.get('protocol')
+            IP             = request.POST.get('ip')
+            PROXY_USER     = request.POST.get('proxyUser')
+            PROXY_PW       = request.POST.get('proxyPw')
+            NATION         = langcode[request.POST.get('nation')]
+            ACTIVATED_DATE = request.POST.get('activatedDate')
             
             #Proxy list:
             for i in DB_Proxy_rawdata:
                 IP_list.append(i['IP'])
                 
+            #Date handling:
+            temp = str(ACTIVATED_DATE).split('-')
+            ACTIVATED_DATE = f'{temp[2]}/{temp[1]}/{temp[0]}'
+             
+            print('abc')   
             #Update on DB:
             ID = id_gen(mode_= 'new', list_= ProxyManamentDB.objects.all().values())
             if IP in IP_list:
-                code = '527'
+                code = '604'
                 ret_dict = DB_Proxy_table(code)
                 return render(request, 'Spotify_control_proxy.html',ret_dict)
             elif IP not in ['IP & Port', None]:
@@ -1202,7 +1217,7 @@ def AddProxy(request):
                                 ACTIVATED_DATE)
             
             #Return:
-            code = '524'
+            code = '603'
             ret_dict = DB_Proxy_table(code)
             return render(request, 'Spotify_control_proxy.html',ret_dict)
         except Exception as error:
