@@ -1002,6 +1002,61 @@ def EditData(request):
         ret_dict = DB_M_succeed_table(code)
         return render(request, 'Spotify_control.html',ret_dict)
 
+@login_required(login_url='/Spot-admin')
+########## ANCHOR: EditProxy ##########
+def EditProxy(request):   
+    try:
+        if request.method == 'POST':
+            ### Input ###
+            DB_Proxy_rawdata       = ProxyManamentDB.objects.all().values()
+            #Edit info:
+            MA_id              = request.POST.get('id')
+            editted_email      = request.POST.get('email')
+            editted_inviteLink = request.POST.get('inviteLink')
+            editted_address    = request.POST.get('address')
+            current_email      = ''
+            #Others:
+            isMAavailable      = False
+            
+            ### Methods ###
+            #Edit MA info in MasterAccountDB:
+            for MA in DB_Proxy_rawdata:
+                if int(MA_id) == MA['id']:
+                    isMAavailable   = True
+                    #Current data:
+                    current_email      = MA['Username']
+                    #Edit data:
+                    Update = MasterAccountDB.objects.get(id = MA_id)
+                    Update.Username = editted_email
+                    Update.FamLink  = editted_inviteLink
+                    Update.Address  = editted_address
+                    Update.save()
+                    
+                
+            #Edit Account info in MainDB:
+            if isMAavailable:
+                for Account in DB_Proxy_rawdata:
+                    if Account['MasterAccout'] == current_email:
+                        Update = MainDB.objects.get(id = Account['id'])
+                        Update.MasterAccout = editted_email
+                        Update.FamLink      = editted_inviteLink
+                        Update.Address      = editted_address
+                        Update.save()
+                        
+                code = '526'
+                ret_dict = DB_M_succeed_table(code)
+                return render(request, 'Spotify_control.html',ret_dict)
+                    
+            else:
+                code = '525'
+                ret_dict = DB_M_succeed_table(code)
+                return render(request, 'Spotify_control.html',ret_dict)
+            
+    except:
+        code = '999'
+        ret_dict = DB_M_succeed_table(code)
+        return render(request, 'Spotify_control.html',ret_dict)
+
 
 @login_required(login_url='/Spot-admin')
 ########## ANCHOR: UploadData ##########
@@ -1067,7 +1122,7 @@ def UploadData(request):
 ########## ANCHOR: UploadProxy ##########
 def UploadProxy(request):   
     if request.method == 'POST':
-        # try: 
+        try: 
             ### Input ###
             dataset          = Dataset()
             DB_Proxy_rawdata = ProxyManamentDB.objects.all().values()
@@ -1088,12 +1143,11 @@ def UploadProxy(request):
                                  'Proxy_PW'      : data_col[3], 
                                  'Nation'        : data_col[4], 
                                  'ActivatedDate' : (data_col[5]).strftime(D_format)})
-            #Master account list:
+            #Proxy list:
             for i in DB_Proxy_rawdata:
                 IP_list.append(i['IP'])
             #Update on DB:
             for proxy in data:
-                print(proxy)
                 id = id_gen(mode_= 'new', list_= ProxyManamentDB.objects.all().values())
                 if proxy['IP'] in IP_list:
                     code = '527'
@@ -1112,10 +1166,58 @@ def UploadProxy(request):
             code = '524'
             ret_dict = DB_Proxy_table(code)
             return render(request, 'Spotify_control_proxy.html',ret_dict)
-        # except Exception as error:
-        #     code = '999'
-        #     ret_dict = DB_Proxy_table(code)
-        #     return render(request, 'Spotify_control_proxy.html',ret_dict)
+        except Exception as error:
+            code = '999'
+            ret_dict = DB_Proxy_table(code)
+            return render(request, 'Spotify_control_proxy.html',ret_dict)
+    else:
+        code = '532'
+        ret_dict = DB_Proxy_table(code)
+        return render(request, 'Spotify_control_proxy.html',ret_dict)
+    
+@login_required(login_url='/Spot-admin')
+########## ANCHOR: AddProxy ##########
+def AddProxy(request):   
+    if request.method == 'POST':
+        try: 
+            ### Input ###
+            DB_Proxy_rawdata = ProxyManamentDB.objects.all().values()
+            IP_list          = []
+            #Proxy info:
+            PROTOCOL       = request.POST.get('Protocol_n')
+            IP             = request.POST.get('IP_n')
+            PROXY_USER     = request.POST.get('ProxyUser_n')
+            PROXY_PW       = request.POST.get('Proxypw_n')
+            NATION         = request.POST.get('Nation_n')
+            ACTIVATED_DATE = request.POST.get('ActivatedDate_n')
+            
+            #Proxy list:
+            for i in DB_Proxy_rawdata:
+                IP_list.append(i['IP'])
+                
+            #Update on DB:
+            ID = id_gen(mode_= 'new', list_= ProxyManamentDB.objects.all().values())
+            if IP in IP_list:
+                code = '527'
+                ret_dict = DB_Proxy_table(code)
+                return render(request, 'Spotify_control_proxy.html',ret_dict)
+            elif IP not in ['IP & Port', None]:
+                DB_Proxy_upload(ID,
+                                PROTOCOL,      
+                                IP,            
+                                PROXY_USER,    
+                                PROXY_PW,      
+                                NATION,        
+                                ACTIVATED_DATE)
+            
+            #Return:
+            code = '524'
+            ret_dict = DB_Proxy_table(code)
+            return render(request, 'Spotify_control_proxy.html',ret_dict)
+        except Exception as error:
+            code = '999'
+            ret_dict = DB_Proxy_table(code)
+            return render(request, 'Spotify_control_proxy.html',ret_dict)
     else:
         code = '532'
         ret_dict = DB_Proxy_table(code)

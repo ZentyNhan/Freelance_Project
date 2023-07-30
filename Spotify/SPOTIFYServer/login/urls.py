@@ -15,7 +15,9 @@ urlpatterns = [
     path('Spot-SysCtrl/UpdateCode',                 API.UpdateCode, name='UpdateCode'),
     path('Spot-SysCtrl/joinLink/uploadData',        API.UploadData, name='UploadData'),
     path('Spot-SysCtrl/joinLink/uploadProxy',       API.UploadProxy, name='UploadProxy'),
+    path('Spot-SysCtrl/joinLink/addProxy',          API.AddProxy, name='AddProxy'),
     path('Spot-SysCtrl/joinLink/editData',          API.EditData, name='EditData'),
+    path('Spot-SysCtrl/joinLink/editProxy',         API.EditProxy, name='EditProxy'),
     path('LogoutAdmin',                             API.LogoutAdmin, name='LogoutAdmin'),
     #EVENT FETCH:        
     path('verification/delete',                     API.DeleteCode),

@@ -89,7 +89,10 @@
   <div class="toolbar w-100">
     <div class="row">
       <div class="col-md-7 d-flex align-items-end">
-        <button id="btnImport" class="btn btn-primary me-3"><i class="fa-solid fa-file-import me-2"></i>Import</button>
+        {% comment %} FOR NEXT RELEASE {% endcomment %}
+        {% comment %} <button id="btnImport" class="btn btn-primary me-3"><i class="fa-solid fa-file-import me-2"></i>Import</button>  {% endcomment %}
+        {% comment %} FOR NEXT RELEASE {% endcomment %}
+        <button id="btnAddNew" class="btn btn-primary me-3"><i class="fa fa-plus"></i> Add New</button>
         <form id="nation-form" class="nav-item action-nation d-flex flex-row align-items-center gap-3" method="post">
           <div class="loading d-none">
             <div class="spinner-border text-light spinner-border-sm" role="status">
@@ -177,6 +180,7 @@
     </table>
   </div>
   {% include 'Components/Modal.html' with id='confirmImport' title='Import Proxy' confirmText='Import file' only %}
+  {% include 'Components/Modal.html' with id='addNewProxy' title='Add proxy' confirmText='Save' closeText='Cancel' only %}
   <div id="import-form-template" class="d-none">
     <form action="{% url 'UploadProxy' %}" class="p-3 py-2" id="import-form" method="post" enctype="multipart/form-data">
       {% csrf_token %}
@@ -234,6 +238,36 @@
         $importModal.modal('show');
         importFormValidation();
       })
+
+      // Handle show Add New proxy model
+      const $addNewModel = $('#addNewProxy');
+      $addNewModel.find('button.confirm').click(function() {
+        $form = $addNewModel.find('.edit-form');
+        if ($form.isValid()) {
+          $(this).addClass('disabled');
+          $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>`);
+          $editModal.find('.edit-form').submit();
+        } else {
+          if (!$form.find('input.email').val()) {
+            $form.find('div.email .invalid-feedback').html('Email is required');
+          } else {
+            $form.find('div.email .invalid-feedback').html('Email format is invalid');
+          }
+
+          if (!$form.find('input.inviteLink').val()) {
+            $form.find('div.inviteLink .invalid-feedback').html('Invite link is required');
+          } else {
+            $form.find('div.inviteLink .invalid-feedback').html('Invite link must start with https://www.spotify.com/...');
+          }
+
+          if (!$form.find('input.address').val()) {
+            $form.find('div.address .invalid-feedback').html('Address is required');
+          }
+        }
+        $form.addClass('was-validated');
+      });
 
       // Handle show toast messages import
       const submitStatus = `{{ status }}`;
