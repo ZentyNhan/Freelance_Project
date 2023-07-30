@@ -193,6 +193,7 @@
   </div>
   {% include 'Components/Modal.html' with id='confirmImport' title='Import Proxy' confirmText='Import file' only %}
   {% include 'Components/Modal.html' with id='addNewProxy' title='Add proxy' confirmText='Add' closeText='Cancel' only %}
+  {% include 'Components/Modal.html' with id='editProxy' title='Edit proxy' confirmText='Save' closeText='Cancel' only %}
   <div id="import-form-template" class="d-none">
     <form action="{% url 'UploadProxy' %}" class="p-3 py-2" id="import-form" method="post" enctype="multipart/form-data">
       {% csrf_token %}
@@ -311,8 +312,8 @@
 
       // Handle show Add New proxy model
       const $addNewModel = $('#addNewProxy');
-      $addNewModel.find('button.confirm').click(function() {
-        $form = $addNewModel.find('#add-proxy-form');
+      const handleSubmitProxy = function($modal) {
+        $form = $modal.find('#add-proxy-form');
         if ($form.isValid()) {
           $(this).addClass('disabled');
           $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
@@ -342,7 +343,8 @@
           }
         }
         $form.addClass('was-validated');
-      });
+      }
+      $addNewModel.find('button.confirm').click(() => handleSubmitProxy($addNewModel));
       $('#btnAddNew').click(function () {
         const $template = $('#add-proxy-template');
         $addNewModel.find('.modal-body').html($template.html());
@@ -375,38 +377,24 @@
         $toast.toast('show');
       }
 
-      // Handle show import confirm modal
-      const $exportModal = $('#confirmExport');
-      $exportModal.find('button.confirm').click(function() {
-        $(this).addClass('disabled');
-        $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>`);
-        $("#export-form").trigger( "submit" );
-        $exportModal.modal('toggle');
-      })
-      $('#btnExport').click(function() {
-        $exportModal.find('button.confirm').removeClass('disabled').html('Export data');
-        $exportModal.find('.modal-body').html($('#export-form-template').html());
-        $exportModal.modal('show');
-      })
-
-      // Setup delete join account buttons 
+      // Setup edit proxy buttons 
+      const $editProxyModel = $('#editProxy');
+      $editProxyModel.find('button.confirm').click(() => handleSubmitProxy($editProxyModel));
       const setupEditButtons = () => {
         $('.proxy-edit').click(function(event) {
           event.preventDefault();
           const rowId = $(this).data('row-id');
           const $template = $('#add-proxy-template');
-          $addNewModel.find('.modal-body').html($template.html());
-          $addNewModel.find('form').prepend(`<input type="hidden" name="id" value="${rowId}" />`);
-          $addNewModel.find('form').attr('action', `{% url 'EditProxy' %}`);
-          $addNewModel.find('input.protocol').val($(this).data('protocol'));
-          $addNewModel.find('input.ip').val($(this).data('ip'));
-          $addNewModel.find('input.proxyUser').val($(this).data('proxyuser'));
-          $addNewModel.find('input.proxyPw').val($(this).data('proxypw'));
-          $addNewModel.find('input.nation').val($(this).data('nationcode'));
-          $addNewModel.find('input.activatedDate').val($(this).data('activateddate').split("/").reverse().join("-"));
-          $addNewModel.modal('show');
+          $editProxyModel.find('.modal-body').html($template.html());
+          $editProxyModel.find('form').prepend(`<input type="hidden" name="id" value="${rowId}" />`);
+          $editProxyModel.find('form').attr('action', `{% url 'EditProxy' %}`);
+          $editProxyModel.find('input.protocol').val($(this).data('protocol'));
+          $editProxyModel.find('input.ip').val($(this).data('ip'));
+          $editProxyModel.find('input.proxyUser').val($(this).data('proxyuser'));
+          $editProxyModel.find('input.proxyPw').val($(this).data('proxypw'));
+          $editProxyModel.find('input.nation').val($(this).data('nationcode'));
+          $editProxyModel.find('input.activatedDate').val($(this).data('activateddate').split("/").reverse().join("-"));
+          $editProxyModel.modal('show');
         })
       }
       $table.on('all.bs.table', function () {
