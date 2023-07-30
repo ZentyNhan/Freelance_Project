@@ -180,13 +180,70 @@
     </table>
   </div>
   {% include 'Components/Modal.html' with id='confirmImport' title='Import Proxy' confirmText='Import file' only %}
-  {% include 'Components/Modal.html' with id='addNewProxy' title='Add proxy' confirmText='Save' closeText='Cancel' only %}
+  {% include 'Components/Modal.html' with id='addNewProxy' title='Add proxy' confirmText='Add' closeText='Cancel' only %}
   <div id="import-form-template" class="d-none">
     <form action="{% url 'UploadProxy' %}" class="p-3 py-2" id="import-form" method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <div>
         <label class="form-label" for="uploadProxy-name">File import</label>
         <input type="file" class="form-control form-control-md required-field" id="uploadProxy-name" name="uploadProxy-name" />
+      </div>
+    </form>
+  </div>
+  <div id="add-proxy-template" class="d-none">
+    <form action="{% url 'AddProxy' %}" class="p-3 py-2" id="add-proxy-form" method="post" enctype="multipart/form-data">
+      <!--       
+      csrfmiddlewaretoken
+      protocol
+      ip
+      proxyUser
+      proxyPw
+      nation
+      activatedDate
+      -->
+      {% csrf_token %}
+      <div class="mb-4 protocol">
+        <label for="protocol">Protocol</label>
+        <input type="text" id="protocol" class="form-control required protocol" name="protocol" required placeholder="Enter protocol"/>
+        <div class="invalid-feedback"></div>
+      </div>
+    
+      <div class="mb-4 ip">
+        <label for="ip" >IP</label>
+        <input type="text" id="ip" class="form-control required ip" 
+          name="ip" required placeholder="Enter IP"/>
+        <div class="invalid-feedback"></div>
+      </div>
+  
+      <div class="mb-4 proxyUser">
+        <label for="proxyUser" >Proxy user</label>
+        <input type="text" id="proxyUser" class="form-control required proxyUser" name="proxyUser" required placeholder="Enter proxy user"/>
+        <div class="invalid-feedback"></div>
+      </div>
+
+      <div class="mb-4 proxyPw">
+        <label for="proxyPw" >Proxy password</label>
+        <input type="text" id="proxyPw" class="form-control required proxyPw" name="proxyPw" required placeholder="Enter proxy password"/>
+        <div class="invalid-feedback"></div>
+      </div>
+
+      <div class="mb-4">
+        <label for="nation" class="form-label">Nation</label>
+        <select class="form-select me-2 required-field" aria-label="nation"
+          id="nation" name="nation">
+          <option value ="IN">Indian</option>
+          <option value ="TR">Turkey</option>
+          <option value ="VN">Vietnam</option>
+          <option value ="US">USA</option>
+          <option value ="JP">Japan</option>
+          <option value ="CN">China</option>
+        </select>
+      </div>
+
+      <div class="mb-4 activatedDate">
+        <label for="activatedDate" class="form-label">Activated Date</label>
+        <input type="date" class="form-control activatedDate" id="activatedDate" name="activatedDate" placeholder="Enter activated date" required>
+        <div class="invalid-feedback"></div>
       </div>
     </form>
   </div>
@@ -242,44 +299,53 @@
       // Handle show Add New proxy model
       const $addNewModel = $('#addNewProxy');
       $addNewModel.find('button.confirm').click(function() {
-        $form = $addNewModel.find('.edit-form');
+        $form = $addNewModel.find('#add-proxy-form');
         if ($form.isValid()) {
           $(this).addClass('disabled');
           $(this).html(`<div class="spinner-border text-light spinner-border-sm" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>`);
-          $editModal.find('.edit-form').submit();
+          $form.submit();
         } else {
-          if (!$form.find('input.email').val()) {
-            $form.find('div.email .invalid-feedback').html('Email is required');
-          } else {
-            $form.find('div.email .invalid-feedback').html('Email format is invalid');
+          if (!$form.find('input.protocol').val()) {
+            $form.find('div.protocol .invalid-feedback').html('Protocol is required');
           }
 
-          if (!$form.find('input.inviteLink').val()) {
-            $form.find('div.inviteLink .invalid-feedback').html('Invite link is required');
-          } else {
-            $form.find('div.inviteLink .invalid-feedback').html('Invite link must start with https://www.spotify.com/...');
+          if (!$form.find('input.ip').val()) {
+            $form.find('div.ip .invalid-feedback').html('IP is required');
           }
 
-          if (!$form.find('input.address').val()) {
-            $form.find('div.address .invalid-feedback').html('Address is required');
+          if (!$form.find('input.proxyUser').val()) {
+            $form.find('div.proxyUser .invalid-feedback').html('Proxy user is required');
+          }
+
+          if (!$form.find('input.proxyPw').val()) {
+            $form.find('div.proxyPw .invalid-feedback').html('Proxy password is required');
+          }
+
+          if (!$form.find('input.activatedDate').val()) {
+            $form.find('div.activatedDate .invalid-feedback').html('Activated date is required');
           }
         }
         $form.addClass('was-validated');
       });
+      $('#btnAddNew').click(function () {
+        const $template = $('#add-proxy-template');
+        $addNewModel.find('.modal-body').html($template.html());
+        $addNewModel.modal('show');
+      })
 
       // Handle show toast messages import
       const submitStatus = `{{ status }}`;
       const submitDetail = `{{ detail }}`;
-      if (submitStatus === 'Upload successfully') {
+      if (submitStatus === 'Add proxy successfully') {
         const $toast = $('#toast-list .toast-success');
-        $toast.find('.toast-title').html('Import successfully');
-        $toast.find('.toast-body').html('Import proxy successfully');
+        $toast.find('.toast-title').html('Add proxy successfully');
+        $toast.find('.toast-body').html('Add new proxy successfully');
         $toast.toast('show');
-      } else if (submitStatus === 'Upload failed') {
+      } else if (submitStatus === 'Add proxy failed') {
         const $toast = $('#toast-list .toast-danger');
-        $toast.find('.toast-title').html('Import failed');
+        $toast.find('.toast-title').html('Add proxy failed');
         $toast.find('.toast-body').html(submitDetail);
         $toast.toast('show');
       }
