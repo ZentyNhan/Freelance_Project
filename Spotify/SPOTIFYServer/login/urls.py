@@ -21,7 +21,8 @@ urlpatterns = [
     path('LogoutAdmin',                             API.LogoutAdmin, name='LogoutAdmin'),
     #EVENT FETCH:        
     path('verification/delete',                     API.DeleteCode),
-    path('joinLink/delete',                         API.DeleteAccount),
+    path('joinLink/delete',                         API.DeleteAccount), 
+    path('proxyManage/delete',                      API.DeleteProxy), #Delete Proxy
     path('Spot-SysCtrl/changeNation',               API.ChangeNation),
     #TEST:        
     path('resp',                                    API.get_test_rep),

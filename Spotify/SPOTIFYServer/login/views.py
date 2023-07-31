@@ -90,6 +90,10 @@ def DB_VC_list():
 
 def DB_M_list():
     rawdata = list(MainDB.objects.all().values())
+    return rawdata 
+ 
+def DB_Proxy_list():
+    rawdata = list(ProxyManamentDB.objects.all().values())
     return rawdata   
 
 def DB_VC_Valid_amount():
@@ -547,6 +551,39 @@ def DeleteAccount(request):
         ret_dict = DB_M_succeed_table(code)
         return JsonResponse(ret_dict, status=404)
     
+########## ANCHOR: DeleteProxy ##########: Delete
+@login_required(login_url='/Spot-admin')
+def DeleteProxy(request):
+    try:
+        ### Input ###  
+        Proxy_list   = DB_Proxy_list()
+        #Get info from admin:
+        input_id = request.POST.get('id') #str
+        #Others:
+        PROXY_ID = []
+        
+        ### Functions ###
+        for i in Proxy_list:
+            #Get proxy id info:
+            PROXY_ID.append(i['id'])
+        
+        if int(input_id) in PROXY_ID:
+            #Delete object:
+            ProxyManamentDB.objects.get(id=input_id).delete()
+            #Update objects order:
+            code     = '530' 
+            ret_dict = DB_Proxy_table(code)
+            return JsonResponse(ret_dict, status=200)
+        else:
+            code     = '529'
+            ret_dict = DB_Proxy_table(code)
+            return JsonResponse(ret_dict, status=404)
+            
+    except:
+        code     = '999'
+        ret_dict = DB_Proxy_table(code)
+        return JsonResponse(ret_dict, status=404)
+    
 ########## ANCHOR: DeleteCode ##########: Delete 
 @login_required(login_url='/Spot-admin')
 def DeleteCode(request):
@@ -610,132 +647,6 @@ def ChangeNation(request):
         code     = '999' 
         ret_dict = DB_Proxy_table(code)
         return JsonResponse(ret_dict, status=404)
-
-#(***OBSOLETED***)
-########## ANCHOR: UpdateCode ##########: Update / Delete / Edit 
-@login_required(login_url='/Spot-admin')
-def UpdateCode(request):
-    try:
-        ### Input ###  
-        VC_list          = DB_VC_list()
-        #Get info from admin:
-        input_id         = request.POST.get('cid-input-name') #str
-        input_edit_value = request.POST.get('VClistedit_n')   #str
-        #Others:
-        length           = len(VerificationCodeDB.objects.all().values())
-        isUsedCode       = False
-        VC_ID            = []
-        VC_ID_RANGE      = []
-
-        ### Functions ###
-        #Get VC id info and check if used code:
-        for i in VC_list:
-            #Get VC id info:
-            VC_ID.append(i['id'])
-            #Check if used code:
-            if str(i['id']) == input_id and \
-               i['Status'] == 'used':
-                isUsedCode = True
-        
-        #id input handling: is_integer
-        if ":" in input_id and str(input_id).count(':') == 1:
-            lim     = str(input_id).split(':')
-            lim_max = int(max(lim))
-            lim_min = int(min(lim))
-            for i in VC_ID:
-                if i <= lim_max and i >= lim_min:
-                    VC_ID_RANGE.append(int(i))
-        elif input_id == 'all':
-            VC_ID_RANGE = VC_ID
-        else:
-            pass
-
-        #Update list:
-        if 'ul-btn-n' in request.POST: 
-            ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}
-
-        #Delete list:
-        elif 'dl-btn-n' in request.POST: 
-            if input_id == '':
-                code = '516'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-            elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
-                #Delete object:
-                for id_i in VC_ID_RANGE:
-                    VerificationCodeDB.objects.get(id=id_i).delete()
-                #Update objects order:
-                Update_VC_list = DB_VC_list()
-                code = '530'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
-            elif int(input_id) not in VC_ID:
-                code = '517'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-            elif int(input_id) in VC_ID:
-                #Delete object:
-                VerificationCodeDB.objects.get(id=input_id).delete()
-                #Update objects order:
-                Update_VC_list = DB_VC_list()
-                code = '530'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
-            else:
-                code = '686'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-                
-        #Edit list:
-        elif 'el-btn-n' in request.POST and isUsedCode == False: 
-            if input_id == '':
-                code = '516'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-            elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
-                #Edit object:
-                for id_i in VC_ID_RANGE:
-                    Update_VC_Object = VerificationCodeDB.objects.get(id=id_i)
-                    Update_VC_Object.Status = input_edit_value
-                    Update_VC_Object.Remark = f'Editted on {current_datetime()}'
-                    Update_VC_Object.save()
-                #Update objects order:
-                Update_VC_list = DB_VC_list()
-                code = '531'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
-            elif int(input_id) not in VC_ID:
-                code = '517'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-            elif int(input_id) in VC_ID:
-                #Edit object:
-                Update_VC_Object = VerificationCodeDB.objects.get(id=input_id)
-                Update_VC_Object.Status = input_edit_value
-                Update_VC_Object.Remark = f'Editted on {current_datetime()}'
-                Update_VC_Object.save()
-                #Update objects order:
-                Update_VC_list = DB_VC_list()
-                code = '531'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
-            else:
-                code = '686'
-                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-        #Used code:
-        elif isUsedCode == True:
-            code = '520'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-        else:
-            code = '686'
-            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-
-        #Return:
-        return render(request, 'Spotify_control_vercode.html',ret_dict)
-        #hello anh Nhan, Diem ngiu anh ne ahihi liu liu
-
-    # Value Error:
-    except ValueError:
-        code = '518'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-        return render(request, 'Spotify_control_vercode.html',ret_dict)
-    # Others:
-    except Exception as e:
-        code = '999'
-        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
-        return render(request, 'Spotify_control_vercode.html',ret_dict)
-    
 
 ########## ANCHOR: GenerateCode ##########
 @login_required(login_url='/Spot-admin')
@@ -1189,6 +1100,132 @@ def UploadProxy(request):
         ret_dict = DB_Proxy_table(code)
         return render(request, 'Spotify_control_proxy.html',ret_dict)
     
+#(***OBSOLETED***)
+########## ANCHOR: UpdateCode ##########: Update / Delete / Edit 
+@login_required(login_url='/Spot-admin')
+def UpdateCode(request):
+    try:
+        ### Input ###  
+        VC_list          = DB_VC_list()
+        #Get info from admin:
+        input_id         = request.POST.get('cid-input-name') #str
+        input_edit_value = request.POST.get('VClistedit_n')   #str
+        #Others:
+        length           = len(VerificationCodeDB.objects.all().values())
+        isUsedCode       = False
+        VC_ID            = []
+        VC_ID_RANGE      = []
+
+        ### Functions ###
+        #Get VC id info and check if used code:
+        for i in VC_list:
+            #Get VC id info:
+            VC_ID.append(i['id'])
+            #Check if used code:
+            if str(i['id']) == input_id and \
+               i['Status'] == 'used':
+                isUsedCode = True
+        
+        #id input handling: is_integer
+        if ":" in input_id and str(input_id).count(':') == 1:
+            lim     = str(input_id).split(':')
+            lim_max = int(max(lim))
+            lim_min = int(min(lim))
+            for i in VC_ID:
+                if i <= lim_max and i >= lim_min:
+                    VC_ID_RANGE.append(int(i))
+        elif input_id == 'all':
+            VC_ID_RANGE = VC_ID
+        else:
+            pass
+
+        #Update list:
+        if 'ul-btn-n' in request.POST: 
+            ret_dict = {'table' : VC_list, 'valid_amount' : DB_VC_Valid_amount()}
+
+        #Delete list:
+        elif 'dl-btn-n' in request.POST: 
+            if input_id == '':
+                code = '516'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
+                #Delete object:
+                for id_i in VC_ID_RANGE:
+                    VerificationCodeDB.objects.get(id=id_i).delete()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '530'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            elif int(input_id) not in VC_ID:
+                code = '517'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif int(input_id) in VC_ID:
+                #Delete object:
+                VerificationCodeDB.objects.get(id=input_id).delete()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '530'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            else:
+                code = '686'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+                
+        #Edit list:
+        elif 'el-btn-n' in request.POST and isUsedCode == False: 
+            if input_id == '':
+                code = '516'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif set(VC_ID_RANGE).issubset(set(VC_ID)) and VC_ID_RANGE != []:
+                #Edit object:
+                for id_i in VC_ID_RANGE:
+                    Update_VC_Object = VerificationCodeDB.objects.get(id=id_i)
+                    Update_VC_Object.Status = input_edit_value
+                    Update_VC_Object.Remark = f'Editted on {current_datetime()}'
+                    Update_VC_Object.save()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '531'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            elif int(input_id) not in VC_ID:
+                code = '517'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+            elif int(input_id) in VC_ID:
+                #Edit object:
+                Update_VC_Object = VerificationCodeDB.objects.get(id=input_id)
+                Update_VC_Object.Status = input_edit_value
+                Update_VC_Object.Remark = f'Editted on {current_datetime()}'
+                Update_VC_Object.save()
+                #Update objects order:
+                Update_VC_list = DB_VC_list()
+                code = '531'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], Update_VC_list, DB_VC_Valid_amount())
+            else:
+                code = '686'
+                ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        #Used code:
+        elif isUsedCode == True:
+            code = '520'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        else:
+            code = '686'
+            ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+
+        #Return:
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+        #hello anh Nhan, Diem ngiu anh ne ahihi liu liu
+
+    # Value Error:
+    except ValueError:
+        code = '518'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+    # Others:
+    except Exception as e:
+        code = '999'
+        ret_dict = ret_dict_met(lib.ResConfig.ResponseCode[code]['status'], lib.ResConfig.ResponseCode[code]['detail']['admin'], VC_list, DB_VC_Valid_amount())
+        return render(request, 'Spotify_control_vercode.html',ret_dict)
+    
+        
 @login_required(login_url='/Spot-admin')
 ########## ANCHOR: AddProxy ##########
 def AddProxy(request):   
